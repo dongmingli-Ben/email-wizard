@@ -102,13 +102,18 @@ recall         0.800000      0.270833  0.500000
 f1             0.644386      0.260417  0.480247
 ```
 
-Another evalutation on the same data:
+Another 2 evalutations on the same data:
 
 ```
            notification  registration  activity
 precision      0.606667      0.254167  0.469136
 recall         0.800000      0.270833  0.500000
 f1             0.651053      0.260417  0.480247
+
+           notification  registration  activity
+precision      0.615000      0.295833  0.432099
+recall         0.800000      0.312500  0.462963
+f1             0.656507      0.302083  0.443210
 ```
 
 Analysis: most errors are due to incorrect year (since year is not provided to the parser).

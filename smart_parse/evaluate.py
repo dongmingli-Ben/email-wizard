@@ -221,8 +221,10 @@ class Evaluator:
             info = self.summarize()
             return info
         
+        sem = asyncio.Semaphore(n_parallel)
+        
         async def async_increment_evaluate(hyp, ref):
-            async with asyncio.Semaphore(n_parallel):
+            async with sem:
                 await asyncio.to_thread(self.increment_evaluate, hyp, ref)
 
         async def async_evaluate(hyps, refs):
