@@ -25,8 +25,8 @@ def get_prompt(email: dict, **kwargs) -> str:
 
     {
         "event_type": "activity",
-        "start_time": "2023-01-01T00:00:00 Asia/Shanghai",
-        "end_time": "unspecified",  // it means the end time is not in the email
+        "start_time": "2023-01-01T07:00:00 Asia/Shanghai",
+        "end_time": "2023-01-01T09:00:00 Asia/Shanghai",  // if you cannot find the end time in the email, use "unspecified"
         "summary": "what is the activity about?",
         // include the url link if the activity will take place online
         "venue": "where will the activity take place?"  
@@ -38,7 +38,7 @@ def get_prompt(email: dict, **kwargs) -> str:
 
     {
         "event_type": "registration",
-        "end_time": "2023-01-01T00:00:00 US/Pacific",
+        "end_time": "2023-01-01T00:00:00 US/Pacific",  // if you are unsure, use "unspecified"
         "summary": "what is the registration about?",
         "venue": "Is there a registration link? If there is one, include it. If not, just leave it empty."
     }
@@ -80,5 +80,5 @@ if __name__ == '__main__':
     import json
     with open(r'smart_parse\data\origin-email.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
-    prompt = get_prompt(data[2], timezone='Asia/Shanghai')
+    prompt = get_prompt(data[5], timezone='Asia/Shanghai')
     print(prompt)

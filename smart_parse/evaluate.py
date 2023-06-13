@@ -242,7 +242,7 @@ if __name__ == "__main__":
     evaluator = Evaluator()
 
     import json
-    with open(r'smart_parse\predictions\time_and_tz.json', 'r', encoding='utf-8') as f:
+    with open(r'smart_parse\predictions\time_and_tz-new.json', 'r', encoding='utf-8') as f:
         hyps = json.load(f)
     with open(r'smart_parse\data\raw-dataset-tz.json', 'r', encoding='utf-8') as f:
         refs = json.load(f)
