@@ -32,11 +32,11 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### B1. parse plain text for summary and dates
 
-- [ ] construct prompts for ChatGPT/GPT
+- [x] construct prompts for ChatGPT/GPT
   - [x] build a small dataset of emails and the structured summary
   - [ ] explore different models and different prompts
     - [x] set up evaluation metrics
-    - [ ] concurrent ChatGPT requests
+    - [x] concurrent ChatGPT requests
 - [x] use OpenAI API or other models to get structured summary
   - [x] obtain model output from prompts
   - [x] parse model output into structured summary
