@@ -117,3 +117,12 @@ f1             0.656507      0.302083  0.443210
 ```
 
 Analysis: most errors are due to incorrect year (since year is not provided to the parser).
+
+### Add Received Dates and User Timezone
+
+```
+           notification  registration  activity
+precision      0.428571      0.306667  0.701923
+recall         0.428571      0.280000  0.711538
+f1             0.428571      0.285333  0.699634
+```
