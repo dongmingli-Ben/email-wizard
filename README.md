@@ -40,6 +40,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [x] use OpenAI API or other models to get structured summary
   - [x] obtain model output from prompts
   - [x] parse model output into structured summary
+- [ ] migrate to langchain
 
 #### C1. store summary to database
 
