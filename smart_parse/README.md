@@ -126,3 +126,14 @@ precision      0.578571      0.354167  0.711538
 recall         0.600000      0.354167  0.698718
 f1             0.586364      0.354167  0.701465
 ```
+
+### OpenAI 06-13 Model Update
+
+Note that the model for evaluation also changes.
+
+```
+           notification  registration  activity
+precision      0.438406      0.333333  0.760417
+recall         0.478261      0.347826  0.770833
+f1             0.450311      0.339130  0.757937
+```

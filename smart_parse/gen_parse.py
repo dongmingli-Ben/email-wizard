@@ -77,5 +77,5 @@ def gen_predictions(src_path, tgt_path, n_parallel: int = 0, **kwargs):
 
 if __name__ == '__main__':
     # gen_predictions(r'smart_parse\data\origin-email.json', r'smart_parse\predictions\test.json')
-    gen_predictions(r'smart_parse\data\origin-email.json', r'smart_parse\predictions\time_and_tz-new.json', 
+    gen_predictions(r'smart_parse\data\origin-email.json', r'smart_parse\predictions\time_and_tz-0614-openai-update.json', 
                     n_parallel=20, timezone='Asia/Shanghai')
