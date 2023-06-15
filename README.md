@@ -29,6 +29,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] discard image (for now)
   - [x] extract and keep plain text content
   - [x] extract email subject, sender, date and time
+- [ ] deploy with microservice (together with A1)
 
 #### B1. parse plain text for summary and dates
 
@@ -40,27 +41,43 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [x] use OpenAI API or other models to get structured summary
   - [x] obtain model output from prompts
   - [x] parse model output into structured summary
-- [ ] migrate to langchain
+- [ ] migrate to langchain?
+- [ ] deploy with microservice
 
 #### C1. store summary to database
 
-- [ ] store summary with user id and email id as primary key to a database
-- [ ] provide retrieval api to retrieve summary from database for a single user
-    - [ ] database engine?
+- [ ] design API protocol
+  - [ ] CRUD operations interface
+- [ ] Implement APIs
+  - [ ] database design
+    - [ ] choose database engine
+    - [ ] design database schema
+  - [ ] create (C) records for users and emails
+  - [ ] read (R) records of users, emails, and parsed events
+  - [ ] update (U) records of users, emails, and parsed events
+  - [ ] delete (D) records of users, emails, and parsed events
+- [ ] deploy as a microservice
 
 #### C2. API requests
-- [ ] receive requests from users: events, date, organizer... 
-  - [ ] web application framework?
-- [ ] retrieve data from summary data base
-- [ ] send data to canlendar view
+
+- [ ] backend API interface design
+  - [ ] refresh events, query events, and more
+- [ ] handle requests by interacting with microservices
+  - [ ] choose microservice framework
+  - [ ] implement logic with prepared microservices
+    - [ ] retrieve emails from user mailboxes
+    - [ ] extract new emails
+    - [ ] parse to events
+    - [ ] store results to database
+    - [ ] query database for results
+- [ ] deploy with microservice
 
 #### C3. calendar view UI
 
 - [ ] frontend UI design and development
   - [ ] UI wireframe
   - [ ] build UI with React
-- [ ] connect to backend api to retrieve structured summary
-  - [ ] develop backend api and deploy it to a server
+- [ ] deploy to production server
 
 ### Stage 2
 
@@ -72,7 +89,11 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 - [ ] handle html content
 
-#### C3. update calendar
+#### B1. parse plain text for summary and dates
+
+- [ ] improve throughput with asynchronous service (possibly through message queues)
+
+#### C4. update calendar
 
 - [ ] add/remove events in user calendar based on user actions
   - [ ] find libraries to access user calendar (possibly outlook calendar)
