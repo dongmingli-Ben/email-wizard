@@ -46,8 +46,15 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 - [ ] store summary with user id and email id as primary key to a database
 - [ ] provide retrieval api to retrieve summary from database for a single user
+    - [ ] database engine?
 
-#### C2. calendar view UI
+#### C2. API requests
+- [ ] receive requests from users: events, date, organizer... 
+  - [ ] web application framework?
+- [ ] retrieve data from summary data base
+- [ ] send data to canlendar view
+
+#### C3. calendar view UI
 
 - [ ] frontend UI design and development
   - [ ] UI wireframe
