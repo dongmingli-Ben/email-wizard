@@ -19,7 +19,7 @@ class Evaluator:
         self.log_path = os.path.join(log_dir, datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S') + '.log')
 
     def __len__(self):
-        return len(self.activity_results)
+        return len(self.acti_results)
 
     def summarize_results(self, results: List[dict]) -> dict:
         p_scores, r_scores, f_scores = [], [], []
