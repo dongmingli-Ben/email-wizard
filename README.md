@@ -92,6 +92,19 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### B1. parse plain text for summary and dates
 
 - [ ] improve throughput with asynchronous service (possibly through message queues)
+- [ ] refine API interface
+
+#### C1. store summary to database
+
+- [ ] refine API interface
+
+#### C2. API requests
+
+- [ ] refine API interface
+
+#### C3. calendar view UI
+
+- [ ] refine API interface
 
 #### C4. update calendar
 
