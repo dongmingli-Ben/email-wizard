@@ -31,7 +31,7 @@ if __name__ == "__main__":
     import json
 
     raw_emails = retrieve_email_bytes_list(
-        user_config=json.load(open("config.json")),
+        user_config=json.load(open("./config/outlook.json")),
         n_mails=10,
     )
     print(raw_emails[0])

@@ -3,7 +3,7 @@ import os, atexit, msal
 import requests
 
 TOKEN_CACHE_PATH = (
-    "D:/OneDrive - CUHK-Shenzhen/myfolder/6/email-wizard/retrieve/msal_cache.bin"
+    "config/msal_cache.bin"
 )
 APP_CLIENT_ID = "34fe7958-6ad4-438e-8218-cb028e47fe40"
 
