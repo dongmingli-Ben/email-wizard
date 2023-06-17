@@ -1,0 +1,1 @@
+docker build -t pyemail:v0.0 .
