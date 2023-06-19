@@ -53,3 +53,25 @@ python main.py --config config/email.json --n-mails 10
 ```
 
 You may be prompted to grant permission in a popup window.
+
+### As a Service
+
+A script to setup email retrival as a microservice through gRPC is prepared.
+
+To set up the service:
+
+```bash
+cd email
+bash run_server.py
+```
+
+The API documentation about the service is available at [docs/API.md](../docs/API.md). Please check it out. Or use the test script to see how it works.
+
+To test the service is up and running:
+
+```bash
+cd email
+bash test_server.sh  # after you have setup the email config under config
+```
+
+If the service is healthy and responding, you should be able to see a list of emails in JSON format.

@@ -29,7 +29,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] discard image (for now)
   - [x] extract and keep plain text content
   - [x] extract email subject, sender, date and time
-- [ ] deploy with microservice (together with A1)
+- [x] deploy with microservice (together with A1)
 
 #### B1. parse plain text for summary and dates
 
