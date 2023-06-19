@@ -14,5 +14,22 @@ n_mails: int
 Response:
 
 ```
-emails: json string
+message: json string
+```
+
+## `parse` service
+
+### ParseEmail
+
+Request:
+
+```
+email: json string
+additional_info: json string
+```
+
+Response:
+
+```
+message: json string
 ```

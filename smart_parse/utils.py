@@ -6,6 +6,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 def get_response(input: str, max_retry: int = 5) -> str:
+    error = None
     for i in range(max_retry):
         try:
             response = openai.ChatCompletion.create(
@@ -25,5 +26,6 @@ def get_response(input: str, max_retry: int = 5) -> str:
             message = ''.join([m.get('content', '') for m in collected_messages])
             return message
         except Exception as e:
+            error = e
             continue
-    raise e
+    raise error

@@ -21,17 +21,19 @@ def clean_to_json(response: str) -> dict:
 
 def get_parse_results(email: dict, max_patience: int = 5, **kwargs) -> dict:
     prompt = get_prompt(email, **kwargs)
+    patience = max_patience
+    # import pdb; pdb.set_trace()
     while True:
         try:
             raw_result = get_response(prompt)
             result = clean_to_json(raw_result)
             break
         except Exception as e:
-            if max_patience == 0:
+            if patience == 0:
                 print('Fail to get results after', max_patience, 'trials')
                 return {"event": []}
             print('Retrying after exception:', e)
-            max_patience -= 1
+            patience -= 1
     return result
 
 

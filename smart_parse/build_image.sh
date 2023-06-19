@@ -1,0 +1,1 @@
+docker build -t pyparse:v0.0 .
