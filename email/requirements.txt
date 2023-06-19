@@ -1,2 +1,4 @@
 msal
 beautifulsoup4
+grpcio
+grpcio-tools
