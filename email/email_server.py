@@ -31,6 +31,7 @@ def get_emails(user_config, n_mails: int) -> dict:
 class EmailHelper(pd2_grpc.EmailHelperServicer):
 
     def GetEmails(self, request, context):
+        logging.info(f'received request {request}')
         config = json.loads(request.config)
         n_mails = request.n_mails
         emails = get_emails(config, n_mails)

@@ -1,1 +1,1 @@
-docker run -it --net=host --ipc=host --privileged=true -v /home/toymaker/projects/email-wizard:/mnt --name email pyemail:v0.0 /bin/bash
+docker run -it --net=host --ipc=host --privileged=true -v /home/toymaker/projects/email-wizard:/mnt --name email pyemail:v0.1 /bin/bash
