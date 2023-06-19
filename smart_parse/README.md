@@ -36,6 +36,51 @@ or
 }
 ```
 
+## Run as a service
+
+The parser can be setup as a microservice with gRPC. 
+
+First setup OPENAI_API_KEY:
+
+```bash
+export OPENAI_API_KEY=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
+```
+
+Second (optional) (re)generate the gRPC codes with proto file:
+
+```bash
+cd service
+bash gen_grpc_code.sh
+```
+
+Third run the server:
+
+```bash
+bash run_server.sh
+```
+
+Fourth (optional) test whether the server is healthy and working:
+
+```bash
+bash test_server.sh
+```
+
+Upon success, you should see something like this:
+
+```json
+GetEmails client received: 
+{
+    "events": [
+        {
+            "event_type": "registration",
+            "end_time": "2023-04-06T12:00:00 Asia/Shanghai",
+            "summary": "2023大学杰出毕业生奖提名者自荐材料征集",
+            "venue": "https://wj.cuhk.edu.cn/vm/YVgulbu.aspx"
+        }
+    ]
+}
+```
+
 ## Prompts
 
 ```
