@@ -30,6 +30,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] extract and keep plain text content
   - [x] extract email subject, sender, date and time
 - [x] deploy with microservice (together with A1)
+  - [ ] benchmark microservice performance
 
 #### B1. parse plain text for summary and dates
 
@@ -43,6 +44,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] parse model output into structured summary
 - [ ] migrate to langchain?
 - [x] deploy with microservice
+  - [ ] benchmark microservice performance
 
 #### C1. store summary to database
 
@@ -57,6 +59,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [ ] update (U) records of users, emails, and parsed events
   - [ ] delete (D) records of users, emails, and parsed events
 - [ ] deploy as a microservice
+  - [ ] benchmark microservice performance
 
 #### C2. API requests
 
