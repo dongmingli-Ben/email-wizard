@@ -180,3 +180,4 @@ learning
 # go
 go.work
 go.work.sum
+test.go
