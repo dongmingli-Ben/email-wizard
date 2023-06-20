@@ -176,3 +176,7 @@ predictions
 data
 smart_parse/run.cmd
 learning
+
+# go
+go.work
+go.work.sum
