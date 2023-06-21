@@ -44,7 +44,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] parse model output into structured summary
 - [ ] migrate to langchain?
 - [x] deploy with microservice
-  - [ ] benchmark microservice performance
+  - [x] benchmark microservice performance
 
 #### C1. store summary to database
 
@@ -70,7 +70,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [ ] implement logic with prepared microservices
     - [x] retrieve emails from user mailboxes
     - [ ] extract new emails
-    - [ ] parse to events
+    - [x] parse to events
     - [ ] store results to database
     - [ ] query database for results
 - [ ] deploy with microservice
@@ -87,6 +87,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### A1. retrieve emails
 
 - [ ] support gmail mailboxes
+- [ ] optimize QPS
 
 #### A2. clean email into plain texts
 
@@ -96,6 +97,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 - [ ] improve throughput with asynchronous service (possibly through message queues)
 - [ ] refine API interface
+- [ ] optimize QPS
 
 #### C1. store summary to database
 
