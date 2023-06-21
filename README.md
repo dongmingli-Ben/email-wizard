@@ -12,6 +12,10 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 ![image](assets/workflow.drawio.svg)
 
+### Architecture
+
+![image](assets/architecture.drawio.svg)
+
 ## Tasks
 
 ### Stage 1
@@ -30,7 +34,7 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] extract and keep plain text content
   - [x] extract email subject, sender, date and time
 - [x] deploy with microservice (together with A1)
-  - [ ] benchmark microservice performance
+  - [x] benchmark microservice performance
 
 #### B1. parse plain text for summary and dates
 
