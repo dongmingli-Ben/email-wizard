@@ -114,3 +114,14 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [ ] add/remove events in user calendar based on user actions
   - [ ] find libraries to access user calendar (possibly outlook calendar)
   - [ ] add links to user calendar in UI
+
+
+## Environments
+
+### Benchmarking
+
+Use `ghz` with Docker for benchmarking gRPC microservice performance:
+
+```bash
+DOCKER_BUILDKIT=1 sudo docker build --output=/usr/local/bin --target=ghz-binary-built https://github.com/bojand/ghz.git
+```
