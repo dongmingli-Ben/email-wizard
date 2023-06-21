@@ -42,3 +42,42 @@ Status code distribution:
 Error distribution:
   [6]   rpc error: code = DeadlineExceeded desc = context deadline exceeded
 ```
+
+## parse.ParseEmail
+
+Retrieve a email (timeout after 100s):
+
+```
+Summary:
+  Count:        200
+  Total:        154.60 s
+  Slowest:      47.28 s
+  Fastest:      4.04 s
+  Average:      33.58 s
+  Requests/sec: 1.29
+
+Response time histogram:
+  4038.180  [1]   |
+  8362.642  [8]   |∎∎∎
+  12687.104 [4]   |∎
+  17011.566 [5]   |∎∎
+  21336.028 [9]   |∎∎∎
+  25660.490 [5]   |∎∎
+  29984.952 [7]   |∎∎∎
+  34309.414 [10]  |∎∎∎∎
+  38633.876 [107] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  42958.338 [35]  |∎∎∎∎∎∎∎∎∎∎∎∎∎
+  47282.800 [9]   |∎∎∎
+
+Latency distribution:
+  10 % in 17.21 s 
+  25 % in 34.36 s 
+  50 % in 36.35 s 
+  75 % in 38.14 s 
+  90 % in 41.42 s 
+  95 % in 42.87 s 
+  99 % in 45.61 s 
+
+Status code distribution:
+  [OK]   200 responses
+```
