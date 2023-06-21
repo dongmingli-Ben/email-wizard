@@ -8,7 +8,7 @@ import (
 	"email-wizard/backend/clients"
 )
 
-func main() {
+func test_email() {
 	var user_config map[string]string
 	body, err := os.ReadFile("outlook.json")
 	if err != nil {

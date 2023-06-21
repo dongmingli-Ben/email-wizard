@@ -18,6 +18,7 @@ option java_multiple_files = true;
 option java_package = "io.grpc.parse";
 option java_outer_classname = "ParseProto";
 option objc_class_prefix = "HLW";
+option go_package = "email-wizard/backend/clients/parse_grpc_client";
 
 package parse;
 
