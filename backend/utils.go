@@ -23,6 +23,7 @@ func getUserEmailsFromAccounts(accounts []map[string]string) []map[string]interf
 			all_emails = append(all_emails, e)
 		}
 	}
+	// todo: filter out emails that have been parsed
 	return all_emails
 }
 
