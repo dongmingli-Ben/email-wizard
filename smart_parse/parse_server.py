@@ -12,11 +12,12 @@ from gen_parse import get_parse_results
 class Parser(pd2_grpc.ParserServicer):
 
     def ParseEmail(self, request, context):
-        logging.info(f'received request {request}')
+        logging.debug(f'received request {request}')
         email = json.loads(request.email)
         additional_info = json.loads(request.additional_info)
         result = get_parse_results(email, **additional_info)
         events_json = json.dumps(result)
+        logging.debug(f'events: {json.dumps(result, indent=4, ensure_ascii=False)}')
         return pb2.EmailParseReply(message=events_json)
 
 

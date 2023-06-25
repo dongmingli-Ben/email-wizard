@@ -1,3 +1,4 @@
+import logging
 import openai
 import os
 
@@ -26,6 +27,7 @@ def get_response(input: str, max_retry: int = 5) -> str:
             message = ''.join([m.get('content', '') for m in collected_messages])
             return message
         except Exception as e:
+            logging.warning(f'get error from openai api: {e} remaining retry times {max_retry-i-1}')
             error = e
             continue
     raise error
