@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var N_EMAIL_RETREIVAL int32 = 5
+
 func parsedUserEmailIDs(user_id string) []string {
 	return make([]string, 0)
 }
@@ -28,7 +30,7 @@ func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []ma
 func getUserEmailsFromAccounts(accounts []map[string]string) []map[string]interface{} {
 	all_emails := make([]map[string]interface{}, 0)
 	for _, account := range accounts {
-		emails, _ := clients.GetEmails(account, 50)
+		emails, _ := clients.GetEmails(account, N_EMAIL_RETREIVAL)
 		for _, email := range emails.Items {
 			e := map[string]interface{}{
 				"email_id":  email.EmailID,
