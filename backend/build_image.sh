@@ -1,1 +1,1 @@
-docker build -t goback:v0.2 .
+docker build -t goback:v0.3 .
