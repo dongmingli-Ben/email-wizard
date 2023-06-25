@@ -108,7 +108,7 @@ RUN set -eux; \
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
-RUN apk update && apk add git bash protobuf
+RUN apk update && apk add git bash protobuf curl
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 WORKDIR /mnt
