@@ -67,17 +67,17 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### C2. API requests
 
-- [ ] backend API interface design
-  - [ ] refresh events, query events, and more
-- [ ] handle requests by interacting with microservices
+- [x] backend API interface design
+  - [x] refresh events, query events, and more
+- [x] handle requests by interacting with microservices
   - [x] choose microservice framework
-  - [ ] implement logic with prepared microservices
+  - [x] implement logic with prepared microservices
     - [x] retrieve emails from user mailboxes
-    - [ ] extract new emails
+    - [x] extract new emails
     - [x] parse to events
-    - [ ] store results to database
-    - [ ] query database for results
-- [ ] deploy with microservice
+    - [x] store results to database
+    - [x] query database for results
+- [x] deploy with microservice
 
 #### C3. calendar view UI
 

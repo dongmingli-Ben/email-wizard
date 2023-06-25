@@ -25,7 +25,7 @@ config:
 
 ```json
 {
-    "username": "guangtouqiang1964@outlook.com",
+    "username": "xxx@outlook.com",
     "protocol": "outlook"
 }
 ```
@@ -123,4 +123,34 @@ Response:
         }
     ]
 }
+```
+
+## Backend API Endpoint
+
+### `events` endpoint
+
+This API is meant for all-in-one communication between clients and the backend server. It will automatically authenticate users' secret, update users' events and return their latest events.
+
+Endpoint: `http://public-ip:8080/events`
+
+Params: 
+
+```yaml
+user_id: string
+secret: string
+```
+
+Response: 
+
+A json string of events (something like the below)
+
+```json
+[
+    {
+        "event_type": "registration",
+        "end_time": "2023-04-06T12:00:00 Asia/Shanghai",
+        "summary": "2023大学杰出毕业生奖提名者自荐材料征集",
+        "venue": "https://wj.cuhk.edu.cn/vm/YVgulbu.aspx"
+    }
+]
 ```
