@@ -20,7 +20,7 @@ func test_parse() {
 
 	timezone := "Asia/Shanghai"
 
-	events, err := clients.ParseEmail(email, timezone)
+	events, err := clients.ParseEmail(email, timezone, 5)
 	if err == nil {
 		fmt.Printf("%v events parsed for email\n", len(events))
 		// fmt.Println(events)

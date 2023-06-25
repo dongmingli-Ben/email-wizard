@@ -4,6 +4,7 @@ package clients
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -14,7 +15,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func ParseEmail(email map[string]interface{}, timezone string) ([]map[string]string, error) {
+func parse_email_no_retry(email map[string]interface{}, timezone string) ([]map[string]string, error) {
 	// fmt.Println("try requesting...")
 	// Set up a connection to the server.
 	conn, err := grpc.Dial("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -39,7 +40,7 @@ func ParseEmail(email map[string]interface{}, timezone string) ([]map[string]str
 			"{\"timezone\": \"%v\"}", timezone),
 	})
 	if err != nil {
-		log.Fatalf("Fail to call ParseEmail over gRPC: %v", err)
+		log.Printf("Fail to call ParseEmail over gRPC: %v", err)
 		return []map[string]string{}, err
 	}
 	// log.Printf("response: %s", r.GetMessage())
@@ -64,4 +65,24 @@ func ParseEmail(email map[string]interface{}, timezone string) ([]map[string]str
 	}
 
 	return events, nil
+}
+
+func ParseEmail(email map[string]interface{}, timezone string, max_retry int) ([]map[string]string, error) {
+	events := make([]map[string]string, 0)
+	success := false
+	for i := 0; i < max_retry; i++ {
+		es, err := parse_email_no_retry(email, timezone)
+		if err != nil {
+			log.Printf("parse gRPC client failed, retry with remaining count of %v", max_retry-i-1)
+			continue
+		}
+		events = es
+		success = true
+		break
+	}
+	if success {
+		return events, nil
+	} else {
+		return events, errors.New("parse gRPC client failed after retrying")
+	}
 }
