@@ -82,7 +82,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### C3. calendar view UI
 
 - [ ] frontend UI design and development
-  - [ ] UI wireframe
+  - [x] UI wireframe
   - [ ] build UI with React
 - [ ] deploy to production server
 
