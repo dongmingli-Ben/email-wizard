@@ -1,0 +1,1 @@
+docker build -t react:v0.0 .

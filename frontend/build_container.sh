@@ -1,0 +1,1 @@
+docker run -it --net=host --ipc=host --privileged=true -v /home/toymaker/projects/email-wizard:/mnt --name frontend react:v0.0 /bin/bash
