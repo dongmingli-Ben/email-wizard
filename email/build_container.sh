@@ -1,1 +1,3 @@
-docker run -it --net=host --ipc=host --privileged=true -v /home/toymaker/projects/email-wizard:/mnt --name email pyemail:v0.1 /bin/bash
+code_dir="$(cd "$(dirname "$0")" && cd .. && pwd)"
+
+docker run -it --net=host --ipc=host --privileged=true -v ${code_dir}:/mnt --name email pyemail:v0.1 /bin/bash
