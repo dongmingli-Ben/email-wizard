@@ -5,4 +5,10 @@ import ReactDOM from "react-dom";
 ReactDOM.render(<h1>This is a test. If you see this, it is working</h1>, document.getElementById("root"));
 
 // allows for live updating
+declare const module: {
+  hot: {
+    accept: () => void;
+  };
+};
+
 module.hot.accept();

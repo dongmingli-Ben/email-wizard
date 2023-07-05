@@ -17,7 +17,7 @@
 */
 
 const path = require("path");
-const entryFile = path.resolve(__dirname, "client", "src", "index.js");
+const entryFile = path.resolve(__dirname, "client", "src", "index.tsx");
 const outputDir = path.resolve(__dirname, "client", "dist");
 
 const webpack = require("webpack");
@@ -36,7 +36,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|tsx)$/,
         loader: "babel-loader",
         exclude: /node_modules/,
       },
@@ -62,7 +62,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx"],
+    extensions: ["*", ".js", ".jsx", ".tsx"],
   },
   plugins: isProduction ? [] : [new webpack.HotModuleReplacementPlugin()],
   devServer: {
