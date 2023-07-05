@@ -84,6 +84,10 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [ ] frontend UI design and development
   - [x] UI wireframe
   - [ ] build UI with React
+    - [ ] implement main calendar page (use fake user_id and secret for now)
+    - [ ] implement add email account
+    - [ ] implement login page (get user_id and secret)
+    - [ ] implement logout page
 - [ ] deploy to production server
 
 ### Stage 2
@@ -120,7 +124,6 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [ ] add/remove events in user calendar based on user actions
   - [ ] find libraries to access user calendar (possibly outlook calendar)
   - [ ] add links to user calendar in UI
-
 
 ## Environments
 
