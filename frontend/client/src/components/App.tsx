@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Feed from "../modules/Feed";
-import SideBar from "../modules/SideBar";
+import Feed from "./modules/Feed";
+import SideBar from "./modules/SideBar";
 
 // to use styles, import the necessary CSS files
 import "./App.css";
