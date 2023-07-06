@@ -101,3 +101,7 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add git bash curl
 RUN npm install --save typescript @types/node @types/react @types/react-dom @types/jest @babel/preset-typescript
+RUN npm install --save \
+  @fullcalendar/core \
+  @fullcalendar/react \
+  @fullcalendar/daygrid 
