@@ -5,6 +5,9 @@ import SideBar from "./modules/SideBar";
 // to use styles, import the necessary CSS files
 import "./App.css";
 
+const userId = "jake";
+const userSecret = "secret";
+
 /**
  * Define the "App" component as a function.
  */
@@ -14,8 +17,8 @@ const App = () => {
     // up in the DOM tree
     <>
       <div className="app-container body">
-        <SideBar />
-        <Feed />
+        <SideBar userId={userId} userSecret={userSecret} />
+        <Feed userId={userId} userSecret={userSecret} />
       </div>
     </>
   );
