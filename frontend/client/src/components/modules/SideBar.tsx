@@ -1,6 +1,8 @@
 import React from "react";
 import UserAccountInfo from "./UserAccountInfo";
 
+import "./SideBar.css";
+
 type SideBarProps = {
   userId: string;
   userSecret: string;

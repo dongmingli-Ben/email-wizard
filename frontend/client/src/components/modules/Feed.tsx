@@ -2,6 +2,8 @@ import React from "react";
 import ToolBar from "./ToolBar";
 import Calendar from "./Calendar";
 
+import "./Feed.css";
+
 type FeedProps = {
   userId: string;
   userSecret: string;

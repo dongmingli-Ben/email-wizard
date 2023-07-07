@@ -4,6 +4,7 @@ import SideBar from "./modules/SideBar";
 
 // to use styles, import the necessary CSS files
 import "./App.css";
+import "../utility.css";
 
 const userId = "jake";
 const userSecret = "secret";
