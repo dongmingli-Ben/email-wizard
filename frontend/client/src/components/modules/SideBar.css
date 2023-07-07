@@ -1,0 +1,5 @@
+.sidebar-container {
+  width: 20%;
+  overflow: auto;
+  height: 100vh;
+}

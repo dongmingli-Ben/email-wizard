@@ -58,6 +58,10 @@ form {
   align-items: center;
 }
 
+.u-block {
+  display: block;
+}
+
 .u-inlineBlock {
   display: inline-block;
 }

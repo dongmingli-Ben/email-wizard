@@ -9,7 +9,7 @@ type calendarProps = {
 
 const Calendar = (props: calendarProps) => {
   return (
-    <div className="calendar-container">
+    <div className="calendar-container u-block">
       <FullCalendar
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"

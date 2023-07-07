@@ -3,7 +3,7 @@ import SearchBar from "./SearchBar";
 
 const ToolBar = () => {
   return (
-    <div className="toolbar-container">
+    <div className="toolbar-container u-block">
       <SearchBar />
     </div>
   );

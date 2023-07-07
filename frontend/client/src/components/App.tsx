@@ -17,7 +17,7 @@ const App = () => {
     // <> is like a <div>, but won't show
     // up in the DOM tree
     <>
-      <div className="app-container body">
+      <div className="app-container body u-flex">
         <SideBar userId={userId} userSecret={userSecret} />
         <Feed userId={userId} userSecret={userSecret} />
       </div>
