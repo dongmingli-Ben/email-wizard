@@ -4,5 +4,8 @@
   flex: 1;
   overflow: auto;
   height: 100vh;
-  padding-left: 3%;
+}
+
+.feed-inner-container {
+  padding: 3%;
 }

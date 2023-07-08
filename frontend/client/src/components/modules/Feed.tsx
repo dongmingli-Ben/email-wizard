@@ -12,8 +12,10 @@ type FeedProps = {
 const Feed = (props: FeedProps) => {
   return (
     <div className="feed-container u-relative">
-      <ToolBar />
-      <Calendar userId={props.userId} userSecret={props.userSecret} />
+      <div className="feed-inner-container">
+        <ToolBar />
+        <Calendar userId={props.userId} userSecret={props.userSecret} />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,43 @@
+.search-container {
+  margin-bottom: 1%;
+}
+
+.search-inner-container {
+  height: calc(var(--l) * 2);
+  width: 70%;
+}
+
+.search-input-container {
+  height: inherit;
+  width: 85%;
+  box-sizing: border-box;
+}
+
+.search-btn-container {
+  height: inherit;
+  width: 15%;
+}
+
+.search-input-text-container {
+  height: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  border-top-left-radius: var(--l);
+  border-bottom-left-radius: var(--l);
+  text-indent: var(--l);
+  font-size: var(--l);
+  border-color: var(--primary--dim);
+}
+
+.submit-btn {
+  height: inherit;
+  width: 100%;
+  border-top-right-radius: var(--l);
+  border-bottom-right-radius: var(--l);
+  background-color: var(--primary--dim);
+  border-color: var(--primary--dim);
+  background-image: url("../../../dist/static/icons8-search.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: calc(var(--l) * 2 * 0.7);
+}
