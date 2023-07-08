@@ -3,26 +3,30 @@ import { useState } from "react";
 
 import "./SearchBar.css";
 
-const SearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+type SearchBarProps = {
+  setQuery: (query: string) => void;
+};
+
+const SearchBar = (props: SearchBarProps) => {
+  const [inputQuery, setInputQuery] = useState("");
   return (
     <div className="search-container u-flex u-flex-justifyCenter">
       <div className="search-inner-container u-flex ">
         <div className="search-input-container">
           <input
             type="text"
-            value={searchQuery}
+            value={inputQuery}
             className="search-input-text-container"
             onChange={(event) => {
-              setSearchQuery(event.target.value);
+              setInputQuery(event.target.value);
             }}
           />
         </div>
         <div className="search-btn-container">
           <button
             onClick={() => {
-              console.log(searchQuery);
-              // props.setQuery(inputQuery);
+              console.log(inputQuery);
+              props.setQuery(inputQuery);
             }}
             value=""
             type="submit"

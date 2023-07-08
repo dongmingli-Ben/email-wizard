@@ -5,6 +5,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 type calendarProps = {
   userId: string;
   userSecret: string;
+  query: string;
 };
 
 type EventType = {
@@ -22,8 +23,28 @@ const getAPIEvents = async (userId: string, userSecret: string) => {
   return EVENTS;
 };
 
+const match = (event: EventType, query: string): boolean => {
+  // use a naive match for now
+  let event_words = event.title.toLowerCase().split(" ");
+  let matched_words = event_words.filter(
+    (word) => query.toLowerCase().search(word) !== -1
+  );
+  return matched_words.length > 0;
+};
+
+const search = (events: EventType[], query: string): EventType[] => {
+  console.log("query:", query);
+  if (query === "") {
+    return events;
+  }
+  let matched_events: EventType[] = [];
+  matched_events = events.filter((event) => match(event, query));
+  return matched_events;
+};
+
 const Calendar = (props: calendarProps) => {
   const [events, setEvents] = useState<EventType[]>([]);
+  const [displayEvents, setDisplayEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
     getAPIEvents(props.userId, props.userSecret).then(
@@ -32,13 +53,19 @@ const Calendar = (props: calendarProps) => {
       }
     );
   }, []);
+
+  useEffect(() => {
+    let _events = search(events, props.query);
+    setDisplayEvents(_events);
+  }, [events, props.query]);
+
   return (
     <div className="calendar-container u-block">
       <FullCalendar
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
         weekends={true}
-        events={events}
+        events={displayEvents}
       />
     </div>
   );

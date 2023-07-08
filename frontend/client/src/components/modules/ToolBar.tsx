@@ -1,10 +1,14 @@
 import React from "react";
 import SearchBar from "./SearchBar";
 
-const ToolBar = () => {
+type ToolBarProps = {
+  setQuery: (query: string) => void;
+};
+
+const ToolBar = (props: ToolBarProps) => {
   return (
     <div className="toolbar-container">
-      <SearchBar />
+      <SearchBar setQuery={props.setQuery} />
     </div>
   );
 };
