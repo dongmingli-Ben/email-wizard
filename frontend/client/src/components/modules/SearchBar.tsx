@@ -5,7 +5,7 @@ const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   return (
     <div className="search-container">
-      <div className="search-input-container">
+      <div className="search-input-container u-inlineBlock">
         <input
           type="text"
           value={searchQuery}
@@ -14,7 +14,7 @@ const SearchBar = () => {
           }}
         />
       </div>
-      <div className="search-btn-container">
+      <div className="search-btn-container u-inlineBlock">
         <button
           onClick={() => {
             console.log(searchQuery);
