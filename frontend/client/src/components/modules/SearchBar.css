@@ -27,6 +27,7 @@
   text-indent: var(--l);
   font-size: var(--l);
   border-color: var(--primary--dim);
+  border-style: solid;
 }
 
 .search-input-text-container:focus {

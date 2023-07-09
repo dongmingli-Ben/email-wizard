@@ -18,7 +18,80 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 30%;
+  width: 20%;
   background-color: var(--white);
   padding: var(--l);
+}
+
+.form-group {
+  margin-bottom: 3%;
+}
+
+.form-lable {
+  margin-bottom: 2%;
+}
+
+.dropdown-cell-container {
+  font-size: var(--l);
+  font: inherit;
+  line-height: 1.5;
+  border-radius: 0;
+  border-color: var(--primary--dim);
+  padding: var(--xs);
+}
+
+.form-input-container {
+  font-size: var(--l);
+  font: inherit;
+  border-radius: 0;
+  border-color: var(--primary--dim);
+  padding: var(--xs);
+  box-sizing: border-box;
+  border-style: solid;
+}
+
+.dropdown-cell-container:focus {
+  outline: none;
+  border-color: var(--primary--dim);
+}
+
+.form-input-container:focus {
+  outline: none;
+  border-color: var(--primary--dim);
+}
+
+.add-account-submit-btn,
+.add-account-cancel-btn {
+  border-radius: 0;
+  font-size: var(--l);
+  font: inherit;
+  margin-left: 4%;
+  margin-right: 4%;
+  margin-top: 3%;
+  width: 35%;
+  padding: 3%;
+  box-sizing: border-box;
+  border-style: solid;
+}
+
+.add-account-submit-btn {
+  border-color: var(--primary--dim);
+  background-color: var(--primary--dim);
+  color: var(--white);
+}
+
+.add-account-cancel-btn {
+  border-color: var(--grey);
+  background-color: var(--grey);
+  color: var(--black);
+}
+
+.add-account-submit-btn:hover {
+  box-shadow: 0 0 1px var(--primary--dim);
+  color: var(--white);
+}
+
+.add-account-cancel-btn:hover {
+  box-shadow: 0 0 1px var(--grey);
+  color: var(--black) !important;
 }

@@ -13,7 +13,7 @@ type AddAccountWindowProps = {
 
 const newEmailAccountAPI = async (req): Promise<string> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return req.emailAddress;
+  return req.emailaddress;
 };
 
 const AddAccountWindow = (props: AddAccountWindowProps) => {
@@ -33,6 +33,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
       emailaddress: emailAddress,
       password: password,
     };
+    console.log(req);
     newEmailAccountAPI(req)
       .then((address: string) => {
         props.setUserInfo({
@@ -52,33 +53,43 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
     <div className="add-account-overlay-container">
       <div className="add-account-container">
         <h3 className="u-textCenter">New Email Account</h3>
-        <form onSubmit={handleSubmit} className="add-account-form">
-          <label htmlFor="Email Type">Select Mailbox Type</label>
-          <select
-            className="dropdown-cell-container"
-            value={emailType}
-            onChange={(e) => {
-              setEmailType(e.target.value);
-            }}
-            required
-          >
-            <option value="">-- Select --</option>
-            <option value="outlook">Outlook</option>
-            <option value="IMAP">IMAP</option>
-            <option value="POP3">POP3</option>
-          </select>
-          <label htmlFor="Email Address">Email Address</label>
-          <input
-            type="email"
-            className="form-input-container"
-            value={emailAddress}
-            onChange={(e) => {
-              setEmailAddress(e.target.value);
-            }}
-          />
+        <form onSubmit={handleSubmit} className="add-account-form u-flexColumn">
+          <div className="form-group u-flexColumn">
+            <label htmlFor="Email Type" className="form-lable">
+              Select Mailbox Type
+            </label>
+            <select
+              className="dropdown-cell-container"
+              value={emailType}
+              onChange={(e) => {
+                setEmailType(e.target.value);
+              }}
+              required
+            >
+              <option value="">-- Select --</option>
+              <option value="outlook">Outlook</option>
+              <option value="IMAP">IMAP</option>
+              <option value="POP3">POP3</option>
+            </select>
+          </div>
+          <div className="form-group u-flexColumn">
+            <label htmlFor="Email Address" className="form-lable">
+              Email Address
+            </label>
+            <input
+              type="email"
+              className="form-input-container"
+              value={emailAddress}
+              onChange={(e) => {
+                setEmailAddress(e.target.value);
+              }}
+            />
+          </div>
           {requirePassword(emailType) ? (
-            <>
-              <label htmlFor="Email Password">Password</label>
+            <div className="form-group u-flexColumn">
+              <label htmlFor="Email Password" className="form-lable">
+                Password
+              </label>
               <input
                 type="email"
                 className="form-input-container"
@@ -87,20 +98,25 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                   setPassword(e.target.value);
                 }}
               />
-            </>
+            </div>
           ) : (
             <></>
           )}
-          <button type="submit">Submit</button>
-          <button
-            type="button"
-            onClick={(e) => {
-              props.setAddAccount(false);
-              console.log("setting addAccount to false");
-            }}
-          >
-            Cancel
-          </button>
+          <div className="form-group u-flex u-flex-justifyCenter">
+            <button type="submit" className="add-account-submit-btn u-link">
+              Submit
+            </button>
+            <button
+              type="button"
+              className="add-account-cancel-btn u-link"
+              onClick={(e) => {
+                props.setAddAccount(false);
+                console.log("setting addAccount to false");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>
