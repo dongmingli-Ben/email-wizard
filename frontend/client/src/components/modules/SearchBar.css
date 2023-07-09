@@ -29,6 +29,11 @@
   border-color: var(--primary--dim);
 }
 
+.search-input-text-container:focus {
+  outline: none;
+  border-color: var(--primary--dim);
+}
+
 .submit-btn {
   height: inherit;
   width: 100%;
