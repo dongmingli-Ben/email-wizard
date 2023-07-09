@@ -37,7 +37,17 @@ const App = () => {
           />
           <Feed userId={userId} userSecret={userSecret} />
         </div>
-        {addAccount ? <AddAccountWindow /> : <></>}
+        {addAccount ? (
+          <AddAccountWindow
+            userId={userId}
+            userSecret={userSecret}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
+            setAddAccount={setAddAccount}
+          />
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );

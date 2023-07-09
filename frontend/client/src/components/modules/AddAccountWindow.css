@@ -12,3 +12,13 @@
   ); /* Adjust the overlay color and opacity as needed */
   z-index: 1; /* Higher z-index to place it above the content */
 }
+
+.add-account-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  background-color: var(--white);
+  padding: var(--l);
+}
