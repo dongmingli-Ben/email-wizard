@@ -5,6 +5,7 @@ import "./UserAccountInfo.css";
 type UserAccountInfoProps = {
   userName: string;
   userAccounts: string[];
+  setAddAccount: (status: boolean) => void;
 };
 
 const UserNameBar = (props: { userName: string }) => {
@@ -25,8 +26,19 @@ const UserAccountBars = (props: { userAccounts: string[] }) => {
   );
 };
 
-const AddAccountButton = () => {
-  return <div className="u-link add-account-btn">Add Account</div>;
+const AddAccountButton = (props: {
+  setAddAccount: (status: boolean) => void;
+}) => {
+  return (
+    <div
+      className="u-link add-account-btn"
+      onClick={() => {
+        props.setAddAccount(true);
+      }}
+    >
+      Add Account
+    </div>
+  );
 };
 
 const UserAccountInfo = (props: UserAccountInfoProps) => {
@@ -34,7 +46,7 @@ const UserAccountInfo = (props: UserAccountInfoProps) => {
     <div className="userinfo-container">
       <UserNameBar userName={props.userName} />
       <UserAccountBars userAccounts={props.userAccounts} />
-      <AddAccountButton />
+      <AddAccountButton setAddAccount={props.setAddAccount} />
     </div>
   );
 };

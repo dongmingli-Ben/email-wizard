@@ -1,3 +1,7 @@
 .app-container {
   background-color: var(--primary--dim);
 }
+
+.app-inactive-container {
+  z-index: 10;
+}
