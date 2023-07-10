@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Router } from "@reach/router";
 import CalendarPage from "./pages/CalendarPage";
+import LoginPage from "./pages/LoginPage";
 
 // to use styles, import the necessary CSS files
 import "./App.css";
@@ -16,9 +17,16 @@ const App = () => {
     // <> is like a <div>, but won't show
     // up in the DOM tree
     <>
-      <div className="App-container">
+      <div className="app-container body">
         <Router>
           <CalendarPage path="/" userId={userId} userSecret={userSecret} />
+          <LoginPage
+            path="/login"
+            userId={userId}
+            userSecret={userSecret}
+            setUserId={setUserId}
+            setUserSecret={setUserSecret}
+          />
         </Router>
       </div>
     </>

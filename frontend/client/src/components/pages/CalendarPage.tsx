@@ -23,35 +23,33 @@ const CalendarPage = (props: CalendarPageProps) => {
     // <> is like a <div>, but won't show
     // up in the DOM tree
     <>
-      <div className="app-container body">
-        <div
-          className={`
+      <div
+        className={`
             ${
               addAccount ? "app-inactive-container" : "app-active-container"
             } u-flex
           `}
-        >
-          <SideBar
-            userId={props.userId}
-            userSecret={props.userSecret}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            setAddAccount={setAddAccount}
-          />
-          <Feed userId={props.userId} userSecret={props.userSecret} />
-        </div>
-        {addAccount ? (
-          <AddAccountWindow
-            userId={props.userId}
-            userSecret={props.userSecret}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            setAddAccount={setAddAccount}
-          />
-        ) : (
-          <></>
-        )}
+      >
+        <SideBar
+          userId={props.userId}
+          userSecret={props.userSecret}
+          userInfo={userInfo}
+          setUserInfo={setUserInfo}
+          setAddAccount={setAddAccount}
+        />
+        <Feed userId={props.userId} userSecret={props.userSecret} />
       </div>
+      {addAccount ? (
+        <AddAccountWindow
+          userId={props.userId}
+          userSecret={props.userSecret}
+          userInfo={userInfo}
+          setUserInfo={setUserInfo}
+          setAddAccount={setAddAccount}
+        />
+      ) : (
+        <></>
+      )}
     </>
   );
 };
