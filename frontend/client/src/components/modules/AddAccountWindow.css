@@ -36,28 +36,30 @@
   font: inherit;
   line-height: 1.5;
   border-radius: 0;
-  border-color: var(--primary--dim);
+  border-color: var(--primary);
   padding: var(--xs);
+  border-width: 1px;
 }
 
 .form-input-container {
   font-size: var(--l);
   font: inherit;
   border-radius: 0;
-  border-color: var(--primary--dim);
+  border-color: var(--primary);
   padding: var(--xs);
   box-sizing: border-box;
   border-style: solid;
+  border-width: 1px;
 }
 
 .dropdown-cell-container:focus {
   outline: none;
-  border-color: var(--primary--dim);
+  border-color: var(--primary);
 }
 
 .form-input-container:focus {
   outline: none;
-  border-color: var(--primary--dim);
+  border-color: var(--primary);
 }
 
 .add-account-submit-btn,
@@ -75,8 +77,8 @@
 }
 
 .add-account-submit-btn {
-  border-color: var(--primary--dim);
-  background-color: var(--primary--dim);
+  border-color: var(--primary);
+  background-color: var(--primary);
   color: var(--white);
 }
 
@@ -87,7 +89,7 @@
 }
 
 .add-account-submit-btn:hover {
-  box-shadow: 0 0 1px var(--primary--dim);
+  box-shadow: 0 0 1px var(--primary);
   color: var(--white);
 }
 

@@ -83,6 +83,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               onChange={(e) => {
                 setEmailAddress(e.target.value);
               }}
+              required
             />
           </div>
           {requirePassword(emailType) ? (
