@@ -92,7 +92,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                 Password
               </label>
               <input
-                type="email"
+                type="password"
                 className="form-input-container u-input"
                 value={password}
                 onChange={(e) => {

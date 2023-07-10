@@ -73,7 +73,7 @@ const LoginPage = (props: LoginPageProps) => {
                 User Password
               </label>
               <input
-                type="text"
+                type="password"
                 className="u-input"
                 value={password}
                 onChange={(e) => {
