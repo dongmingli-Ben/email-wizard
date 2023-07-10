@@ -150,3 +150,20 @@ form {
 .u-form-lable {
   margin-bottom: 2%;
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.u-spin-btn {
+  animation: spin 1s linear infinite;
+}
+
+.u-btn-image {
+  max-height: var(--m);
+}

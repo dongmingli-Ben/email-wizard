@@ -21,12 +21,15 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const requirePassword = (emailType: string): boolean => {
     let needPasswordEmails = ["IMAP", "POP3"];
     return needPasswordEmails.includes(emailType);
   };
 
   const handleSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     let req = {
       emailtype: emailType,
@@ -42,6 +45,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
             ? [...props.userInfo.useraccounts, address]
             : [address],
         });
+        setLoading(false);
         props.setAddAccount(false);
       })
       .catch((err) => {
@@ -104,8 +108,18 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
             <></>
           )}
           <div className="u-form-group u-flex u-flex-justifyCenter">
-            <button type="submit" className="u-submit-btn u-link u-button">
-              Submit
+            <button
+              type="submit"
+              className="u-submit-btn u-link u-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="u-spin-btn u-flex u-flex-justifyCenter">
+                  <img src="./static/refresh.svg" className="u-btn-image" />
+                </div>
+              ) : (
+                "Submit"
+              )}
             </button>
             <button
               type="button"

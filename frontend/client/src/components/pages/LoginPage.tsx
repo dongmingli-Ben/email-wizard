@@ -46,6 +46,7 @@ const LoginPage = (props: LoginPageProps) => {
           props.setUserSecret(resp.userSecret);
           navigate("/");
         }
+        setLoading(false);
       }
     );
   };
@@ -92,11 +93,8 @@ const LoginPage = (props: LoginPageProps) => {
                 disabled={loading}
               >
                 {loading ? (
-                  <div className="spin-btn u-flex u-flex-justifyCenter">
-                    <img
-                      src="./static/refresh.svg"
-                      className="button-image-container"
-                    />
+                  <div className="u-spin-btn u-flex u-flex-justifyCenter">
+                    <img src="./static/refresh.svg" className="u-btn-image" />
                   </div>
                 ) : (
                   "Submit"
