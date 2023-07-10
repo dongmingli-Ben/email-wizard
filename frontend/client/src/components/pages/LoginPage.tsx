@@ -13,6 +13,17 @@ type LoginPageProps = {
   path: string;
 };
 
+const authenticateUserPassword = async (
+  username: string,
+  password: string
+): Promise<{ userId: string; userSecret: string }> => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return {
+    userId: "Jake",
+    userSecret: "secret",
+  };
+};
+
 /**
  * Define the "CalendarPage" component as a function.
  */
@@ -22,7 +33,19 @@ const LoginPage = (props: LoginPageProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = () => {};
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    authenticateUserPassword(username, password).then(
+      (resp: { userId: string; userSecret: string }) => {
+        console.log(resp);
+        if (resp.userId.length > 0) {
+          props.setUserId(resp.userId);
+          props.setUserSecret(resp.userSecret);
+          navigate("/");
+        }
+      }
+    );
+  };
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
