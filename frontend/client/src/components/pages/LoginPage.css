@@ -17,3 +17,20 @@
   background-color: var(--white);
   padding: var(--l);
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-btn {
+  animation: spin 1s linear infinite;
+}
+
+.button-image-container {
+  max-height: var(--m);
+}

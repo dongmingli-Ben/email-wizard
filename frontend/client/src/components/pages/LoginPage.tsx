@@ -33,8 +33,11 @@ const LoginPage = (props: LoginPageProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     authenticateUserPassword(username, password).then(
       (resp: { userId: string; userSecret: string }) => {
         console.log(resp);
@@ -83,8 +86,21 @@ const LoginPage = (props: LoginPageProps) => {
               />
             </div>
             <div className="u-form-group u-flex u-flex-justifyCenter">
-              <button type="submit" className="u-submit-btn u-link u-button">
-                Submit
+              <button
+                type="submit"
+                className="u-submit-btn u-link u-button"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="spin-btn u-flex u-flex-justifyCenter">
+                    <img
+                      src="./static/refresh.svg"
+                      className="button-image-container"
+                    />
+                  </div>
+                ) : (
+                  "Submit"
+                )}
               </button>
               <button
                 type="button"
