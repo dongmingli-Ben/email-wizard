@@ -1,53 +1,25 @@
 import React, { useState, useEffect } from "react";
-import Feed from "./modules/Feed";
-import SideBar, { userInfoType } from "./modules/SideBar";
-import AddAccountWindow from "./modules/AddAccountWindow";
+import { Router } from "@reach/router";
+import CalendarPage from "./pages/CalendarPage";
 
 // to use styles, import the necessary CSS files
 import "./App.css";
 import "../utility.css";
 
-const userId = "jake";
-const userSecret = "secret";
-
 /**
  * Define the "App" component as a function.
  */
 const App = () => {
-  const [addAccount, setAddAccount] = useState(false);
-  const [userInfo, setUserInfo] = useState<userInfoType>();
+  const [userId, setUserId] = useState<string>("");
+  const [userSecret, setUserSecret] = useState("");
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
     <>
-      <div className="app-container body">
-        <div
-          className={`
-            ${
-              addAccount ? "app-inactive-container" : "app-active-container"
-            } u-flex
-          `}
-        >
-          <SideBar
-            userId={userId}
-            userSecret={userSecret}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            setAddAccount={setAddAccount}
-          />
-          <Feed userId={userId} userSecret={userSecret} />
-        </div>
-        {addAccount ? (
-          <AddAccountWindow
-            userId={userId}
-            userSecret={userSecret}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-            setAddAccount={setAddAccount}
-          />
-        ) : (
-          <></>
-        )}
+      <div className="App-container">
+        <Router>
+          <CalendarPage path="/" userId={userId} userSecret={userSecret} />
+        </Router>
       </div>
     </>
   );
