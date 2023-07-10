@@ -85,9 +85,12 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] UI wireframe
   - [ ] build UI with React
     - [x] implement main calendar page (use fake user_id and secret for now)
-    - [ ] implement add email account
+    - [x] implement add email account (use fake autheticate for now)
     - [ ] implement login page (get user_id and secret)
+    - [ ] implement register page (get user_id and secret)
     - [ ] implement logout page
+    - [ ] implement account authetication
+    - [ ] integrate with backend API
 - [ ] deploy to production server
 
 ### Stage 2
