@@ -29,15 +29,15 @@ const LoginPage = (props: LoginPageProps) => {
     <>
       <div className="page-container">
         <div className="login-container">
-          <h3 className="u-textCenter">New Account</h3>
+          <h3 className="u-textCenter">Log In</h3>
           <form onSubmit={handleSubmit} className="login-form u-flexColumn">
-            <div className="form-group u-flexColumn">
-              <label htmlFor="User Name" className="form-lable">
+            <div className="u-form-group u-flexColumn">
+              <label htmlFor="User Name" className="u-form-lable">
                 User Name
               </label>
               <input
                 type="text"
-                className="form-input-container"
+                className="u-input"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
@@ -45,13 +45,13 @@ const LoginPage = (props: LoginPageProps) => {
                 required
               />
             </div>
-            <div className="form-group u-flexColumn">
-              <label htmlFor="User Password" className="form-lable">
+            <div className="u-form-group u-flexColumn">
+              <label htmlFor="User Password" className="u-form-lable">
                 User Password
               </label>
               <input
                 type="text"
-                className="form-input-container"
+                className="u-input"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -59,13 +59,13 @@ const LoginPage = (props: LoginPageProps) => {
                 required
               />
             </div>
-            <div className="form-group u-flex u-flex-justifyCenter">
-              <button type="submit" className="login-submit-btn u-link">
+            <div className="u-form-group u-flex u-flex-justifyCenter">
+              <button type="submit" className="u-submit-btn u-link u-button">
                 Submit
               </button>
               <button
                 type="button"
-                className="login-cancel-btn u-link"
+                className="u-cancel-btn u-link u-button"
                 onClick={(e) => {
                   navigate("/");
                 }}
