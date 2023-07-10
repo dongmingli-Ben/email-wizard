@@ -89,6 +89,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [ ] implement login page (get user_id and secret)
     - [ ] implement register page (get user_id and secret)
     - [ ] implement logout page
+    - [ ] implement intro page
     - [ ] implement account authetication
     - [ ] integrate with backend API
 - [ ] deploy to production server
