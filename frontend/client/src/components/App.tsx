@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Router } from "@reach/router";
 import CalendarPage from "./pages/CalendarPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 // to use styles, import the necessary CSS files
 import "./App.css";
@@ -27,6 +28,7 @@ const App = () => {
             setUserId={setUserId}
             setUserSecret={setUserSecret}
           />
+          <RegisterPage path="/register" />
         </Router>
       </div>
     </>

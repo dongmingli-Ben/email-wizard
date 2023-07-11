@@ -107,7 +107,7 @@ const LoginPage = (props: LoginPageProps) => {
                     <img src="./static/refresh.svg" className="u-btn-image" />
                   </div>
                 ) : (
-                  "Submit"
+                  "Log In"
                 )}
               </button>
               <button
