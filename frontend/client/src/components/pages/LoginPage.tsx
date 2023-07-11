@@ -16,11 +16,12 @@ type LoginPageProps = {
 const authenticateUserPassword = async (
   username: string,
   password: string
-): Promise<{ userId: string; userSecret: string }> => {
+): Promise<{ userId: string; userSecret: string; errMsg: string }> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return {
-    userId: "Jake",
+    userId: "jake",
     userSecret: "secret",
+    errMsg: "",
   };
 };
 
@@ -34,17 +35,21 @@ const LoginPage = (props: LoginPageProps) => {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
     authenticateUserPassword(username, password).then(
-      (resp: { userId: string; userSecret: string }) => {
+      (resp: { userId: string; userSecret: string; errMsg: string }) => {
         console.log(resp);
         if (resp.userId.length > 0) {
           props.setUserId(resp.userId);
           props.setUserSecret(resp.userSecret);
           navigate("/");
+        } else {
+          setErrorMsg(resp.errMsg);
         }
         setLoading(false);
       }
@@ -85,6 +90,11 @@ const LoginPage = (props: LoginPageProps) => {
                 }}
                 required
               />
+              {errorMsg === "" ? (
+                <></>
+              ) : (
+                <div className="u-error-msg">{errorMsg}</div>
+              )}
             </div>
             <div className="u-form-group u-flex u-flex-justifyCenter">
               <button

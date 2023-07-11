@@ -24,6 +24,7 @@
   --grey: #f7f7f7;
   --white: #fff;
   --black: #000;
+  --red: #ff0000;
 
   --xs: 4px;
   --s: 8px;
@@ -166,4 +167,8 @@ form {
 
 .u-btn-image {
   max-height: var(--m);
+}
+
+.u-error-msg {
+  color: var(--red);
 }
