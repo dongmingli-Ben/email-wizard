@@ -11,9 +11,17 @@ type AddAccountWindowProps = {
   setAddAccount: (status: boolean) => void;
 };
 
-const newEmailAccountAPI = async (req): Promise<string> => {
+const newEmailAccountAPI = async (
+  req
+): Promise<{ userInfo: userInfoType; errMsg: string }> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return req.emailaddress;
+  return {
+    userInfo: {
+      username: "jake",
+      useraccounts: ["jake@outlook.com", "jake@gmail.com", req.emailaddress],
+    },
+    errMsg: "",
+  };
 };
 
 const AddAccountWindow = (props: AddAccountWindowProps) => {
@@ -22,6 +30,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const requirePassword = (emailType: string): boolean => {
     let needPasswordEmails = ["IMAP", "POP3"];
@@ -35,18 +44,33 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
       emailtype: emailType,
       emailaddress: emailAddress,
       password: password,
+      userId: props.userId,
+      userSecret: props.userSecret,
     };
     console.log(req);
     newEmailAccountAPI(req)
-      .then((address: string) => {
-        props.setUserInfo({
-          username: props.userInfo ? props.userInfo.username : "No User Name",
-          useraccounts: props.userInfo
-            ? [...props.userInfo.useraccounts, address]
-            : [address],
-        });
+      .then((resp: { userInfo: userInfoType; errMsg: string }) => {
+        if (resp.errMsg === "") {
+          props.setUserInfo({
+            username: props.userInfo ? props.userInfo.username : "No User Name",
+            useraccounts: props.userInfo
+              ? [
+                  ...props.userInfo.useraccounts,
+                  resp.userInfo.useraccounts[
+                    resp.userInfo.useraccounts.length - 1
+                  ],
+                ]
+              : [
+                  resp.userInfo.useraccounts[
+                    resp.userInfo.useraccounts.length - 1
+                  ],
+                ],
+          });
+          props.setAddAccount(false);
+        } else {
+          setErrorMsg(resp.errMsg);
+        }
         setLoading(false);
-        props.setAddAccount(false);
       })
       .catch((err) => {
         console.log(err);
@@ -89,6 +113,11 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               }}
               required
             />
+            {errorMsg === "" ? (
+              <></>
+            ) : (
+              <div className="u-error-msg">{errorMsg}</div>
+            )}
           </div>
           {requirePassword(emailType) ? (
             <div className="u-form-group u-flexColumn">

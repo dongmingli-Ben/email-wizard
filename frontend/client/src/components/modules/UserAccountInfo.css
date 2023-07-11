@@ -19,12 +19,15 @@
   row-gap: var(--s);
   width: 15vw;
   position: relative;
+}
+
+.useraccount-cell-container {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.useraccounts-container::after {
+/* .useraccount-cell-container::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -36,9 +39,9 @@
     rgba(255, 255, 255, 0),
     var(--primary) 50%
   );
-}
+} */
 
-/* .useraccounts-container:before {
+/* .useraccount-cell-container:before {
   content: "";
   position: absolute;
   top: 0;
