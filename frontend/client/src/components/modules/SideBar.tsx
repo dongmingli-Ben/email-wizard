@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import UserAccountInfo from "./UserAccountInfo";
+import { useNavigate } from "@reach/router";
 
 import "./SideBar.css";
 
@@ -14,6 +15,8 @@ type SideBarProps = {
   userInfo: userInfoType | undefined;
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
+  setUserId: (userId: string) => void;
+  setUserSecret: (userSecret: string) => void;
 };
 
 const USERNAME = "jake";
@@ -27,6 +30,8 @@ const getUserInfo = (
 };
 
 const SideBar = (props: SideBarProps) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const [userName, userAccounts] = getUserInfo(
       props.userId,
@@ -47,6 +52,19 @@ const SideBar = (props: SideBarProps) => {
         }
         setAddAccount={props.setAddAccount}
       />
+      <div className="logout-btn-container">
+        <button
+          className="u-button logout-btn u-link"
+          type="button"
+          onClick={(e) => {
+            props.setUserId("");
+            props.setUserSecret("");
+            navigate("/login");
+          }}
+        >
+          Log Out
+        </button>
+      </div>
     </div>
   );
 };

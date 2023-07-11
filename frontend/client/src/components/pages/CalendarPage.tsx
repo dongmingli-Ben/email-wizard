@@ -10,6 +10,8 @@ import "../../utility.css";
 type CalendarPageProps = {
   userId: string;
   userSecret: string;
+  setUserId: (userId: string) => void;
+  setUserSecret: (userSecret: string) => void;
   path: string;
 };
 
@@ -33,6 +35,8 @@ const CalendarPage = (props: CalendarPageProps) => {
         <SideBar
           userId={props.userId}
           userSecret={props.userSecret}
+          setUserId={props.setUserId}
+          setUserSecret={props.setUserSecret}
           userInfo={userInfo}
           setUserInfo={setUserInfo}
           setAddAccount={setAddAccount}

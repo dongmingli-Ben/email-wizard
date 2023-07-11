@@ -20,7 +20,13 @@ const App = () => {
     <>
       <div className="app-container body">
         <Router>
-          <CalendarPage path="/" userId={userId} userSecret={userSecret} />
+          <CalendarPage
+            path="/"
+            userId={userId}
+            userSecret={userSecret}
+            setUserId={setUserId}
+            setUserSecret={setUserSecret}
+          />
           <LoginPage
             path="/login"
             userId={userId}
