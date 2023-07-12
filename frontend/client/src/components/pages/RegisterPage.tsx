@@ -129,7 +129,7 @@ const RegisterPage = (props: RegisterPageProps) => {
               </form>
             </>
           )}
-          <div className="u-textCenter">
+          <div className="u-textCenter  u-prompt">
             Already have an account? <Link to="/login">Log In</Link> Now!
           </div>
         </div>

@@ -121,7 +121,7 @@ const LoginPage = (props: LoginPageProps) => {
               </button>
             </div>
           </form>
-          <div className="u-textCenter">
+          <div className="u-textCenter u-prompt">
             Do not have an account? <Link to="/register">Register</Link> Now!
           </div>
         </div>

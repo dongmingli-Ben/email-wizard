@@ -172,3 +172,7 @@ form {
 .u-error-msg {
   color: var(--red);
 }
+
+.u-prompt {
+  font-size: var(--s);
+}
