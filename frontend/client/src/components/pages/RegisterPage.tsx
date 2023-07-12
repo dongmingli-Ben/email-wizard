@@ -129,6 +129,9 @@ const RegisterPage = (props: RegisterPageProps) => {
               </form>
             </>
           )}
+          <div className="u-textCenter">
+            Already have an account? <Link to="/login">Log In</Link> Now!
+          </div>
         </div>
       </div>
     </>

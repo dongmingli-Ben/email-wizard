@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "@reach/router";
+import { Link, useNavigate } from "@reach/router";
 
 // to use styles, import the necessary CSS files
 import "./LoginPage.css";
@@ -121,6 +121,9 @@ const LoginPage = (props: LoginPageProps) => {
               </button>
             </div>
           </form>
+          <div className="u-textCenter">
+            Do not have an account? <Link to="/register">Register</Link> Now!
+          </div>
         </div>
       </div>
     </>
