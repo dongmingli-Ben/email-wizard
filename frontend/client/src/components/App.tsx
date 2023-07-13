@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 // to use styles, import the necessary CSS files
 import "./App.css";
 import "../utility.css";
+import IntroPage from "./pages/IntroPage";
 
 /**
  * Define the "App" component as a function.
@@ -21,7 +22,7 @@ const App = () => {
       <div className="app-container body">
         <Router>
           <CalendarPage
-            path="/"
+            path="/calendar"
             userId={userId}
             userSecret={userSecret}
             setUserId={setUserId}
@@ -35,6 +36,7 @@ const App = () => {
             setUserSecret={setUserSecret}
           />
           <RegisterPage path="/register" />
+          <IntroPage path="/" />
         </Router>
       </div>
     </>

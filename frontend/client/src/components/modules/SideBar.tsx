@@ -59,7 +59,7 @@ const SideBar = (props: SideBarProps) => {
           onClick={(e) => {
             props.setUserId("");
             props.setUserSecret("");
-            navigate("/login");
+            navigate("/");
           }}
         >
           Log Out

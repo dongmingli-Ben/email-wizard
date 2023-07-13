@@ -47,7 +47,7 @@ const LoginPage = (props: LoginPageProps) => {
         if (resp.userId.length > 0) {
           props.setUserId(resp.userId);
           props.setUserSecret(resp.userSecret);
-          navigate("/");
+          navigate("/calendar");
         } else {
           setErrorMsg(resp.errMsg);
         }
