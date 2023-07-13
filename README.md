@@ -89,7 +89,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] implement login page (get user_id and secret)
     - [x] implement register page (get user_id and secret)
     - [x] implement logout mechanism
-    - [ ] implement intro page
+    - [x] implement intro page
     - [ ] implement account authetication
     - [ ] integrate with backend API
 - [ ] deploy to production server
@@ -124,6 +124,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 - [ ] refine API interface
 - [ ] add email registration and forget password functionaility
+- [ ] make the UI more beautiful
 
 #### C4. update calendar
 
