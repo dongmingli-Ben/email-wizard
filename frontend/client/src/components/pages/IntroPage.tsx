@@ -19,10 +19,10 @@ const IntroPage = (props: IntroPageProps) => {
     // <> is like a <div>, but won't show
     // up in the DOM tree
     <>
-      <div className="page-container">
+      <div className="intro-page-container">
         <div className="intro-container">
           <div className="intro-title-container">
-            Email Wizard -- View Your Emails in Calendar with AI
+            Email Wizard: View Your Emails in Calendar with AI
           </div>
           <div className="intro-feature-container">
             Streamline event management with Email Wizard. Our web app reads
@@ -33,10 +33,10 @@ const IntroPage = (props: IntroPageProps) => {
             participants are recognized instantly. Simplify event planning and
             unlock efficiency with Email Wizard.
           </div>
-          <div className="button-container">
+          <div className="button-container u-flex u-flex-justifyCenter">
             <button
               type="button"
-              className="u-link u-button"
+              className="u-link u-button intro-btn"
               onClick={(e) => {
                 navigate("/login");
               }}
@@ -45,7 +45,7 @@ const IntroPage = (props: IntroPageProps) => {
             </button>
             <button
               type="button"
-              className="u-link u-button"
+              className="u-link u-button intro-btn"
               onClick={(e) => {
                 navigate("/register");
               }}
