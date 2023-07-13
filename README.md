@@ -99,6 +99,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### A1. retrieve emails
 
 - [ ] support gmail mailboxes
+- [ ] support exchange protocol
 - [ ] optimize QPS
 
 #### A2. clean email into plain texts
@@ -122,6 +123,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### C3. calendar view UI
 
 - [ ] refine API interface
+- [ ] add email registration and forget password functionaility
 
 #### C4. update calendar
 
