@@ -35,3 +35,19 @@
   width: 30%;
   background-color: var(--primary--light);
 }
+
+.intro-image-container {
+  position: absolute;
+  left: 50%;
+  right: 0%;
+  /* overflow: hidden; */
+  height: 100vh;
+  /* background-color: var(--primary--light); */
+}
+
+.intro-image {
+  position: relative;
+  top: 5%;
+  max-width: 45vw;
+  max-height: 90vh;
+}

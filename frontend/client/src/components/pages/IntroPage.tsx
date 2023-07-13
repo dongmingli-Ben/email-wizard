@@ -54,6 +54,9 @@ const IntroPage = (props: IntroPageProps) => {
             </button>
           </div>
         </div>
+        <div className="intro-image-container u-flex u-flex-justifyCenter">
+          <img src="./static/intro.png" className="intro-image" />
+        </div>
       </div>
     </>
   );
