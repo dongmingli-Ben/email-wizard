@@ -105,3 +105,4 @@ RUN npm install --save \
   @fullcalendar/core \
   @fullcalendar/react \
   @fullcalendar/daygrid 
+RUN npm install --save @azure/msal-react @azure/msal-browser

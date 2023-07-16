@@ -4,21 +4,29 @@ import CalendarPage from "./pages/CalendarPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
+// MSAL imports
+import { MsalProvider } from "@azure/msal-react";
+import { IPublicClientApplication } from "@azure/msal-browser";
+
 // to use styles, import the necessary CSS files
 import "./App.css";
 import "../utility.css";
 import IntroPage from "./pages/IntroPage";
 
+type AppProps = {
+  pca: IPublicClientApplication;
+};
+
 /**
  * Define the "App" component as a function.
  */
-const App = () => {
+const App = ({ pca }: AppProps) => {
   const [userId, setUserId] = useState<string>("");
   const [userSecret, setUserSecret] = useState("");
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
-    <>
+    <MsalProvider instance={pca}>
       <div className="app-container body">
         <Router>
           <CalendarPage
@@ -39,7 +47,7 @@ const App = () => {
           <IntroPage path="/" />
         </Router>
       </div>
-    </>
+    </MsalProvider>
   );
 };
 
