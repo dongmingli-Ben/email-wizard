@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { userInfoType } from "./SideBar";
+import {
+  verifyOutlook,
+  verifyIMAP,
+  verifyPOP3,
+} from "../../utilities/verifyEmail";
 
 import "./AddAccountWindow.css";
 
@@ -11,10 +16,43 @@ type AddAccountWindowProps = {
   setAddAccount: (status: boolean) => void;
 };
 
-const newEmailAccountAPI = async (
+const verifyEmailAccount = async (req): Promise<string> => {
+  let errMsg: string;
+  if (req.emailtype === "outlook") {
+    errMsg = await verifyOutlook(req.emailaddress);
+  } else if (req.emailtype === "IMAP") {
+    errMsg = await verifyIMAP(req.emailaddress, req.password);
+  } else if (req.emailaddress === "POP3") {
+    errMsg = await verifyPOP3(req.emailaddress, req.password);
+  } else {
+    console.log(`Un-recognized account type: ${req.emailtype}`);
+    errMsg = `Un-recognized account type: ${req.emailtype}`;
+  }
+  return errMsg;
+};
+
+const addEmailAccountDB = async (req): Promise<string> => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return "";
+};
+
+const newEmailAccount = async (
   req
 ): Promise<{ userInfo: userInfoType; errMsg: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  let errMsg = await verifyEmailAccount(req);
+  if (errMsg !== "") {
+    return {
+      userInfo: { username: "", useraccounts: [] },
+      errMsg: errMsg,
+    };
+  }
+  errMsg = await addEmailAccountDB(req);
+  if (errMsg !== "") {
+    return {
+      userInfo: { username: "", useraccounts: [] },
+      errMsg: errMsg,
+    };
+  }
   return {
     userInfo: {
       username: "jake",
@@ -48,7 +86,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
       userSecret: props.userSecret,
     };
     console.log(req);
-    newEmailAccountAPI(req)
+    newEmailAccount(req)
       .then((resp: { userInfo: userInfoType; errMsg: string }) => {
         if (resp.errMsg === "") {
           props.setUserInfo({
