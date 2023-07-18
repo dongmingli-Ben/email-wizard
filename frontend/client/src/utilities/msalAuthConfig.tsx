@@ -24,7 +24,13 @@ export const loginRequest: PopupRequest = {
   // loginHint: "guangtouqiang1964@outlook.com",
 };
 
+export const tokenRequest = {
+  scopes: ["User.Read", "Mail.Read"],
+  forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
+};
+
 // Add here the endpoints for MS Graph API services you would like to use.
 export const graphConfig = {
   graphMeEndpoint: "https://graph.microsoft.com/v1.0/me",
+  graphMailEndpoint: "https://graph.microsoft.com/v1.0/me/messages",
 };
