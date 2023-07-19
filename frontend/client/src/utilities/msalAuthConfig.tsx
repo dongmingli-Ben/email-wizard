@@ -3,10 +3,10 @@ import { Configuration, PopupRequest } from "@azure/msal-browser";
 // Config object to be passed to Msal on creation
 export const msalConfig: Configuration = {
   auth: {
-    clientId: "29b1aa3a-d153-4c40-b592-fdf771efb603",
+    clientId: "34fe7958-6ad4-438e-8218-cb028e47fe40",
     authority: "https://login.microsoftonline.com/common",
-    redirectUri: "/calendar",
-    postLogoutRedirectUri: "/calendar",
+    redirectUri: "http://localhost:39017/calendar",
+    postLogoutRedirectUri: "http://localhost:39017/calendar",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -24,7 +24,13 @@ export const loginRequest: PopupRequest = {
   // loginHint: "guangtouqiang1964@outlook.com",
 };
 
+export const tokenRequest = {
+  scopes: ["User.Read", "Mail.Read"],
+  forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
+};
+
 // Add here the endpoints for MS Graph API services you would like to use.
 export const graphConfig = {
   graphMeEndpoint: "https://graph.microsoft.com/v1.0/me",
+  graphMailEndpoint: "https://graph.microsoft.com/v1.0/me/messages",
 };

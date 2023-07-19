@@ -88,6 +88,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
     console.log(req);
     newEmailAccount(req)
       .then((resp: { userInfo: userInfoType; errMsg: string }) => {
+        setLoading(false);
         if (resp.errMsg === "") {
           props.setUserInfo({
             username: props.userInfo ? props.userInfo.username : "No User Name",
@@ -108,7 +109,6 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
         } else {
           setErrorMsg(resp.errMsg);
         }
-        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
