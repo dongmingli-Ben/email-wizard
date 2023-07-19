@@ -3,10 +3,10 @@ import { Configuration, PopupRequest } from "@azure/msal-browser";
 // Config object to be passed to Msal on creation
 export const msalConfig: Configuration = {
   auth: {
-    clientId: "29b1aa3a-d153-4c40-b592-fdf771efb603",
+    clientId: "34fe7958-6ad4-438e-8218-cb028e47fe40",
     authority: "https://login.microsoftonline.com/common",
-    redirectUri: "/calendar",
-    postLogoutRedirectUri: "/calendar",
+    redirectUri: "http://localhost:39017/calendar",
+    postLogoutRedirectUri: "http://localhost:39017/calendar",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored

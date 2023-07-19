@@ -5,7 +5,7 @@ import {
 } from "@azure/msal-browser";
 import { graphConfig, tokenRequest, loginRequest } from "./msalAuthConfig";
 
-function callMSGraph(endpoint: string, token: string) {
+async function callMSGraph(endpoint: string, token: string) {
   const headers = new Headers();
   const bearer = `Bearer ${token}`;
 
@@ -18,7 +18,7 @@ function callMSGraph(endpoint: string, token: string) {
 
   console.log("request made to Graph API at: " + new Date().toString());
 
-  fetch(endpoint, options)
+  await fetch(endpoint, options)
     .then((response) => response.json())
     .then((response) => console.log(response))
     .catch((error) => console.log(error));
@@ -64,11 +64,11 @@ function seeProfile(username: string) {
     });
 }
 
-function readMail(username: string) {
-  getTokenPopup(tokenRequest, username)
-    .then((response) => {
+async function readMail(username: string) {
+  await getTokenPopup(tokenRequest, username)
+    .then(async (response) => {
       if (response !== undefined) {
-        callMSGraph(graphConfig.graphMailEndpoint, response.accessToken);
+        await callMSGraph(graphConfig.graphMailEndpoint, response.accessToken);
         return;
       }
       console.log("err: fail to read emails");
@@ -85,16 +85,16 @@ const verifyOutlook = async (address: string): Promise<string> => {
   let username: string;
   console.log(`msal login:`);
   console.log(req);
-  await msalInstance.loginPopup(req).then((response) => {
+  await msalInstance.loginPopup(req).then(async (response) => {
     console.log("logged user in");
     if (response !== null) {
       if (response.account === null) {
         console.log("empty username from msal login response");
         errMsg = "error: empty username from msal login response";
-        return errMsg;
+        return;
       }
       username = response.account.username;
-      readMail(username);
+      await readMail(username);
     } else {
       console.log("null response from msal");
       errMsg = "error: null response from msal";
