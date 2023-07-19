@@ -43,9 +43,11 @@ function getTokenPopup(request, username: string) {
         })
         .catch((error) => {
           console.error(error);
+          return String(error);
         });
     } else {
       console.warn(error);
+      return String(error);
     }
   });
 }
@@ -53,11 +55,12 @@ function getTokenPopup(request, username: string) {
 function seeProfile(username: string) {
   getTokenPopup(loginRequest, username)
     .then((response) => {
-      if (response !== undefined) {
+      if (typeof response !== "string") {
         callMSGraph(graphConfig.graphMeEndpoint, response.accessToken);
         return;
       }
       console.log("err: auth token not obtained");
+      console.log(response);
     })
     .catch((error) => {
       console.error(error);
@@ -67,14 +70,16 @@ function seeProfile(username: string) {
 async function readMail(username: string) {
   await getTokenPopup(tokenRequest, username)
     .then(async (response) => {
-      if (response !== undefined) {
+      if (typeof response !== "string") {
         await callMSGraph(graphConfig.graphMailEndpoint, response.accessToken);
         return;
       }
       console.log("err: fail to read emails");
+      console.log(response);
     })
     .catch((error) => {
       console.error(error);
+      console.log(error);
     });
 }
 
