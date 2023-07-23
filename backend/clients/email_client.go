@@ -46,12 +46,12 @@ func GetEmails(user_config map[string]string, n_mails int32) (EmailCollections, 
 	config_json, err := json.Marshal(user_config)
 	// fmt.Printf("config: %v\n", user_config)
 	if err != nil {
-		log.Fatalf("%v cannot be jsonfied into json string", user_config)
+		log.Printf("%v cannot be jsonfied into json string", user_config)
 		return EmailCollections{}, err
 	}
 	r, err := c.GetEmails(ctx, &pb.EmailRequest{Config: string(config_json), NMails: n_mails})
 	if err != nil {
-		log.Fatalf("Fail to call GetEmail over gRPC: %v", err)
+		log.Printf("Fail to call GetEmail over gRPC: %v", err)
 		return EmailCollections{}, err
 	}
 	// log.Printf("response: %s", r.GetMessage())

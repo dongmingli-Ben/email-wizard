@@ -27,10 +27,13 @@ func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []ma
 	return unparsed_emails
 }
 
-func getUserEmailsFromAccounts(accounts []map[string]string) []map[string]interface{} {
+func getUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]interface{}, error) {
 	all_emails := make([]map[string]interface{}, 0)
 	for _, account := range accounts {
-		emails, _ := clients.GetEmails(account, N_EMAIL_RETREIVAL)
+		emails, err := clients.GetEmails(account, N_EMAIL_RETREIVAL)
+		if err != nil {
+			return make([]map[string]interface{}, 0), err
+		}
 		for _, email := range emails.Items {
 			e := map[string]interface{}{
 				"email_id":  email.EmailID,
@@ -43,7 +46,7 @@ func getUserEmailsFromAccounts(accounts []map[string]string) []map[string]interf
 			all_emails = append(all_emails, e)
 		}
 	}
-	return all_emails
+	return all_emails, nil
 }
 
 func getUserEmailAccounts(user_id string) []map[string]string {

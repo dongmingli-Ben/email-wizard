@@ -12,7 +12,10 @@ func updateUserEvents(user_id string) error {
 	var accounts []map[string]string = getUserEmailAccounts(user_id)
 
 	// read recent emails from user email accounts
-	emails := getUserEmailsFromAccounts(accounts)
+	emails, err := getUserEmailsFromAccounts(accounts)
+	if err != nil {
+		return err
+	}
 
 	// filter for un-parsed emails
 	emails = getUserUnparsedEmails(emails, user_id)
@@ -21,7 +24,7 @@ func updateUserEvents(user_id string) error {
 	events := parseEmailsToEvents(emails, 5)
 
 	// store back to db
-	err := storeUserEvents(events, user_id)
+	err = storeUserEvents(events, user_id)
 	return err
 }
 
@@ -76,8 +79,12 @@ func getEmails(c *gin.Context) {
 		}
 		accounts = append(accounts, account)	
 	}
-	emails := getUserEmailsFromAccounts(accounts)
-	c.IndentedJSON(http.StatusOK, emails)
+	emails, err := getUserEmailsFromAccounts(accounts)
+	if err == nil {
+		c.IndentedJSON(http.StatusOK, emails)
+		return
+	}
+	c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 }
 
 func main() {
