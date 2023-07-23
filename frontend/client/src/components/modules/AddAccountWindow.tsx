@@ -21,13 +21,14 @@ const verifyEmailAccount = async (req): Promise<string> => {
   if (req.emailtype === "outlook") {
     errMsg = await verifyOutlook(req.emailaddress);
   } else if (req.emailtype === "IMAP") {
-    errMsg = await verifyIMAP(req.emailaddress, req.password);
+    errMsg = await verifyIMAP(req.emailaddress, req.password, req.imapServer);
   } else if (req.emailaddress === "POP3") {
-    errMsg = await verifyPOP3(req.emailaddress, req.password);
+    errMsg = await verifyPOP3(req.emailaddress, req.password, req.pop3Server);
   } else {
     console.log(`Un-recognized account type: ${req.emailtype}`);
     errMsg = `Un-recognized account type: ${req.emailtype}`;
   }
+  console.log(errMsg);
   return errMsg;
 };
 
@@ -66,6 +67,8 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
   const [emailType, setEmailType] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [imapServer, setIMAPServer] = useState("");
+  const [pop3Server, setPOP3Server] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -84,6 +87,8 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
       password: password,
       userId: props.userId,
       userSecret: props.userSecret,
+      imapServer: imapServer,
+      pop3Server: pop3Server,
     };
     console.log(req);
     newEmailAccount(req)
@@ -168,6 +173,40 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
+                }}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
+          {emailType === "IMAP" ? (
+            <div className="u-form-group u-flexColumn">
+              <label htmlFor="IMAP server" className="u-form-lable">
+                IMAP server
+              </label>
+              <input
+                type="text"
+                className="form-input-container u-input"
+                value={imapServer}
+                onChange={(e) => {
+                  setIMAPServer(e.target.value);
+                }}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
+          {emailType === "POP3" ? (
+            <div className="u-form-group u-flexColumn">
+              <label htmlFor="POP3 server" className="u-form-lable">
+                POP3 server
+              </label>
+              <input
+                type="text"
+                className="form-input-container u-input"
+                value={pop3Server}
+                onChange={(e) => {
+                  setPOP3Server(e.target.value);
                 }}
               />
             </div>

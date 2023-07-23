@@ -4,6 +4,7 @@ import {
   AuthenticationResult,
 } from "@azure/msal-browser";
 import { graphConfig, tokenRequest, loginRequest } from "./msalAuthConfig";
+import { backendConfig, get } from "./requestUtility";
 
 async function callMSGraph(endpoint: string, token: string) {
   const headers = new Headers();
@@ -111,14 +112,28 @@ const verifyOutlook = async (address: string): Promise<string> => {
 
 const verifyIMAP = async (
   address: string,
-  password: string
+  password: string,
+  imapServer: string
 ): Promise<string> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  let resp = await get(backendConfig.verify_email, {
+    username: address,
+    password: password,
+    imap_server: imapServer,
+    type: "IMAP",
+  }).catch((e) => {
+    console.log("error in verifyIMAP:", e);
+    return { errMsg: "Fail to verify your email. Please check your inputs." };
+  });
+  console.log(resp);
+  if ("errMsg" in resp) {
+    return resp.errMsg;
+  }
   return "";
 };
 const verifyPOP3 = async (
   address: string,
-  password: string
+  password: string,
+  pop3Server: string
 ): Promise<string> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return "";
