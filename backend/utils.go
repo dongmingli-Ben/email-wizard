@@ -35,7 +35,7 @@ func getUserEmailsFromAccounts(accounts []map[string]string) []map[string]interf
 			e := map[string]interface{}{
 				"email_id":  email.EmailID,
 				"subject":   email.Item.Subject,
-				"sender":    email.Item.Date,
+				"sender":    email.Item.Sender,
 				"date":      email.Item.Date,
 				"recipient": email.Item.Recipient,
 				"content":   email.Item.Content,
