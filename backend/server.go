@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 func updateUserEvents(user_id string) error {
@@ -87,8 +88,38 @@ func getEmails(c *gin.Context) {
 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 }
 
+// func CORSMiddleware() gin.HandlerFunc {
+//     return func(c *gin.Context) {
+//         c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+//         c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+//         c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+//         c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+//         if c.Request.Method == "OPTIONS" {
+//             c.AbortWithStatus(204)
+//             return
+//         }
+
+//         c.Next()
+//     }
+// }
+
 func main() {
 	router := gin.Default()
+
+	// Add CORS middleware
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"}
+	config.AllowMethods = []string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}
+	config.AllowHeaders = []string{
+		"Origin",
+		"Content-Type",
+		"Accept",
+		"Authorization",
+		"Access-Control-Allow-Origin",
+		"Access-Control-Allow-Methods",
+	}
+	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
 
