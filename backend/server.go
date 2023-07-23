@@ -92,5 +92,5 @@ func main() {
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
 
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
