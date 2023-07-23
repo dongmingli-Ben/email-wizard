@@ -35,7 +35,8 @@ class EmailHelper(pd2_grpc.EmailHelperServicer):
         config = json.loads(request.config)
         n_mails = request.n_mails
         emails = get_emails(config, n_mails)
-        email_json = json.dumps(emails)
+        email_json = json.dumps(emails, indent=4, ensure_ascii=False)
+        logging.debug(f'return email JSON:\n {email_json}')
         return pb2.EmailReply(message=email_json)
 
 
@@ -50,5 +51,5 @@ def serve():
 
 
 if __name__ == '__main__':
-    logging.basicConfig()
+    logging.basicConfig(level=logging.INFO)
     serve()

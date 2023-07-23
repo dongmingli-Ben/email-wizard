@@ -19,7 +19,7 @@ def bytes_to_texts(email_bytes: ByteString) -> Dict[str, str]:
         "subject": subject,
         "sender": sender,
         "date": date,
-        "recipient": recipient,
+        "recipient": recipient if isinstance(recipient, list) else [recipient],
     }
 
     content = extract_raw_texts(message)
