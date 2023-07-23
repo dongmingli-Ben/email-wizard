@@ -159,3 +159,30 @@ A json string of events (something like the below)
   }
 ]
 ```
+
+### `verify_email` endpoint
+
+This API is meant to verify whether our service can retrieve emails from users' IMAP or POP3 mailboxes.
+
+Endpoint: `http://public-ip:8080/verify_email`
+
+Params:
+
+```yaml
+username: string
+password: string
+imap_server: string # for IMAP
+pop3_server: string # for POP3
+type: string # must be IMAP or POP3
+```
+
+Response:
+
+If it is successful, the response will be similar to `GetEmails` service.
+If there is an internal error, it will return:
+
+```json
+{
+  "errMsg": "error message"
+}
+```
