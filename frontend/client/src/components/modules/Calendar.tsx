@@ -18,7 +18,7 @@ const EVENTS = [
   { title: "event 2", date: "2023-04-02" },
 ];
 
-const getAPIEvents = async (userId: string, userSecret: string) => {
+const getEventsAPI = async (userId: string, userSecret: string) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return EVENTS;
 };
@@ -47,7 +47,7 @@ const Calendar = (props: calendarProps) => {
   const [displayEvents, setDisplayEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
-    getAPIEvents(props.userId, props.userSecret).then(
+    getEventsAPI(props.userId, props.userSecret).then(
       (_events: EventType[]) => {
         setEvents(_events);
       }

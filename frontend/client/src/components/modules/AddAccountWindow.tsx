@@ -7,6 +7,7 @@ import {
 } from "../../utilities/verifyEmail";
 
 import "./AddAccountWindow.css";
+import { backendConfig, post } from "../../utilities/requestUtility";
 
 type AddAccountWindowProps = {
   userId: string;
@@ -32,9 +33,34 @@ const verifyEmailAccount = async (req): Promise<string> => {
   return errMsg;
 };
 
-const addEmailAccountDB = async (req): Promise<string> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return "";
+const addEmailAccountDBAPI = async (req): Promise<string> => {
+  let add_req: { [key: string]: string };
+  add_req = {
+    userId: req.userId,
+    userSecret: req.userSecret,
+    type: req.type,
+    address: req.emailaddress,
+  };
+  if (req.type === "IMAP") {
+    add_req.password = req.password;
+    add_req.imap_server = req.imapServer;
+  } else if (req.type === "POP3") {
+    add_req.password = req.password;
+    add_req.pop3_server = req.pop3Server;
+  }
+  let errMsg = await post(backendConfig.add_mailbox, add_req)
+    .then((resp) => {
+      if ("errMsg" in resp) {
+        console.log(resp);
+        return resp.errMsg;
+      }
+      return "";
+    })
+    .catch((e) => {
+      console.log("caught error when adding mailbox:", e);
+      return "fail to add mailbox.";
+    });
+  return errMsg;
 };
 
 const newEmailAccount = async (
@@ -47,7 +73,7 @@ const newEmailAccount = async (
       errMsg: errMsg,
     };
   }
-  errMsg = await addEmailAccountDB(req);
+  errMsg = await addEmailAccountDBAPI(req);
   if (errMsg !== "") {
     return {
       userInfo: { username: "", useraccounts: [] },

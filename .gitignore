@@ -176,6 +176,9 @@ predictions
 data
 smart_parse/run.cmd
 learning
+test.cpp
+.editorconfig
+test
 
 # go
 go.work

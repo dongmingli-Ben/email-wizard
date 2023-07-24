@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"email-wizard/backend/clients"
@@ -8,12 +8,12 @@ import (
 
 var N_EMAIL_RETREIVAL int32 = 5
 
-func parsedUserEmailIDs(user_id string) []string {
+func ParsedUserEmailIDs(user_id string) []string {
 	return make([]string, 0)
 }
 
-func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []map[string]interface{} {
-	parsed_email_ids := parsedUserEmailIDs(user_id)
+func GetUserUnparsedEmails(emails []map[string]interface{}, user_id string) []map[string]interface{} {
+	parsed_email_ids := ParsedUserEmailIDs(user_id)
 	email_ids := make(map[string]bool)
 	for _, id := range parsed_email_ids {
 		email_ids[id] = true
@@ -27,7 +27,7 @@ func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []ma
 	return unparsed_emails
 }
 
-func getUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]interface{}, error) {
+func GetUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]interface{}, error) {
 	all_emails := make([]map[string]interface{}, 0)
 	for _, account := range accounts {
 		emails, err := clients.GetEmails(account, N_EMAIL_RETREIVAL)
@@ -49,7 +49,7 @@ func getUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]inter
 	return all_emails, nil
 }
 
-func getUserEmailAccounts(user_id string) []map[string]string {
+func GetUserEmailAccounts(user_id string) []map[string]string {
 	// use fake account for now
 	body, err := os.ReadFile("tests/outlook.json")
 	if err != nil {
@@ -62,7 +62,7 @@ func getUserEmailAccounts(user_id string) []map[string]string {
 	return accounts
 }
 
-func parseEmailsToEvents(emails []map[string]interface{}, retry int) []map[string]string {
+func ParseEmailsToEvents(emails []map[string]interface{}, retry int) []map[string]string {
 	all_events := make([]map[string]string, 0)
 	for _, email := range emails {
 		events, _ := clients.ParseEmail(email, "Asia/Shanghai", retry)
@@ -74,15 +74,15 @@ func parseEmailsToEvents(emails []map[string]interface{}, retry int) []map[strin
 	return all_events
 }
 
-func storeUserEvents(events []map[string]string, user_id string) error {
+func StoreUserEvents(events []map[string]string, user_id string) error {
 	return nil
 }
 
-func validateUserSecret(user_id string, secret string) bool {
+func ValidateUserSecret(user_id string, secret string) bool {
 	return true
 }
 
-func getUserEvents(user_id string) []map[string]interface{} {
+func GetUserEvents(user_id string) []map[string]interface{} {
 	events := make([]map[string]interface{}, 0)
 	event := map[string]interface{}{
 		"event_type": "registration",

@@ -22,25 +22,30 @@ type SideBarProps = {
 const USERNAME = "jake";
 const USERACCOUNTS = ["jake@outlook.com", "jake@gmail.com"];
 
-const getUserInfo = (
+const getUserInfoAPI = async (
   userId: string,
   userSecret: string
-): [string, string[]] => {
-  return [USERNAME, USERACCOUNTS];
+): Promise<{ userName: string; userAccounts: string[] }> => {
+  return {
+    userName: USERNAME,
+    userAccounts: USERACCOUNTS,
+  };
 };
 
 const SideBar = (props: SideBarProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const [userName, userAccounts] = getUserInfo(
-      props.userId,
-      props.userSecret
-    );
-    props.setUserInfo({
-      username: userName,
-      useraccounts: userAccounts,
-    });
+    getUserInfoAPI(props.userId, props.userSecret)
+      .then(({ userName, userAccounts }) => {
+        props.setUserInfo({
+          username: userName,
+          useraccounts: userAccounts,
+        });
+      })
+      .catch((e) => {
+        console.log("fail to fetch user profile:", e);
+      });
   }, []);
 
   return (
