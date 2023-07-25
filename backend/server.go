@@ -198,6 +198,23 @@ func getUserProfile(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, profile)
 }
 
+func authenticateUser(c *gin.Context) {
+	q := c.Request.URL.Query()
+	username := q.Get("username")
+	password := q.Get("password")
+	if !utils.ValidateUserPassword(username, password) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": 
+			fmt.Sprintf("wrong user name %v with password %v", username, password)})
+		return
+	}
+	user_id, user_secret, err := utils.GetUserIdSecret(username)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"user_id": user_id, "user_secret": user_secret})
+}
+
 func main() {
 	router := gin.Default()
 
@@ -216,6 +233,7 @@ func main() {
 	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
+	router.GET("/verify_user", authenticateUser)
 	router.GET("/user_profile", getUserProfile)
 	router.POST("/add_mailbox", addUserMailbox)
 

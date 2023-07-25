@@ -246,3 +246,33 @@ user_accounts:
   - username: string # mailbox address
   - protocal: string # mailbox type
 ```
+
+### `verify_user` endpoint
+
+This API is meant to autheticate user name and password then return the user id and user secret for future API call.
+
+Endpoint: `http://public-ip:8080/user_profile`
+
+Method: GET
+
+Payload:
+
+```yaml
+username: string
+password: string
+```
+
+Response:
+
+If the request is not successful:
+
+```yaml
+errMsg: string
+```
+
+If the request is successful:
+
+```yaml
+user_id: string
+user_secret: string
+```

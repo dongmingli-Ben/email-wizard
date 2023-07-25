@@ -99,6 +99,14 @@ func ValidateUserSecret(user_id string, secret string) bool {
 	return true
 }
 
+func ValidateUserPassword(username string, password string) bool {
+	return true
+}
+
+func GetUserIdSecret(username string) (string, string, error) {
+	return "jake", "jhk193348", nil
+}
+
 func GetUserEvents(user_id string) []map[string]interface{} {
 	events := make([]map[string]interface{}, 0)
 	event := map[string]interface{}{
