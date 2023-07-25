@@ -186,3 +186,31 @@ If there is an internal error, it will return:
   "errMsg": "error message"
 }
 ```
+
+### `add_mailbox` endpoint
+
+This API is meant to add users' mailbox info to the user DB.
+
+Endpoint: `http://public-ip:8080/add_mailbox`
+
+Method: POST
+
+Payload:
+
+```yaml
+userId: string
+userSecret: string
+type: string # mailbox type
+address: string # mailbox address
+password: string # needed for IMAP/POP3
+imap_server: string # for IMAP
+pop3_server: string # for POP3
+```
+
+Response:
+
+If the request is not successful:
+
+```yaml
+errMsg: string
+```

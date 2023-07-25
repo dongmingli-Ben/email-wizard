@@ -50,11 +50,6 @@ const addEmailAccountDBAPI = async (req): Promise<string> => {
   }
   let errMsg = await post(backendConfig.add_mailbox, add_req)
     .then((resp) => {
-      if (typeof resp === "object" && "errMsg" in resp) {
-        console.log(resp);
-        console.log(add_req);
-        return resp.errMsg;
-      }
       return "";
     })
     .catch((e) => {
