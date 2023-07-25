@@ -38,26 +38,28 @@ const addEmailAccountDBAPI = async (req): Promise<string> => {
   add_req = {
     userId: req.userId,
     userSecret: req.userSecret,
-    type: req.type,
+    type: req.emailtype,
     address: req.emailaddress,
   };
-  if (req.type === "IMAP") {
+  if (req.emailtype === "IMAP") {
     add_req.password = req.password;
     add_req.imap_server = req.imapServer;
-  } else if (req.type === "POP3") {
+  } else if (req.emailtype === "POP3") {
     add_req.password = req.password;
     add_req.pop3_server = req.pop3Server;
   }
   let errMsg = await post(backendConfig.add_mailbox, add_req)
     .then((resp) => {
-      if ("errMsg" in resp) {
+      if (typeof resp === "object" && "errMsg" in resp) {
         console.log(resp);
+        console.log(add_req);
         return resp.errMsg;
       }
       return "";
     })
     .catch((e) => {
       console.log("caught error when adding mailbox:", e);
+      console.log(add_req);
       return "fail to add mailbox.";
     });
   return errMsg;

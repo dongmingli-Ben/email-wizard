@@ -67,20 +67,20 @@ func getEmails(c *gin.Context) {
 	accounts := make([]map[string]string, 0)
 	if email_type == "IMAP" {
 		account := map[string]string{
-			"protocol": "IMAP",
-			"username": username,
-			"password": password,
+			"protocol":    "IMAP",
+			"username":    username,
+			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
 		accounts = append(accounts, account)
 	} else {
 		account := map[string]string{
-			"protocol": "POP3",
-			"username": username,
-			"password": password,
+			"protocol":    "POP3",
+			"username":    username,
+			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
-		accounts = append(accounts, account)	
+		accounts = append(accounts, account)
 	}
 	emails, err := utils.GetUserEmailsFromAccounts(accounts)
 	if err == nil {
@@ -98,24 +98,28 @@ func addUserMailbox(c *gin.Context) {
 	var mailbox_type string
 	var user_id string
 	var user_secret string
-	var mailbox_address string 
+	var mailbox_address string
 	if _mailbox_type, ok := payload["type"]; !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: type"})
+		return
 	} else {
 		mailbox_type = _mailbox_type
 	}
 	if _user_id, ok := payload["userId"]; !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userId"})
+		return
 	} else {
 		user_id = _user_id
 	}
 	if _user_secret, ok := payload["userSecret"]; !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userSecret"})
+		return
 	} else {
 		user_secret = _user_secret
 	}
 	if _mailbox_address, ok := payload["address"]; !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: address"})
+		return
 	} else {
 		mailbox_address = _mailbox_address
 	}
@@ -129,43 +133,50 @@ func addUserMailbox(c *gin.Context) {
 		err := utils.AddUserMailboxOutlook(user_id, mailbox_address)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
 		}
 	} else if mailbox_type == "IMAP" {
 		var password string
 		var imap_server string
 		if _password, ok := payload["password"]; !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
+			return
 		} else {
 			password = _password
 		}
 		if _imap_server, ok := payload["imap_server"]; !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: imap_server"})
+			return
 		} else {
 			imap_server = _imap_server
 		}
 		err := utils.AddUserMailboxIMAP(user_id, mailbox_address, password, imap_server)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
 		}
 	} else if mailbox_type == "POP3" {
 		var password string
 		var pop3_server string
 		if _password, ok := payload["password"]; !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
+			return
 		} else {
 			password = _password
 		}
 		if _pop3_server, ok := payload["pop3_server"]; !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: pop3_server"})
+			return
 		} else {
 			pop3_server = _pop3_server
 		}
 		err := utils.AddUserMailboxPOP3(user_id, mailbox_address, password, pop3_server)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
 		}
 	}
-	c.IndentedJSON(http.StatusAccepted, "")
+	c.IndentedJSON(http.StatusCreated, "")
 }
 
 func main() {
@@ -186,7 +197,7 @@ func main() {
 	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
-	router.POST("/add_mailbox", addUserMailbox);
+	router.POST("/add_mailbox", addUserMailbox)
 
 	router.Run(":8080")
 }
