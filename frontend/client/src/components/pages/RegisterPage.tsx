@@ -4,6 +4,7 @@ import { Link, useNavigate } from "@reach/router";
 // to use styles, import the necessary CSS files
 import "./RegisterPage.css";
 import "../../utility.css";
+import { backendConfig, post } from "../../utilities/requestUtility";
 
 type RegisterPageProps = {
   path: string;
@@ -13,10 +14,19 @@ const registerUserPassword = async (
   username: string,
   password: string
 ): Promise<{ errMsg: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return {
-    errMsg: "",
-  };
+  return post(backendConfig.add_user, {
+    username: username,
+    password: password,
+  })
+    .then((resp) => {
+      return { errMsg: "" };
+    })
+    .catch((e) => {
+      console.log("fail to add new user:", e);
+      return {
+        errMsg: "fail to add: Please change your user name or password",
+      };
+    });
 };
 
 /**

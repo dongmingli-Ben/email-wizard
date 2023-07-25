@@ -4,28 +4,33 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
+	"email-wizard/backend/utils"
 )
 
 func updateUserEvents(user_id string) error {
 
-	var accounts []map[string]string = getUserEmailAccounts(user_id)
+	accounts, err := utils.GetUserEmailAccounts(user_id)
+	if err != nil {
+		return err
+	}
 
 	// read recent emails from user email accounts
-	emails, err := getUserEmailsFromAccounts(accounts)
+	emails, err := utils.GetUserEmailsFromAccounts(accounts)
 	if err != nil {
 		return err
 	}
 
 	// filter for un-parsed emails
-	emails = getUserUnparsedEmails(emails, user_id)
+	emails = utils.GetUserUnparsedEmails(emails, user_id)
 
 	// parse into events
-	events := parseEmailsToEvents(emails, 5)
+	events := utils.ParseEmailsToEvents(emails, 5)
 
 	// store back to db
-	err = storeUserEvents(events, user_id)
+	err = utils.StoreUserEvents(events, user_id)
 	return err
 }
 
@@ -33,7 +38,7 @@ func updateUserEvents(user_id string) error {
 func getEvents(c *gin.Context) {
 	user_id := c.Param("user_id")
 	secret := c.Param("secret")
-	if !validateUserSecret(user_id, secret) {
+	if !utils.ValidateUserSecret(user_id, secret) {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
 	}
@@ -46,7 +51,7 @@ func getEvents(c *gin.Context) {
 	}
 
 	// read events from db
-	events := getUserEvents(user_id)
+	events := utils.GetUserEvents(user_id)
 
 	c.IndentedJSON(http.StatusOK, events)
 }
@@ -65,22 +70,22 @@ func getEmails(c *gin.Context) {
 	accounts := make([]map[string]string, 0)
 	if email_type == "IMAP" {
 		account := map[string]string{
-			"protocol": "IMAP",
-			"username": username,
-			"password": password,
+			"protocol":    "IMAP",
+			"username":    username,
+			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
 		accounts = append(accounts, account)
 	} else {
 		account := map[string]string{
-			"protocol": "POP3",
-			"username": username,
-			"password": password,
+			"protocol":    "POP3",
+			"username":    username,
+			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
-		accounts = append(accounts, account)	
+		accounts = append(accounts, account)
 	}
-	emails, err := getUserEmailsFromAccounts(accounts)
+	emails, err := utils.GetUserEmailsFromAccounts(accounts)
 	if err == nil {
 		c.IndentedJSON(http.StatusOK, emails)
 		return
@@ -88,21 +93,147 @@ func getEmails(c *gin.Context) {
 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 }
 
-// func CORSMiddleware() gin.HandlerFunc {
-//     return func(c *gin.Context) {
-//         c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-//         c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-//         c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-//         c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+func addUserMailbox(c *gin.Context) {
+	var payload map[string]string
+	if err := c.BindJSON(&payload); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+	}
+	var mailbox_type string
+	var user_id string
+	var user_secret string
+	var mailbox_address string
+	if _mailbox_type, ok := payload["type"]; !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: type"})
+		return
+	} else {
+		mailbox_type = _mailbox_type
+	}
+	if _user_id, ok := payload["userId"]; !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userId"})
+		return
+	} else {
+		user_id = _user_id
+	}
+	if _user_secret, ok := payload["userSecret"]; !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userSecret"})
+		return
+	} else {
+		user_secret = _user_secret
+	}
+	if _mailbox_address, ok := payload["address"]; !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: address"})
+		return
+	} else {
+		mailbox_address = _mailbox_address
+	}
 
-//         if c.Request.Method == "OPTIONS" {
-//             c.AbortWithStatus(204)
-//             return
-//         }
+	if !utils.ValidateUserSecret(user_id, user_secret) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+		return
+	}
 
-//         c.Next()
-//     }
-// }
+	if mailbox_type == "outlook" {
+		err := utils.AddUserMailboxOutlook(user_id, mailbox_address)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
+		}
+	} else if mailbox_type == "IMAP" {
+		var password string
+		var imap_server string
+		if _password, ok := payload["password"]; !ok {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
+			return
+		} else {
+			password = _password
+		}
+		if _imap_server, ok := payload["imap_server"]; !ok {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: imap_server"})
+			return
+		} else {
+			imap_server = _imap_server
+		}
+		err := utils.AddUserMailboxIMAP(user_id, mailbox_address, password, imap_server)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
+		}
+	} else if mailbox_type == "POP3" {
+		var password string
+		var pop3_server string
+		if _password, ok := payload["password"]; !ok {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
+			return
+		} else {
+			password = _password
+		}
+		if _pop3_server, ok := payload["pop3_server"]; !ok {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: pop3_server"})
+			return
+		} else {
+			pop3_server = _pop3_server
+		}
+		err := utils.AddUserMailboxPOP3(user_id, mailbox_address, password, pop3_server)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusCreated, "")
+}
+
+func addUser(c *gin.Context) {
+	var payload map[string]string
+	if err := c.BindJSON(&payload); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	username, ok_username := payload["username"]
+	password, ok_password := payload["password"]
+	if !(ok_username && ok_password) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	err := utils.AddUserDB(username, password)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, "")
+}
+
+func getUserProfile(c *gin.Context) {
+	q := c.Request.URL.Query()
+	user_id := q.Get("userId")
+	user_secret := q.Get("userSecret")
+	if !utils.ValidateUserSecret(user_id, user_secret) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+		return
+	}
+	profile, err := utils.GetUserProfile(user_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, profile)
+}
+
+func authenticateUser(c *gin.Context) {
+	q := c.Request.URL.Query()
+	username := q.Get("username")
+	password := q.Get("password")
+	if !utils.ValidateUserPassword(username, password) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": 
+			fmt.Sprintf("wrong user name %v with password %v", username, password)})
+		return
+	}
+	user_id, user_secret, err := utils.GetUserIdSecret(username)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"user_id": user_id, "user_secret": user_secret})
+}
 
 func main() {
 	router := gin.Default()
@@ -122,6 +253,10 @@ func main() {
 	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
+	router.GET("/verify_user", authenticateUser)
+	router.GET("/user_profile", getUserProfile)
+	router.POST("/add_mailbox", addUserMailbox)
+	router.POST("/add_user", addUser)
 
 	router.Run(":8080")
 }

@@ -4,6 +4,7 @@ import { Link, useNavigate } from "@reach/router";
 // to use styles, import the necessary CSS files
 import "./LoginPage.css";
 import "../../utility.css";
+import { backendConfig, get } from "../../utilities/requestUtility";
 
 type LoginPageProps = {
   userId: string;
@@ -17,12 +18,25 @@ const authenticateUserPassword = async (
   username: string,
   password: string
 ): Promise<{ userId: string; userSecret: string; errMsg: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return {
-    userId: "jake",
-    userSecret: "secret",
-    errMsg: "",
-  };
+  return get(backendConfig.verify_user, {
+    username: username,
+    password: password,
+  })
+    .then((resp) => {
+      return {
+        userId: resp.user_id,
+        userSecret: resp.user_secret,
+        errMsg: "",
+      };
+    })
+    .catch((e) => {
+      console.log(`error in user verification: ${e}`);
+      return {
+        userId: "",
+        userSecret: "",
+        errMsg: "Cannot verify your user name and password",
+      };
+    });
 };
 
 /**

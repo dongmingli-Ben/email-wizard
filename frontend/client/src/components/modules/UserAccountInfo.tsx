@@ -13,6 +13,7 @@ const UserNameBar = (props: { userName: string }) => {
 };
 
 const UserAccountBars = (props: { userAccounts: string[] }) => {
+  console.log(props.userAccounts.map((ele) => ele));
   return (
     <div className="useraccounts-container">
       {props.userAccounts.map((account: string, index: number) => {

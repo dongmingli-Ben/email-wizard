@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import { backendConfig, get } from "../../utilities/requestUtility";
 
 type calendarProps = {
   userId: string;
@@ -13,14 +14,36 @@ type EventType = {
   date: string;
 };
 
-const EVENTS = [
-  { title: "event 1", date: "2023-07-01" },
-  { title: "event 2", date: "2023-04-02" },
-];
-
-const getAPIEvents = async (userId: string, userSecret: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return EVENTS;
+const getEventsAPI = async (
+  userId: string,
+  userSecret: string
+): Promise<EventType[]> => {
+  return get(backendConfig.events, {
+    userId: userId,
+    userSecret: userSecret,
+  })
+    .then((resp) => {
+      console.log(`events returned`);
+      console.log(resp);
+      let events: EventType[] = [];
+      for (const e of resp) {
+        if ("end_time" in e) {
+          events = [
+            ...events,
+            {
+              title: e.summary,
+              date: e.end_time.split("T")[0],
+            },
+          ];
+        }
+      }
+      console.log(events);
+      return events;
+    })
+    .catch((e) => {
+      console.log("fail to get user events:", e);
+      return [];
+    });
 };
 
 const match = (event: EventType, query: string): boolean => {
@@ -47,7 +70,7 @@ const Calendar = (props: calendarProps) => {
   const [displayEvents, setDisplayEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
-    getAPIEvents(props.userId, props.userSecret).then(
+    getEventsAPI(props.userId, props.userSecret).then(
       (_events: EventType[]) => {
         setEvents(_events);
       }

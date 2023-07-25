@@ -1,19 +1,21 @@
-package main
+package utils
 
 import (
 	"email-wizard/backend/clients"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 )
 
 var N_EMAIL_RETREIVAL int32 = 5
 
-func parsedUserEmailIDs(user_id string) []string {
+func ParsedUserEmailIDs(user_id string) []string {
 	return make([]string, 0)
 }
 
-func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []map[string]interface{} {
-	parsed_email_ids := parsedUserEmailIDs(user_id)
+func GetUserUnparsedEmails(emails []map[string]interface{}, user_id string) []map[string]interface{} {
+	parsed_email_ids := ParsedUserEmailIDs(user_id)
 	email_ids := make(map[string]bool)
 	for _, id := range parsed_email_ids {
 		email_ids[id] = true
@@ -27,7 +29,7 @@ func getUserUnparsedEmails(emails []map[string]interface{}, user_id string) []ma
 	return unparsed_emails
 }
 
-func getUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]interface{}, error) {
+func GetUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]interface{}, error) {
 	all_emails := make([]map[string]interface{}, 0)
 	for _, account := range accounts {
 		emails, err := clients.GetEmails(account, N_EMAIL_RETREIVAL)
@@ -49,20 +51,36 @@ func getUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]inter
 	return all_emails, nil
 }
 
-func getUserEmailAccounts(user_id string) []map[string]string {
+func GetUserProfile(user_id string) (map[string]interface{}, error) {
 	// use fake account for now
+	user_name := "Jake"
 	body, err := os.ReadFile("tests/outlook.json")
 	if err != nil {
-		return []map[string]string{}
+		return make(map[string]interface{}), err
 	}
 	account := make(map[string]string)
 	_ = json.Unmarshal(body, &account)
 	accounts := make([]map[string]string, 0)
 	accounts = append(accounts, account)
-	return accounts
+	return map[string]interface{}{
+		"user_name":     user_name,
+		"user_accounts": accounts,
+	}, nil
 }
 
-func parseEmailsToEvents(emails []map[string]interface{}, retry int) []map[string]string {
+func GetUserEmailAccounts(user_id string) ([]map[string]string, error) {
+	user_profile, err := GetUserProfile(user_id)
+	if err != nil {
+		return make([]map[string]string, 0), nil
+	}
+	accounts, ok := user_profile["user_accounts"].([]map[string]string)
+	if !ok {
+		return make([]map[string]string, 0), errors.New("fail to get user_accounts from profile")
+	}
+	return accounts, nil
+}
+
+func ParseEmailsToEvents(emails []map[string]interface{}, retry int) []map[string]string {
 	all_events := make([]map[string]string, 0)
 	for _, email := range emails {
 		events, _ := clients.ParseEmail(email, "Asia/Shanghai", retry)
@@ -74,15 +92,23 @@ func parseEmailsToEvents(emails []map[string]interface{}, retry int) []map[strin
 	return all_events
 }
 
-func storeUserEvents(events []map[string]string, user_id string) error {
+func StoreUserEvents(events []map[string]string, user_id string) error {
 	return nil
 }
 
-func validateUserSecret(user_id string, secret string) bool {
+func ValidateUserSecret(user_id string, secret string) bool {
 	return true
 }
 
-func getUserEvents(user_id string) []map[string]interface{} {
+func ValidateUserPassword(username string, password string) bool {
+	return true
+}
+
+func GetUserIdSecret(username string) (string, string, error) {
+	return "jake", "jhk193348", nil
+}
+
+func GetUserEvents(user_id string) []map[string]interface{} {
 	events := make([]map[string]interface{}, 0)
 	event := map[string]interface{}{
 		"event_type": "registration",
@@ -92,4 +118,9 @@ func getUserEvents(user_id string) []map[string]interface{} {
 	}
 	events = append(events, event)
 	return events
+}
+
+func AddUserDB(username string, password string) error {
+	fmt.Printf("adding username: %v, password: %v\n", username, password)
+	return nil
 }
