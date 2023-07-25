@@ -91,7 +91,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] implement logout mechanism
     - [x] implement intro page
     - [x] implement account authorization grants
-    - [ ] integrate with backend API
+    - [x] integrate with backend API
 - [ ] deploy to production server
 
 ### Stage 2
