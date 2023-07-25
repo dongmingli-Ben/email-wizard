@@ -182,6 +182,26 @@ func addUserMailbox(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, "")
 }
 
+func addUser(c *gin.Context) {
+	var payload map[string]string
+	if err := c.BindJSON(&payload); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	username, ok_username := payload["username"]
+	password, ok_password := payload["password"]
+	if !(ok_username && ok_password) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	err := utils.AddUserDB(username, password)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, "")
+}
+
 func getUserProfile(c *gin.Context) {
 	q := c.Request.URL.Query()
 	user_id := q.Get("userId")
@@ -236,6 +256,7 @@ func main() {
 	router.GET("/verify_user", authenticateUser)
 	router.GET("/user_profile", getUserProfile)
 	router.POST("/add_mailbox", addUserMailbox)
+	router.POST("/add_user", addUser)
 
 	router.Run(":8080")
 }

@@ -276,3 +276,26 @@ If the request is successful:
 user_id: string
 user_secret: string
 ```
+
+### `add_user` endpoint
+
+This API is meant to add user name and password to backend database.
+
+Endpoint: `http://public-ip:8080/add_user`
+
+Method: GET
+
+Payload:
+
+```yaml
+username: string
+password: string
+```
+
+Response:
+
+If the request is not successful:
+
+```yaml
+errMsg: string
+```

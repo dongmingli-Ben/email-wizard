@@ -4,6 +4,7 @@ import (
 	"email-wizard/backend/clients"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -117,4 +118,9 @@ func GetUserEvents(user_id string) []map[string]interface{} {
 	}
 	events = append(events, event)
 	return events
+}
+
+func AddUserDB(username string, password string) error {
+	fmt.Printf("adding username: %v, password: %v\n", username, password)
+	return nil
 }
