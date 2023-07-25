@@ -3,6 +3,8 @@ import UserAccountInfo from "./UserAccountInfo";
 import { useNavigate } from "@reach/router";
 
 import "./SideBar.css";
+import { get } from "../../utilities/requestUtility";
+import { backendConfig } from "../../utilities/requestUtility";
 
 type userInfoType = {
   username: string;
@@ -19,17 +21,34 @@ type SideBarProps = {
   setUserSecret: (userSecret: string) => void;
 };
 
-const USERNAME = "jake";
-const USERACCOUNTS = ["jake@outlook.com", "jake@gmail.com"];
-
 const getUserInfoAPI = async (
   userId: string,
   userSecret: string
-): Promise<{ userName: string; userAccounts: string[] }> => {
-  return {
-    userName: USERNAME,
-    userAccounts: USERACCOUNTS,
-  };
+): Promise<{ userName: string; userAccounts: string[]; errMsg: string }> => {
+  return get(backendConfig.user_profile, {
+    userId: userId,
+    userSecret: userSecret,
+  })
+    .then((resp) => {
+      return {
+        userName: resp.user_name,
+        userAccounts: resp.user_accounts.map((ele) => ele.username),
+        errMsg: "",
+      };
+    })
+    .catch((e) => {
+      console.log("fail to get user profile:", e);
+      return {
+        userName: "",
+        userAccounts: [],
+        errMsg: "fail to get user profile",
+      };
+    });
+  // return {
+  //   userName: "Jake",
+  //   userAccounts: [],
+  //   errMsg: "",
+  // };
 };
 
 const SideBar = (props: SideBarProps) => {
@@ -37,7 +56,9 @@ const SideBar = (props: SideBarProps) => {
 
   useEffect(() => {
     getUserInfoAPI(props.userId, props.userSecret)
-      .then(({ userName, userAccounts }) => {
+      .then(({ userName, userAccounts, errMsg }) => {
+        console.log(userName);
+        console.log(userAccounts);
         props.setUserInfo({
           username: userName,
           useraccounts: userAccounts,

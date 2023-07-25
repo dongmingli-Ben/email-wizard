@@ -3,6 +3,7 @@ package utils
 import (
 	"email-wizard/backend/clients"
 	"encoding/json"
+	"errors"
 	"os"
 )
 
@@ -49,17 +50,33 @@ func GetUserEmailsFromAccounts(accounts []map[string]string) ([]map[string]inter
 	return all_emails, nil
 }
 
-func GetUserEmailAccounts(user_id string) []map[string]string {
+func GetUserProfile(user_id string) (map[string]interface{}, error) {
 	// use fake account for now
+	user_name := "Jake"
 	body, err := os.ReadFile("tests/outlook.json")
 	if err != nil {
-		return []map[string]string{}
+		return make(map[string]interface{}), err
 	}
 	account := make(map[string]string)
 	_ = json.Unmarshal(body, &account)
 	accounts := make([]map[string]string, 0)
 	accounts = append(accounts, account)
-	return accounts
+	return map[string]interface{}{
+		"user_name":     user_name,
+		"user_accounts": accounts,
+	}, nil
+}
+
+func GetUserEmailAccounts(user_id string) ([]map[string]string, error) {
+	user_profile, err := GetUserProfile(user_id)
+	if err != nil {
+		return make([]map[string]string, 0), nil
+	}
+	accounts, ok := user_profile["user_accounts"].([]map[string]string)
+	if !ok {
+		return make([]map[string]string, 0), errors.New("fail to get user_accounts from profile")
+	}
+	return accounts, nil
 }
 
 func ParseEmailsToEvents(emails []map[string]interface{}, retry int) []map[string]string {

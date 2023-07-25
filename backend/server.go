@@ -12,7 +12,10 @@ import (
 
 func updateUserEvents(user_id string) error {
 
-	var accounts []map[string]string = utils.GetUserEmailAccounts(user_id)
+	accounts, err := utils.GetUserEmailAccounts(user_id)
+	if err != nil {
+		return err
+	}
 
 	// read recent emails from user email accounts
 	emails, err := utils.GetUserEmailsFromAccounts(accounts)
@@ -179,6 +182,22 @@ func addUserMailbox(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, "")
 }
 
+func getUserProfile(c *gin.Context) {
+	q := c.Request.URL.Query()
+	user_id := q.Get("userId")
+	user_secret := q.Get("userSecret")
+	if !utils.ValidateUserSecret(user_id, user_secret) {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+		return
+	}
+	profile, err := utils.GetUserProfile(user_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, profile)
+}
+
 func main() {
 	router := gin.Default()
 
@@ -197,6 +216,7 @@ func main() {
 	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
 	router.GET("/verify_email", getEmails)
+	router.GET("/user_profile", getUserProfile)
 	router.POST("/add_mailbox", addUserMailbox)
 
 	router.Run(":8080")

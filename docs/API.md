@@ -214,3 +214,35 @@ If the request is not successful:
 ```yaml
 errMsg: string
 ```
+
+### `user_profile` endpoint
+
+This API is meant to get user name and their added mailboxes information for display.
+
+Endpoint: `http://public-ip:8080/user_profile`
+
+Method: GET
+
+Payload:
+
+```yaml
+userId: string
+userSecret: string
+```
+
+Response:
+
+If the request is not successful:
+
+```yaml
+errMsg: string
+```
+
+If the request is successful:
+
+```yaml
+user_name: string
+user_accounts:
+  - username: string # mailbox address
+  - protocal: string # mailbox type
+```

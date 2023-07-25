@@ -19,9 +19,13 @@ function formatParams(params: Object): string {
 }
 
 // convert a fetch result to a JSON object with error handling for fetch and json errors
-function convertToJSON(res: Response) {
+async function convertToJSON(res: Response) {
   if (!res.ok) {
-    throw `API request failed with response status ${res.status} and text: ${res.statusText}`;
+    console.log(
+      `API request failed with response status ${res.status} and text: ${res.statusText}`
+    );
+    let errData = await res.json();
+    throw new Error(errData.errMsg);
   }
 
   return res
