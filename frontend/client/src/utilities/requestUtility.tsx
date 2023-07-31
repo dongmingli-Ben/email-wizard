@@ -75,10 +75,10 @@ export async function post(endpoint: string, params = {}) {
 }
 
 export const backendConfig = {
-  verify_email: "http://47.243.42.37:8080/verify_email",
-  events: "http://47.243.42.37:8080/events",
-  add_user: "http://47.243.42.37:8080/add_user",
-  verify_user: "http://47.243.42.37:8080/verify_user",
-  add_mailbox: "http://47.243.42.37:8080/add_mailbox",
-  user_profile: "http://47.243.42.37:8080/user_profile",
+  verify_email: "https://47.243.42.37:8080/verify_email",
+  events: "https://47.243.42.37:8080/events",
+  add_user: "https://47.243.42.37:8080/add_user",
+  verify_user: "https://47.243.42.37:8080/verify_user",
+  add_mailbox: "https://47.243.42.37:8080/add_mailbox",
+  user_profile: "https://47.243.42.37:8080/user_profile",
 };

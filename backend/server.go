@@ -258,5 +258,6 @@ func main() {
 	router.POST("/add_mailbox", addUserMailbox)
 	router.POST("/add_user", addUser)
 
-	router.Run(":8080")
+	// router.Run(":8080")
+	router.RunTLS(":8080", "config/test.pem", "config/test.key")
 }

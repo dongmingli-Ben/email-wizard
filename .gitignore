@@ -179,6 +179,8 @@ learning
 test.cpp
 .editorconfig
 test
+*.key
+*.pem
 
 # go
 go.work
