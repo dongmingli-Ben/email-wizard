@@ -27,6 +27,7 @@
     "@types/node": "^20.3.3",
     "@types/react": "^17.0.62",
     "@types/react-dom": "^18.2.6",
+    "axios": "^1.4.0",
     "core-js": "^3.8.1",
     "nodemon": "^2.0.6",
     "react": "^16.14.0",
