@@ -130,6 +130,72 @@ Response:
 }
 ```
 
+## Database Services
+
+### Email database
+
+The email database should store users' emails. It should support queries on users.
+
+#### `get_email_ids` service
+
+Input: user ID
+
+Response: a list of email ids of the emails of the user in the database
+
+### User database
+
+The user database should store users' profile.
+
+#### `get_user_profile` service
+
+Input: user ID
+
+Response: user name and mailboxes of the user
+
+#### `get_user_credential_by_name` service
+
+Input: user name
+
+Response: user ID and secret
+
+#### `get_user_secret` service
+
+This is used to authenticate users (for internal backend services). It may possibly be called frequently.
+
+Input: user ID
+
+Response: user secret
+
+#### `get_user_password` service
+
+This is used to authenticate users (and then acquire user ID and secret).
+
+Input: user name
+
+Response: user password
+
+#### `add_user` service
+
+Input: user name and password
+
+Response: void
+
+### Event database
+
+The event database should store the parsed events from users' emails.
+
+#### `store_event` service
+
+Input: an event (possibly in JSON format)
+
+Response: void
+
+#### `get_events` service
+
+Input: user ID
+
+Response: a list of events (possibly in JSON format)
+
 ## Backend API Endpoint
 
 ### `events` endpoint
