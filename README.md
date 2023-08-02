@@ -52,8 +52,8 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### C1. store summary to database
 
-- [ ] design API protocol
-  - [ ] CRUD operations interface
+- [x] design API protocol
+  - [x] CRUD operations interface
 - [ ] Implement APIs
   - [ ] database design
     - [ ] choose database engine
@@ -81,9 +81,9 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### C3. calendar view UI
 
-- [ ] frontend UI design and development
+- [x] frontend UI design and development
   - [x] UI wireframe
-  - [ ] build UI with React
+  - [x] build UI with React
     - [x] implement main calendar page (use fake user_id and secret for now)
     - [x] implement add email account (use fake autheticate for now)
     - [x] implement login page (get user_id and secret)
