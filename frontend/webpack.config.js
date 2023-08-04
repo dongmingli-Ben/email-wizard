@@ -76,5 +76,6 @@ module.exports = {
         ws: true,
       },
     },
+    allowedHosts: ["www.toymaker-ben.online"],
   },
 };
