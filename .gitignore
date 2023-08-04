@@ -181,6 +181,7 @@ test.cpp
 test
 *.key
 *.pem
+bundle.js
 
 # go
 go.work
