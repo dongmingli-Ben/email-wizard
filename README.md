@@ -99,7 +99,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] implement intro page
     - [x] implement account authorization grants
     - [x] integrate with backend API
-- [ ] deploy to production server
+- [x] deploy to production server
 
 ### Stage 2
 
@@ -126,6 +126,8 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### C2. API requests
 
 - [ ] refine API interface
+- [ ] API testing
+- [ ] microservices testing
 
 #### C3. calendar view UI
 
