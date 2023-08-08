@@ -5,8 +5,8 @@ export const msalConfig: Configuration = {
   auth: {
     clientId: "34fe7958-6ad4-438e-8218-cb028e47fe40",
     authority: "https://login.microsoftonline.com/common",
-    redirectUri: "http://localhost:39017/calendar",
-    postLogoutRedirectUri: "http://localhost:39017/calendar",
+    redirectUri: "https://www.toymaker-ben.online/calendar",
+    postLogoutRedirectUri: "https://www.toymaker-ben.online/calendar",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
