@@ -48,10 +48,10 @@ export async function post(endpoint: string, params = {}) {
 }
 
 export const backendConfig = {
-  verify_email: "https://47.243.42.37:8080/verify_email",
-  events: "https://47.243.42.37:8080/events",
-  add_user: "https://47.243.42.37:8080/add_user",
-  verify_user: "https://47.243.42.37:8080/verify_user",
-  add_mailbox: "https://47.243.42.37:8080/add_mailbox",
-  user_profile: "https://47.243.42.37:8080/user_profile",
+  verify_email: "https://www.toymaker-ben.online/api/verify_email",
+  events: "https://www.toymaker-ben.online/api/events",
+  add_user: "https://www.toymaker-ben.online/api/add_user",
+  verify_user: "https://www.toymaker-ben.online/api/verify_user",
+  add_mailbox: "https://www.toymaker-ben.online/api/add_mailbox",
+  user_profile: "https://www.toymaker-ben.online/api/user_profile",
 };
