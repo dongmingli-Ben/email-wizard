@@ -128,6 +128,9 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [ ] refine API interface
 - [ ] API testing
 - [ ] microservices testing
+- [ ] migrate to full docker orchestration
+  - [ ] migrate to docker compose
+  - [ ] deploy with k8s
 
 #### C3. calendar view UI
 
