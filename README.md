@@ -55,9 +55,9 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [x] design API protocol
   - [x] CRUD operations interface
 - [ ] Implement APIs
-  - [ ] database design
-    - [ ] choose database engine
-    - [ ] design database schema
+  - [x] database design
+    - [x] choose database engine
+    - [x] design database schema
   - [ ] CRUD for email db
     - [ ] `get_email_ids`
   - [ ] CRUD for user db
@@ -126,6 +126,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### C2. API requests
 
 - [ ] refine API interface
+  - [ ] migrate to RESTful APIs
 - [ ] API testing
 - [ ] microservices testing
 - [ ] migrate to full docker orchestration
