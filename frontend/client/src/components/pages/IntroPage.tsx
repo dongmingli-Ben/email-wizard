@@ -33,6 +33,9 @@ const IntroPage = (props: IntroPageProps) => {
             participants are recognized instantly. Simplify event planning and
             unlock efficiency with Email Wizard.
           </div>
+          <div className="intro-feature-container intro-message-container">
+            Preview! Still in progress.
+          </div>
           <div className="button-container u-flex u-flex-justifyCenter">
             <button
               type="button"

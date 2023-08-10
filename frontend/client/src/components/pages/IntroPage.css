@@ -27,6 +27,11 @@
   text-align: justify;
 }
 
+.intro-message-container {
+  font-size: var(--l);
+  font-weight: bold;
+}
+
 .intro-btn {
   border: none;
   color: var(--black);
