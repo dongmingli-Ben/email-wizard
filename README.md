@@ -59,16 +59,24 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] choose database engine
     - [x] design database schema
   - [ ] CRUD for email db
-    - [ ] `get_email_ids`
+    - [ ] `add_row`
+    - [ ] `update_row`
+    - [ ] `update_item`
+    - [ ] `delete_row`
+    - [ ] `query`
   - [ ] CRUD for user db
-    - [ ] `get_user_profile`
-    - [ ] `get_user_credential_by_name`
-    - [ ] `get_user_secret`
-    - [ ] `get_user_password`
-    - [ ] `add_user`
+    - [ ] `add_row`
+    - [ ] `update_row`
+    - [ ] `update_item`
+    - [ ] `delete_row`
+    - [ ] `query`
   - [ ] CRUD for event db
-    - [ ] `store_event`
-    - [ ] `get_events`
+    - [ ] `add_row`
+    - [ ] `update_row`
+    - [ ] `update_item`
+    - [ ] `delete_row`
+    - [ ] `query`
+  - [ ] `execute`
 - [ ] deploy as a microservice
   - [ ] benchmark microservice performance
 
@@ -81,9 +89,18 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] implement logic with prepared microservices
     - [x] retrieve emails from user mailboxes
     - [x] extract new emails
+      - [ ] `get_email_ids`
     - [x] parse to events
     - [x] store results to database
+      - [ ] `store_event`
     - [x] query database for results
+      - [ ] `store_event`
+    - [ ] user registration
+      - [ ] `get_user_profile`
+      - [ ] `get_user_credential_by_name`
+      - [ ] `get_user_secret`
+      - [ ] `get_user_password`
+      - [ ] `add_user`
 - [x] deploy with microservice
 
 #### C3. calendar view UI
