@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_secret TEXT NOT NULL,
     user_name TEXT UNIQUE NOT NULL,
     user_password TEXT NOT NULL,
-    mailboxes JSON[]
+    mailboxes JSON
 );
 
 ALTER TABLE public.users 
