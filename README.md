@@ -73,7 +73,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] `update_item`
     - [x] `delete_row`
     - [ ] `query`
-  - [ ] `execute`
+    <!-- - [ ] `execute` -->
   - [ ] testing
 - [ ] deploy as a microservice
   - [ ] testing

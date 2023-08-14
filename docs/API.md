@@ -144,14 +144,12 @@ The user database should store users' profile.
 
 The event database should store the parsed events from users' emails.
 
-| endpoint    | service            | input                          | output        |
-| ----------- | ------------------ | ------------------------------ | ------------- |
-| add_row     | add a row          | JSON                           | error message |
-| update_row  | update a row       | JSON                           | error message |
-| update_item | update an element  | JSON                           | error message |
-| delete_row  | delete a row       | JSON                           | error message |
-| query       | query database     | JSON of fields and constraints | JSON          |
-| execute     | execute SQL script | SQL string                     | JSON          |
+| endpoint    | service           | input                          | output        |
+| ----------- | ----------------- | ------------------------------ | ------------- |
+| add_row     | add a row         | JSON                           | error message |
+| update_item | update an element | JSON                           | error message |
+| delete_row  | delete a row      | JSON                           | error message |
+| query       | query database    | JSON of fields and constraints | JSON          |
 
 ## Backend API Endpoint
 

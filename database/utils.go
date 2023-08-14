@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/lib/pq"
 )
@@ -188,4 +189,83 @@ func deleteRows(condition map[string]interface{}, table string) error {
 		return err
 	}
 	return nil
+}
+
+func prepare_select_query(db *sql.DB, columns []string, condition map[string]interface{}, 
+		table string) (string, []interface{}, error) {
+	query := fmt.Sprintf("SELECT %s FROM %s", strings.Join(columns, ", "), table)
+	if len(condition) == 0 {
+		return query, nil, nil
+	}
+	query += " WHERE "
+	idx := 0
+	values := make([]interface{}, 0)
+	for key, val := range condition {
+		if idx > 0 {
+			query += " AND "
+		}
+		query += fmt.Sprintf("%s = $%d", key, idx+1)
+		values = append(values, val)
+	}
+	return query, values, nil
+}
+
+// do not support complex fields for columns yet
+func query(columns []string, condition map[string]interface{}, table string) ([]map[string]interface{}, error) {
+	db, err := connectDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	column_info, err := get_column_name_type(db, table)
+	if err != nil {
+		return nil, err
+	}
+	query, values, err := prepare_select_query(db, columns, condition, table)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := db.Query(query, values...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		record := make(map[string]interface{})
+		values = make([]interface{}, len(columns))
+		for i := 0; i < len(values); i++ {
+			values[i] = new(interface{})
+		}
+		if err := rows.Scan(values...); err != nil {
+			return nil, err
+		}
+		for i := 0; i < len(columns); i++ {
+			col := columns[i]
+			val := *values[i].(*interface{})
+			if column_info[col] == "json" {
+				val_json := make(map[string]interface{})
+				// fmt.Println(string(val.([]byte)))
+				if err := json.Unmarshal(val.([]byte), &val_json); err != nil {
+					arr_json := make([]map[string]interface{}, 0)
+					if err := json.Unmarshal(val.([]byte), &arr_json); err != nil {
+						return nil, err
+					}
+					record[col] = arr_json
+				} else {
+					record[col] = val_json
+				}
+			} else if column_info[col] == "ARRAY" {
+				array, ok := val.([]interface{})
+				if !ok {
+					return nil, fmt.Errorf("cannot read array from column %s", col)
+				}
+				record[col] = array
+			} else {
+				record[col] = val
+			}
+		}
+		results = append(results, record)
+	}
+	return results, nil
 }
