@@ -109,3 +109,50 @@ func addRow(row map[string]interface{}, table string) error {
 	}
 	return nil
 }
+
+func prepare_update_query(db *sql.DB, column string, value interface{},
+	condition map[string]interface{}, table string) (string, []interface{}, error) {
+	column_info, err := get_column_name_type(db, table)
+	if err != nil {
+		return "", nil, err
+	}
+	query := fmt.Sprintf("UPDATE %s SET %s = $%d WHERE ", table, column, len(condition)+1)
+	idx := 1
+	values := make([]interface{}, 0)
+	for col, val := range condition {
+		if idx > 1 {
+			query += " AND "
+		}
+		query += fmt.Sprintf("%s = $%d", col, idx)
+		values = append(values, val)
+	}
+	if col_type, ok := column_info[column]; !ok {
+		return "", nil, fmt.Errorf("%s not in table %s", column, table)
+	} else if col_type == "json" {
+		json_str, err := json.Marshal(value)
+		if err != nil {
+			return "", nil, err
+		}
+		values = append(values, json_str)
+	} else {
+		values = append(values, value)
+	}
+	return query, values, nil
+}
+
+func updateValue(column string, value interface{}, condition map[string]interface{}, table string) error {
+	db, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	update_query, values, err := prepare_update_query(db, column, value, condition, table)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(update_query, values...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
