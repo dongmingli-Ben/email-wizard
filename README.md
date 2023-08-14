@@ -58,21 +58,21 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] database design
     - [x] choose database engine
     - [x] design database schema
-  - [ ] CRUD for email db
+  - [x] CRUD for email db
     - [x] `add_row`
     - [x] `update_item`
     - [x] `delete_row`
-    - [ ] `query`
-  - [ ] CRUD for user db
+    - [x] `query`
+  - [x] CRUD for user db
     - [x] `add_row`
     - [x] `update_item`
     - [x] `delete_row`
-    - [ ] `query`
-  - [ ] CRUD for event db
+    - [x] `query`
+  - [x] CRUD for event db
     - [x] `add_row`
     - [x] `update_item`
     - [x] `delete_row`
-    - [ ] `query`
+    - [x] `query`
     <!-- - [ ] `execute` -->
   - [ ] testing
 - [ ] deploy as a microservice
