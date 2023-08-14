@@ -140,6 +140,7 @@ func prepare_update_query(db *sql.DB, column string, value interface{},
 	return query, values, nil
 }
 
+// do not support complex type condition yet
 func updateValue(column string, value interface{}, condition map[string]interface{}, table string) error {
 	db, err := connectDB()
 	if err != nil {
@@ -151,6 +152,38 @@ func updateValue(column string, value interface{}, condition map[string]interfac
 		return err
 	}
 	_, err = db.Exec(update_query, values...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func prepare_delete_query(db *sql.DB, condition map[string]interface{}, table string) (string, []interface{}, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE ", table)
+	idx := 1
+	values := make([]interface{}, 0)
+	for col, val := range condition {
+		if idx > 1 {
+			query += " AND "
+		}
+		query += fmt.Sprintf("%s = $%d", col, idx)
+		values = append(values, val)
+	}
+	return query, values, nil
+}
+
+// do not support complex type condition yet
+func deleteRows(condition map[string]interface{}, table string) error {
+	db, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	delete_query, values, err := prepare_delete_query(db, condition, table)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(delete_query, values...)
 	if err != nil {
 		return err
 	}
