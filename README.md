@@ -61,17 +61,17 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [ ] CRUD for email db
     - [x] `add_row`
     - [x] `update_item`
-    - [ ] `delete_row`
+    - [x] `delete_row`
     - [ ] `query`
   - [ ] CRUD for user db
     - [x] `add_row`
     - [x] `update_item`
-    - [ ] `delete_row`
+    - [x] `delete_row`
     - [ ] `query`
   - [ ] CRUD for event db
     - [x] `add_row`
     - [x] `update_item`
-    - [ ] `delete_row`
+    - [x] `delete_row`
     - [ ] `query`
   - [ ] `execute`
   - [ ] testing
