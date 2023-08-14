@@ -74,7 +74,9 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [ ] `delete_row`
     - [ ] `query`
   - [ ] `execute`
+  - [ ] testing
 - [ ] deploy as a microservice
+  - [ ] testing
   - [ ] benchmark microservice performance
 
 #### C2. API requests
