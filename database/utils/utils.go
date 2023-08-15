@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"database/sql"
@@ -94,7 +94,7 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 	return query, values, nil
 }
 
-func addRow(row map[string]interface{}, table string) error {
+func AddRow(row map[string]interface{}, table string) error {
 	db, err := connectDB()
 	if err != nil {
 		return err
@@ -142,7 +142,7 @@ func prepare_update_query(db *sql.DB, column string, value interface{},
 }
 
 // do not support complex type condition yet
-func updateValue(column string, value interface{}, condition map[string]interface{}, table string) error {
+func UpdateValue(column string, value interface{}, condition map[string]interface{}, table string) error {
 	db, err := connectDB()
 	if err != nil {
 		return err
@@ -174,7 +174,7 @@ func prepare_delete_query(db *sql.DB, condition map[string]interface{}, table st
 }
 
 // do not support complex type condition yet
-func deleteRows(condition map[string]interface{}, table string) error {
+func DeleteRows(condition map[string]interface{}, table string) error {
 	db, err := connectDB()
 	if err != nil {
 		return err
@@ -191,8 +191,8 @@ func deleteRows(condition map[string]interface{}, table string) error {
 	return nil
 }
 
-func prepare_select_query(db *sql.DB, columns []string, condition map[string]interface{}, 
-		table string) (string, []interface{}, error) {
+func prepare_select_query(db *sql.DB, columns []string, condition map[string]interface{},
+	table string) (string, []interface{}, error) {
 	query := fmt.Sprintf("SELECT %s FROM %s", strings.Join(columns, ", "), table)
 	if len(condition) == 0 {
 		return query, nil, nil
@@ -211,7 +211,7 @@ func prepare_select_query(db *sql.DB, columns []string, condition map[string]int
 }
 
 // do not support complex fields for columns yet
-func query(columns []string, condition map[string]interface{}, table string) ([]map[string]interface{}, error) {
+func Query(columns []string, condition map[string]interface{}, table string) ([]map[string]interface{}, error) {
 	db, err := connectDB()
 	if err != nil {
 		return nil, err
