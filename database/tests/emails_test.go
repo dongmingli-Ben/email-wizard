@@ -14,8 +14,8 @@ func prepare_db() error {
 	if err := reset(); err != nil {
 		return err
 	}
-	err := utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	_, err := utils.AddRow(map[string]interface{}{
+		// "user_id":       1234323,
 		"user_secret":   "oe2o950jgrnwgr",
 		"user_name":     "jake",
 		"user_password": "sjgn",
@@ -31,7 +31,7 @@ func TestQueryEmails(t *testing.T) {
 	if err := prepare_db(); err != nil {
 		t.Error(err.Error())
 	}
-	results, err := utils.Query([]string{"user_id", "email_address", "event_ids"}, map[string]interface{}{"user_id": 1234323},
+	results, err := utils.Query([]string{"user_id", "email_address", "event_ids"}, map[string]interface{}{"user_id": 1},
 		"emails")
 	if err != nil {
 		t.Error(err.Error())
@@ -43,8 +43,8 @@ func TestAddQueryEmails(t *testing.T) {
 	if err := prepare_db(); err != nil {
 		t.Error(err.Error())
 	}
-	err := utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"mailbox_type":  "outlook",
@@ -55,18 +55,18 @@ func TestAddQueryEmails(t *testing.T) {
 		t.Error(err.Error())
 	}
 	results, err := utils.Query([]string{"user_id", "email_address", "event_ids"},
-		map[string]interface{}{"user_id": 1234323}, "emails")
+		pk_values, "emails")
 	if err != nil {
 		t.Error(err.Error())
 	}
 	if len(results) != 1 {
 		t.Error("mismatched length")
 	}
-	if results[0]["user_id"].(int64) != 1234323 ||
+	if results[0]["user_id"].(int64) != 1 ||
 		results[0]["email_address"].(string) != "jake@example.com" ||
 		!reflect.DeepEqual(results[0]["event_ids"].([]interface{}), []interface{}{0., 1., 2.}) {
 		fmt.Println(results[0]["user_id"].(int64), results[0]["email_address"].(string), results[0]["event_ids"].([]interface{}))
-		fmt.Println(results[0]["user_id"].(int64) != 1234323)
+		fmt.Println(results[0]["user_id"].(int64) != 1)
 		fmt.Println(results[0]["email_address"].(string) != "jake@example.com")
 		fmt.Println(!reflect.DeepEqual(results[0]["event_ids"].([]interface{}), []interface{}{0., 1., 2.}))
 		t.Error("mismatched content")
@@ -77,8 +77,8 @@ func TestAddUpdateQueryEmails(t *testing.T) {
 	if err := prepare_db(); err != nil {
 		t.Error(err.Error())
 	}
-	err := utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"mailbox_type":  "outlook",
@@ -90,13 +90,13 @@ func TestAddUpdateQueryEmails(t *testing.T) {
 	}
 	err = utils.UpdateValue("event_ids",
 		[]int32{4, 5, 6},
-		map[string]interface{}{"user_id": 1234323},
+		pk_values,
 		"emails")
 	if err != nil {
 		t.Error(err.Error())
 	}
 	results, err := utils.Query([]string{"event_ids"},
-		map[string]interface{}{"user_id": 1234323}, "emails")
+		pk_values, "emails")
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -112,8 +112,8 @@ func TestAddDeleteQueryEmails(t *testing.T) {
 	if err := prepare_db(); err != nil {
 		t.Error(err.Error())
 	}
-	err := utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"mailbox_type":  "outlook",
@@ -123,7 +123,7 @@ func TestAddDeleteQueryEmails(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	err = utils.DeleteRows(map[string]interface{}{"user_id": 1234323},
+	err = utils.DeleteRows(pk_values,
 		"emails")
 	if err != nil {
 		t.Error(err.Error())

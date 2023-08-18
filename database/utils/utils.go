@@ -53,10 +53,46 @@ func get_column_name_type(db *sql.DB, table string) (map[string]string, error) {
 	return column_info, nil
 }
 
-func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) (string, []interface{}, error) {
+func get_primary_keys(db *sql.DB, table string) ([]string, error) {
+	query := fmt.Sprintf(`
+		SELECT a.attname AS column_name
+		FROM pg_index i
+		JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+		WHERE i.indrelid = '%s'::regclass
+			AND i.indisprimary;
+	`, table)
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pk_cols []string
+
+	for rows.Next() {
+		var col_name string
+		err := rows.Scan(&col_name)
+		if err != nil {
+			return nil, err
+		}
+		pk_cols = append(pk_cols, col_name)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return pk_cols, nil
+}
+
+func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) (string, []interface{}, []string, error) {
 	column_info, err := get_column_name_type(db, table)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
+	}
+	pk_cols, err := get_primary_keys(db, table)
+	if err != nil {
+		return "", nil, nil, err
 	}
 	values := make([]interface{}, 0)
 	query := fmt.Sprintf("INSERT INTO %s (", table)
@@ -64,14 +100,14 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 	for col_name, value := range row {
 		col_type, ok := column_info[col_name]
 		if !ok {
-			return "", nil, fmt.Errorf("unrecognized column %s in row", col_name)
+			return "", nil, nil, fmt.Errorf("unrecognized column %s in row", col_name)
 		}
 		if col_type == "ARRAY" {
 			values = append(values, pq.Array(value))
 		} else if col_type == "json" {
 			json_str, err := json.Marshal(value)
 			if err != nil {
-				return "", nil, err
+				return "", nil, nil, err
 			}
 			values = append(values, json_str)
 		} else {
@@ -90,25 +126,33 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 		}
 		query += fmt.Sprintf("$%d", i)
 	}
-	query += ")"
-	return query, values, nil
+	query += ") RETURNING " + strings.Join(pk_cols, ", ")
+	return query, values, pk_cols, nil
 }
 
-func AddRow(row map[string]interface{}, table string) error {
+func AddRow(row map[string]interface{}, table string) (map[string]interface{}, error) {
 	db, err := connectDB()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer db.Close()
-	insert_query, values, err := prepare_insert_query(db, row, table)
+	insert_query, values, pk_cols, err := prepare_insert_query(db, row, table)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, err = db.Exec(insert_query, values...)
+	pk_values := make([]interface{}, len(pk_cols))
+	for i := 0; i < len(pk_cols); i++ {
+		pk_values[i] = new(interface{})
+	}
+	err = db.QueryRow(insert_query, values...).Scan(pk_values...)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	pk_vals := make(map[string]interface{})
+	for i := 0; i < len(pk_cols); i++ {
+		pk_vals[pk_cols[i]] = *pk_values[i].(*interface{})
+	}
+	return pk_vals, nil
 }
 
 func prepare_update_query(db *sql.DB, column string, value interface{},
@@ -126,6 +170,7 @@ func prepare_update_query(db *sql.DB, column string, value interface{},
 		}
 		query += fmt.Sprintf("%s = $%d", col, idx)
 		values = append(values, val)
+		idx++
 	}
 	if col_type, ok := column_info[column]; !ok {
 		return "", nil, fmt.Errorf("%s not in table %s", column, table)
@@ -171,6 +216,7 @@ func prepare_delete_query(db *sql.DB, condition map[string]interface{}, table st
 		}
 		query += fmt.Sprintf("%s = $%d", col, idx)
 		values = append(values, val)
+		idx++
 	}
 	return query, values, nil
 }
@@ -219,6 +265,7 @@ func prepare_select_query(db *sql.DB, columns []string, condition map[string]int
 		}
 		query += fmt.Sprintf("%s = $%d", key, idx+1)
 		values = append(values, val)
+		idx++
 	}
 	return query, values, nil
 }

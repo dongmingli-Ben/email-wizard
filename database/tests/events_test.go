@@ -14,8 +14,8 @@ func prepare_db_for_events() error {
 	if err := reset(); err != nil {
 		return err
 	}
-	err := utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	pk_values, err := utils.AddRow(map[string]interface{}{
+		// "user_id":       1234323,
 		"user_secret":   "oe2o950jgrnwgr",
 		"user_name":     "jake",
 		"user_password": "sjgn",
@@ -24,8 +24,8 @@ func prepare_db_for_events() error {
 	if err != nil {
 		return err
 	}
-	err = utils.AddRow(map[string]interface{}{
-		"user_id":       1234323,
+	_, err = utils.AddRow(map[string]interface{}{
+		"user_id":       pk_values["user_id"],
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"mailbox_type":  "outlook",
@@ -58,7 +58,7 @@ func TestAddQueryEvents(t *testing.T) {
 	content := map[string]interface{}{
 		"type": "notification", "content": "test notification",
 	}
-	err := utils.AddRow(map[string]interface{}{
+	pk_values, err := utils.AddRow(map[string]interface{}{
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -67,8 +67,7 @@ func TestAddQueryEvents(t *testing.T) {
 		t.Error(err.Error())
 	}
 	results, err := utils.Query([]string{"event_id", "email_id", "email_address", "event_content"},
-		map[string]interface{}{"event_id": 1},
-		"events")
+		pk_values, "events")
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -93,7 +92,7 @@ func TestAddUpdateQueryEvents(t *testing.T) {
 	content := map[string]interface{}{
 		"type": "notification", "content": "test notification",
 	}
-	err := utils.AddRow(map[string]interface{}{
+	pk_values, err := utils.AddRow(map[string]interface{}{
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -105,13 +104,12 @@ func TestAddUpdateQueryEvents(t *testing.T) {
 		"type": "registration", "content": "test notification",
 	}
 	err = utils.UpdateValue("event_content", new_content,
-		map[string]interface{}{"event_id": 1},
-		"events")
+		pk_values, "events")
 	if err != nil {
 		t.Error(err.Error())
 	}
 	results, err := utils.Query([]string{"event_content"},
-		map[string]interface{}{"event_id": 1}, "events")
+		pk_values, "events")
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -130,7 +128,7 @@ func TestAddDeleteQueryEvents(t *testing.T) {
 	content := map[string]interface{}{
 		"type": "notification", "content": "test notification",
 	}
-	err := utils.AddRow(map[string]interface{}{
+	pk_values, err := utils.AddRow(map[string]interface{}{
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -138,8 +136,7 @@ func TestAddDeleteQueryEvents(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	err = utils.DeleteRows(map[string]interface{}{"event_id": 1},
-		"events")
+	err = utils.DeleteRows(pk_values, "events")
 	if err != nil {
 		t.Error(err.Error())
 	}
