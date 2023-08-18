@@ -54,7 +54,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 - [x] design API protocol
   - [x] CRUD operations interface
-- [ ] Implement APIs
+- [x] Implement APIs
   - [x] database design
     - [x] choose database engine
     - [x] design database schema
@@ -74,7 +74,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] `delete_row`
     - [x] `query`
     <!-- - [ ] `execute` -->
-  - [ ] testing
+  - [x] testing
 - [ ] deploy as a microservice
   - [ ] testing
   - [ ] benchmark microservice performance
