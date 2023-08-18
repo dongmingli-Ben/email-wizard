@@ -61,10 +61,10 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 	values := make([]interface{}, 0)
 	query := fmt.Sprintf("INSERT INTO %s (", table)
 	idx := 0
-	for col_name, col_type := range column_info {
-		value, ok := row[col_name]
+	for col_name, value := range row {
+		col_type, ok := column_info[col_name]
 		if !ok {
-			return "", nil, fmt.Errorf("missing column %s in row", col_name)
+			return "", nil, fmt.Errorf("unrecognized column %s in row", col_name)
 		}
 		if col_type == "ARRAY" {
 			values = append(values, pq.Array(value))
@@ -84,7 +84,7 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 		idx++
 	}
 	query += ") VALUES ("
-	for i := 1; i <= len(column_info); i++ {
+	for i := 1; i <= len(row); i++ {
 		if i != 1 {
 			query += ", "
 		}
