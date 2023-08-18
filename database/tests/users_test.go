@@ -24,7 +24,7 @@ func reset() error {
 	return nil
 }
 
-func TestQuery(t *testing.T) {
+func TestQueryUsers(t *testing.T) {
 	if err := reset(); err != nil {
 		t.Error(err.Error())
 	}
@@ -36,7 +36,7 @@ func TestQuery(t *testing.T) {
 	fmt.Println(results)
 }
 
-func TestAddQuery(t *testing.T) {
+func TestAddQueryUsers(t *testing.T) {
 	if err := reset(); err != nil {
 		t.Error(err.Error())
 	}
@@ -63,7 +63,7 @@ func TestAddQuery(t *testing.T) {
 	}
 }
 
-func TestAddUpdateQuery(t *testing.T) {
+func TestAddUpdateQueryUsers(t *testing.T) {
 	if err := reset(); err != nil {
 		t.Error(err.Error())
 	}
@@ -100,7 +100,7 @@ func TestAddUpdateQuery(t *testing.T) {
 	}
 }
 
-func TestAddDeleteQuery(t *testing.T) {
+func TestAddDeleteQueryUsers(t *testing.T) {
 	if err := reset(); err != nil {
 		t.Error(err.Error())
 	}

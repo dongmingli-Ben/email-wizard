@@ -135,6 +135,8 @@ func prepare_update_query(db *sql.DB, column string, value interface{},
 			return "", nil, err
 		}
 		values = append(values, json_str)
+	} else if col_type == "ARRAY" {
+		values = append(values, pq.Array(value))
 	} else {
 		values = append(values, value)
 	}
@@ -193,7 +195,18 @@ func DeleteRows(condition map[string]interface{}, table string) error {
 
 func prepare_select_query(db *sql.DB, columns []string, condition map[string]interface{},
 	table string) (string, []interface{}, error) {
-	query := fmt.Sprintf("SELECT %s FROM %s", strings.Join(columns, ", "), table)
+	column_info, err := get_column_name_type(db, table)
+	if err != nil {
+		return "", nil, err
+	}
+	ready_cols := make([]string, len(columns))
+	copy(ready_cols, columns)
+	for i := 0; i < len(ready_cols); i++ {
+		if col_type, ok := column_info[ready_cols[i]]; ok && col_type == "ARRAY" {
+			ready_cols[i] = fmt.Sprintf("array_to_json(%s)", ready_cols[i])
+		}
+	}
+	query := fmt.Sprintf("SELECT %s FROM %s", strings.Join(ready_cols, ", "), table)
 	if len(condition) == 0 {
 		return query, nil, nil
 	}
@@ -256,11 +269,11 @@ func Query(columns []string, condition map[string]interface{}, table string) ([]
 					record[col] = val_json
 				}
 			} else if column_info[col] == "ARRAY" {
-				array, ok := val.([]interface{})
-				if !ok {
-					return nil, fmt.Errorf("cannot read array from column %s", col)
+				arr_json := make([]interface{}, 0)
+				if err := json.Unmarshal(val.([]byte), &arr_json); err != nil {
+					return nil, err
 				}
-				record[col] = array
+				record[col] = arr_json
 			} else {
 				record[col] = val
 			}
