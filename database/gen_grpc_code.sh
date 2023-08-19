@@ -1,7 +1,4 @@
-# protoc --proto_path=../protos \
-#     --go_out=. \
-#     --go_opt=Mdatabase.proto=/grpc \
-#     ../protos/database.proto
+cd "$(dirname "$0")"
 
 protoc --proto_path=../protos \
     --go_out=Mdatabase.proto=/grpc:. \

@@ -26,8 +26,9 @@ package database;
 service DatabaseHelper {
   rpc AddRow (AddRowRequest) returns (Response) {}
   rpc UpdateValue (UpdateValueRequest) returns (Response) {}
-  rpc DeleteRow (DeleteRowRequest) returns (Response) {}
+  rpc DeleteRows (DeleteRowsRequest) returns (Response) {}
   rpc Query (QueryRequest) returns (Response) {}
+  rpc ResetDB (EmptyRequest) returns (Response) {}
 }
 
 // complex data is supposed to be serialized into JSON
@@ -42,7 +43,7 @@ message UpdateValueRequest {
   string table = 3;
 }
 
-message DeleteRowRequest {
+message DeleteRowsRequest {
   string condition = 1;
   string table = 2;
 }
@@ -52,6 +53,8 @@ message QueryRequest {
   string condition = 2;
   string table = 3;
 }
+
+message EmptyRequest {}
 
 message Response {
   string message = 1;

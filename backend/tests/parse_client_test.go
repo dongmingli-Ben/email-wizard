@@ -1,14 +1,15 @@
-package main
+package tests
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"testing"
 
 	"email-wizard/backend/clients"
 )
 
-func test_parse() {
+func TestParse(t *testing.T) {
 	var email map[string]interface{}
 	body, err := os.ReadFile("example_email.json")
 	if err != nil {
@@ -26,6 +27,6 @@ func test_parse() {
 		// fmt.Println(events)
 		fmt.Println("parse: ParseEmail test passed.")
 	} else {
-		fmt.Println("parse: ParseEmail test failed.")
+		t.Error(err.Error())
 	}
 }

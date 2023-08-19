@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: database.proto
 
-package grpc
+package database_grpc_client
 
 import (
 	context "context"

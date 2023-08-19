@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os/exec"
 
 	"email-wizard/data/utils"
 
@@ -21,6 +22,20 @@ var (
 
 type server struct {
 	pb.UnimplementedDatabaseHelperServer
+}
+
+func reset() error {
+	cmd := exec.Command("sh", "./reset_db.sh")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		fmt.Println(string(output))
+		return err
+	}
+	cmd = exec.Command("sh", "./init_db.sh")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		fmt.Println(string(output))
+		return err
+	}
+	return nil
 }
 
 func prepare_error_response(err_msg string) (*pb.Response, error) {
@@ -45,6 +60,16 @@ func load_json_value(json_str string) (map[string]interface{}, error) {
 	var value map[string]interface{}
 	err := json.Unmarshal([]byte(json_str), &value)
 	return value, err
+}
+
+func (s *server) ResetDB(ctx context.Context, in *pb.EmptyRequest) (*pb.Response, error) {
+	err := reset()
+	if err != nil {
+		return prepare_error_response(err.Error())
+	}
+	return prepare_normal_response(map[string]interface{} {
+		"err_msg": "",
+	})
 }
 
 func (s *server) AddRow(ctx context.Context, in *pb.AddRowRequest) (*pb.Response, error) {
@@ -94,7 +119,7 @@ func (s *server) UpdateValue(ctx context.Context, in *pb.UpdateValueRequest) (*p
 	return prepare_normal_response(message)
 }
 
-func (s *server) DeleteRows(ctx context.Context, in *pb.DeleteRowRequest) (*pb.Response, error) {
+func (s *server) DeleteRows(ctx context.Context, in *pb.DeleteRowsRequest) (*pb.Response, error) {
 	table := in.GetTable()
 	condition, err := load_json_value(in.GetCondition())
 	if err != nil {
