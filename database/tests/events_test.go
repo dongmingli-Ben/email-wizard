@@ -3,6 +3,7 @@ package data_tests
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	"email-wizard/data/utils"
 	"testing"
@@ -29,6 +30,10 @@ func prepare_db_for_events() error {
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"mailbox_type":  "outlook",
+		"email_subject": "example subject",
+		"email_sender": "salon@example.com",
+		"email_recipients": []string {"jake@example.com", "sully@example.com"},
+		"email_date": time.Date(2023, time.August, 20, 12, 0, 0, 0, time.FixedZone("Asia/Shanghai", 8*60*60)),
 		"email_content": "example content",
 		"event_ids":     []int32{0, 1, 2},
 	}, "emails")
@@ -59,6 +64,7 @@ func TestAddQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id": 		 1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -93,6 +99,7 @@ func TestAddUpdateQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id": 		 1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -129,6 +136,7 @@ func TestAddDeleteQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id": 		 1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,

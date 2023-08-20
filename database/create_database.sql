@@ -14,6 +14,10 @@ CREATE TABLE IF NOT EXISTS emails (
     email_id TEXT NOT NULL,
     email_address TEXT NOT NULL,
     mailbox_type VARCHAR(10) NOT NULL,
+    email_sender TEXT NOT NULL,
+    email_recipients TEXT[] NOT NULL,
+    email_date TIMESTAMPTZ NOT NULL,
+    email_subject TEXT,
     email_content TEXT,
     event_ids INT[],
     PRIMARY KEY (email_id, email_address),
@@ -26,9 +30,12 @@ ALTER TABLE public.emails
 
 CREATE TABLE IF NOT EXISTS events (
     event_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
     email_id TEXT NOT NULL,
     email_address TEXT NOT NULL,
     event_content JSON,
+    CONSTRAINT fk_events_user_id FOREIGN KEY (user_id)
+        REFERENCES users(user_id),
     CONSTRAINT fk_events_email FOREIGN KEY 
         (email_id, email_address)
         REFERENCES emails(email_id, email_address)

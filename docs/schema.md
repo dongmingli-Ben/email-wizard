@@ -17,14 +17,18 @@ Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type
 
 ## Emails
 
-| attribute          | type         | constraints |
-| ------------------ | ------------ | ----------- |
-| user ID (FK)       | integer      | not null    |
-| email ID (PK)      | string       | not null    |
-| email address (PK) | string       | not null    |
-| mailbox type       | string       | not null    |
-| email content      | string       | -           |
-| event IDs          | array of int | -           |
+| attribute          | type                    | constraints |
+| ------------------ | ----------------------- | ----------- |
+| user ID (FK)       | integer                 | not null    |
+| email ID (PK)      | string                  | not null    |
+| email address (PK) | string                  | not null    |
+| mailbox type       | string                  | not null    |
+| email subject      | string                  | -           |
+| email sender       | string                  | not null    |
+| email recipients   | array of strings        | not null    |
+| email datetime     | timestamp with timezone | not null    |
+| email content      | string                  | -           |
+| event IDs          | array of int            | -           |
 
 ## Events
 
