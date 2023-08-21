@@ -30,7 +30,7 @@ type EmailCollections struct {
 	Items []Email `json:"items"`
 }
 
-func GetEmails(user_config map[string]string, n_mails int32) (EmailCollections, error) {
+func GetEmails(user_config map[string]interface{}, n_mails int32) (EmailCollections, error) {
 	// fmt.Println("try requesting...")
 	// Set up a connection to the server.
 	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))

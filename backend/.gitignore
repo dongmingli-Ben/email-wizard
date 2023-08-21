@@ -1,3 +1,4 @@
 tests/outlook.json
 tests/test_server_secret.sh
 main
+__debug_bin*

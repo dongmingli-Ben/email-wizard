@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -18,41 +19,51 @@ func updateUserEvents(user_id int) error {
 		return err
 	}
 
-	// read recent emails from user email accounts (and store emails to DB)
-	emails, err := utils.GetUserEmailsFromAccounts(accounts)
-	if err != nil {
-		return err
-	}
-
-	// filter for un-parsed emails
-	emails = utils.GetUserUnparsedEmails(emails, user_id)
-
-	for _, email := range emails {
-		// parse into events
-		events, err := utils.ParseEmailToEvents(email, 5)
+	for _, account := range accounts {
+		// read recent emails from user email accounts (and store emails to DB)
+		emails, err := utils.GetUserEmailsFromAccount(account)
 		if err != nil {
 			return err
 		}
-		// store back to db
-		err = utils.StoreUserEvents(events, user_id, 
-			email["email_id"].(string), 
-			email["email_address"].(string))
+
+		// filter for un-parsed emails
+		emails, err = utils.GetUserUnparsedEmails(emails, account["username"].(string), user_id)
 		if err != nil {
 			return err
 		}
+		for _, email := range emails {
+			// todo: atomic!
+			err = utils.StoreUserEmails([]map[string]interface{}{email}, account, user_id)
+			if err != nil {
+				return err
+			}
+			// parse into events
+			events, err := utils.ParseEmailToEvents(email, 5)
+			if err != nil {
+				return err
+			}
+			// store back to db
+			err = utils.StoreUserEvents(events, user_id,
+				email["email_id"].(string),
+				account["username"].(string))
+			if err != nil {
+				return err
+			}
+		}
 	}
-	return err
+
+	return nil
 }
 
 // getEvents reads user's email, parse them, read from db and return them all in one.
 func getEvents(c *gin.Context) {
-	user_id, err := strconv.Atoi(c.Param("user_id"))
+	q := c.Request.URL.Query()
+	user_id, err := strconv.Atoi(q.Get("user_id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": 
-			fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
 		return
 	}
-	secret := c.Param("secret")
+	secret := q.Get("secret")
 	if ok, err := utils.ValidateUserSecret(user_id, secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
@@ -70,7 +81,7 @@ func getEvents(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err.Error())
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "fail to load events"})
-		return 
+		return
 	}
 
 	c.IndentedJSON(http.StatusOK, events)
@@ -87,25 +98,23 @@ func getEmails(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "type only accepts IMAP and POP3"})
 		return
 	}
-	accounts := make([]map[string]string, 0)
+	var account map[string]interface{}
 	if email_type == "IMAP" {
-		account := map[string]string{
+		account = map[string]interface{}{
 			"protocol":    "IMAP",
 			"username":    username,
 			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
-		accounts = append(accounts, account)
 	} else {
-		account := map[string]string{
+		account = map[string]interface{}{
 			"protocol":    "POP3",
 			"username":    username,
 			"password":    password,
 			"imap_server": q.Get("imap_server"),
 		}
-		accounts = append(accounts, account)
 	}
-	emails, err := utils.GetUserEmailsFromAccounts(accounts)
+	emails, err := utils.GetUserEmailsFromAccount(account)
 	if err == nil {
 		c.IndentedJSON(http.StatusOK, emails)
 		return
@@ -117,6 +126,7 @@ func addUserMailbox(c *gin.Context) {
 	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
 	}
 	var mailbox_type string
 	var user_id int
@@ -128,11 +138,11 @@ func addUserMailbox(c *gin.Context) {
 	} else {
 		mailbox_type = _mailbox_type
 	}
-	if _user_id, ok := payload["userId"].(int); !ok {
+	if _user_id, ok := payload["userId"].(float64); !ok {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userId"})
 		return
 	} else {
-		user_id = _user_id
+		user_id = int(_user_id)
 	}
 	if _user_secret, ok := payload["userSecret"].(string); !ok {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userSecret"})
@@ -203,8 +213,9 @@ func addUserMailbox(c *gin.Context) {
 }
 
 func addUser(c *gin.Context) {
-	var payload map[string]string
+	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
+		fmt.Println(io.ReadAll(c.Request.Body))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
 		return
 	}
@@ -214,7 +225,7 @@ func addUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
 		return
 	}
-	err := utils.AddUserDB(username, password)
+	err := utils.AddUserDB(username.(string), password.(string))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": err.Error()})
 		return
@@ -246,8 +257,7 @@ func authenticateUser(c *gin.Context) {
 	username := q.Get("username")
 	password := q.Get("password")
 	if ok, err := utils.ValidateUserPassword(username, password); err != nil || !ok {
-		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": 
-			fmt.Sprintf("fail to validate user name %v with password %v", username, password)})
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("fail to validate user name %v with password %v", username, password)})
 		return
 	}
 	user_id, user_secret, err := utils.GetUserIdSecret(username)
