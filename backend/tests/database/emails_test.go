@@ -97,7 +97,7 @@ func TestAddUpdateQueryEmails(t *testing.T) {
 		"email_subject":    "example subject",
 		"email_sender":     "salon@example.com",
 		"email_recipients": []string{"jake@example.com", "sully@example.com"},
-		"email_date":       time.Date(2023, time.August, 20, 12, 0, 0, 0, time.FixedZone("Asia/Shanghai", 8*60*60)),
+		"email_date":       "2023-06-07T13:59:04Z",
 		"email_content":    "example content",
 		"event_ids":        []int32{0, 1, 2},
 	}, "emails")
@@ -136,7 +136,7 @@ func TestAddDeleteQueryEmails(t *testing.T) {
 		"email_subject":    "example subject",
 		"email_sender":     "salon@example.com",
 		"email_recipients": []string{"jake@example.com", "sully@example.com"},
-		"email_date":       time.Date(2023, time.August, 20, 12, 0, 0, 0, time.FixedZone("Asia/Shanghai", 8*60*60)),
+		"email_date":       "2023-06-07T13:59:04Z",
 		"email_content":    "example content",
 		"event_ids":        []int32{0, 1, 2},
 	}, "emails")
