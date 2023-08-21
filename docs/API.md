@@ -153,16 +153,16 @@ The event database should store the parsed events from users' emails.
 
 ## Backend API Endpoint
 
-### `events` endpoint
+### `events` endpoint - GET
 
-This API is meant for all-in-one communication between clients and the backend server. It will automatically authenticate users' secret, update users' events and return their latest events.
+This API is meant for querying events already in DB.
 
 Endpoint: `http://public-ip:8080/events`
 
 Params:
 
 ```yaml
-user_id: string
+user_id: int
 secret: string
 ```
 
@@ -179,6 +179,29 @@ A json string of events (something like the below)
     "venue": "https://wj.cuhk.edu.cn/vm/YVgulbu.aspx"
   }
 ]
+```
+
+### `events` endpoint - POST
+
+This API is meant for updating new events of a mailbox of a user.
+
+Endpoint: `http://public-ip:8080/events`
+
+Params:
+
+```yaml
+userId: int
+userSecret: string
+address: string
+kwargs: JSON
+```
+
+Response:
+
+A json of error message
+
+```json
+{ "errMsg": "empty string if there is no error" }
 ```
 
 ### `verify_email` endpoint
