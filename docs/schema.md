@@ -34,6 +34,7 @@ Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type
 
 | attribute          | type    | constraints   |
 | ------------------ | ------- | ------------- |
+| user ID (FK)       | integer | not null      |
 | event ID (PK)      | integer | not null      |
 | email ID (FK)      | string  | not null      |
 | email address (FK) | string  | not null      |

@@ -3,6 +3,7 @@ package data_tests
 import (
 	"fmt"
 	"reflect"
+	"time"
 
 	utils "email-wizard/backend/clients"
 	"testing"
@@ -25,12 +26,16 @@ func prepare_db_for_events() error {
 		return err
 	}
 	_, err = utils.AddRow(map[string]interface{}{
-		"user_id":       pk_values["user_id"],
-		"email_id":      "oe2o950jgrnwgr",
-		"email_address": "jake@example.com",
-		"mailbox_type":  "outlook",
-		"email_content": "example content",
-		"event_ids":     []int32{0, 1, 2},
+		"user_id":          pk_values["user_id"],
+		"email_id":         "oe2o950jgrnwgr",
+		"email_address":    "jake@example.com",
+		"mailbox_type":     "outlook",
+		"email_subject":    "example subject",
+		"email_sender":     "salon@example.com",
+		"email_recipients": []string{"jake@example.com", "sully@example.com"},
+		"email_date":       time.Date(2023, time.August, 20, 12, 0, 0, 0, time.FixedZone("Asia/Shanghai", 8*60*60)),
+		"email_content":    "example content",
+		"event_ids":        []int32{0, 1, 2},
 	}, "emails")
 	if err != nil {
 		return err
@@ -59,6 +64,7 @@ func TestAddQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -77,10 +83,6 @@ func TestAddQueryEvents(t *testing.T) {
 	if results[0]["email_id"].(string) != "oe2o950jgrnwgr" ||
 		results[0]["email_address"].(string) != "jake@example.com" ||
 		!reflect.DeepEqual(results[0]["event_content"].(map[string]interface{}), content) {
-		// fmt.Println(results[0]["user_id"].(int64), results[0]["email_address"].(string), results[0]["event_ids"].([]interface{}))
-		// fmt.Println(results[0]["user_id"].(int64) != 1234323)
-		// fmt.Println(results[0]["email_address"].(string) != "jake@example.com")
-		// fmt.Println(!reflect.DeepEqual(results[0]["event_ids"].([]interface{}), []interface{}{0., 1., 2.}))
 		t.Error("mismatched content")
 	}
 }
@@ -93,6 +95,7 @@ func TestAddUpdateQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,
@@ -129,6 +132,7 @@ func TestAddDeleteQueryEvents(t *testing.T) {
 		"type": "notification", "content": "test notification",
 	}
 	pk_values, err := utils.AddRow(map[string]interface{}{
+		"user_id":       1,
 		"email_id":      "oe2o950jgrnwgr",
 		"email_address": "jake@example.com",
 		"event_content": content,

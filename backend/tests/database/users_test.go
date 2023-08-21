@@ -30,13 +30,13 @@ func TestAddQueryUsers(t *testing.T) {
 		"user_secret":   "oe2o950jgrnwgr",
 		"user_name":     "jake",
 		"user_password": "sjgn",
-		"mailboxes":     []map[string]interface{}{},
+		// "mailboxes":     []map[string]interface{}{},
 	}, "users")
 	if err != nil {
 		t.Error(err.Error())
 	}
 	fmt.Println(pk_values)
-	results, err := utils.Query([]string{"user_id", "user_secret"}, pk_values,
+	results, err := utils.Query([]string{"user_id", "user_secret", "mailboxes"}, pk_values,
 		"users")
 	if err != nil {
 		t.Error(err.Error())
