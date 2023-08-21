@@ -10,7 +10,7 @@ import (
 )
 
 func TestEmail(t *testing.T) {
-	var user_config map[string]string
+	var user_config map[string]interface{}
 	body, err := os.ReadFile("outlook.json")
 	if err != nil {
 		fmt.Println("fail to open file")
@@ -26,7 +26,7 @@ func TestEmail(t *testing.T) {
 		t.Error(err.Error())
 	}
 	if len(emails.Items) != 5 {
-		t.Error(fmt.Sprintf("%v/%v emails retrieved", len(emails.Items), n_mails))
+		t.Errorf("%v/%v emails retrieved", len(emails.Items), n_mails)
 	}
 	fmt.Printf("%v emails retrieved\n", len(emails.Items))
 	fmt.Println("email GetEmail test passed.")

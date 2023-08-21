@@ -12,50 +12,93 @@ import (
 	"email-wizard/backend/utils"
 )
 
-func updateUserEvents(user_id int) error {
-
-	accounts, err := utils.GetUserEmailAccounts(user_id)
+func UpdateUserEventsForAccount(user_id int, account map[string]interface{}) error {
+	// read recent emails from user email accounts (and store emails to DB)
+	emails, err := utils.GetUserEmailsFromAccount(account)
 	if err != nil {
 		return err
 	}
 
-	for _, account := range accounts {
-		// read recent emails from user email accounts (and store emails to DB)
-		emails, err := utils.GetUserEmailsFromAccount(account)
+	// filter for un-parsed emails
+	emails, err = utils.GetUserUnparsedEmails(emails, account["username"].(string), user_id)
+	if err != nil {
+		return err
+	}
+	for _, email := range emails {
+		// todo: atomic!
+		err = utils.StoreUserEmails([]map[string]interface{}{email}, account, user_id)
 		if err != nil {
 			return err
 		}
-
-		// filter for un-parsed emails
-		emails, err = utils.GetUserUnparsedEmails(emails, account["username"].(string), user_id)
+		// parse into events
+		events, err := utils.ParseEmailToEvents(email, 5)
 		if err != nil {
 			return err
 		}
-		for _, email := range emails {
-			// todo: atomic!
-			err = utils.StoreUserEmails([]map[string]interface{}{email}, account, user_id)
-			if err != nil {
-				return err
-			}
-			// parse into events
-			events, err := utils.ParseEmailToEvents(email, 5)
-			if err != nil {
-				return err
-			}
-			// store back to db
-			err = utils.StoreUserEvents(events, user_id,
-				email["email_id"].(string),
-				account["username"].(string))
-			if err != nil {
-				return err
-			}
+		// store back to db
+		err = utils.StoreUserEvents(events, user_id,
+			email["email_id"].(string),
+			account["username"].(string))
+		if err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-// getEvents reads user's email, parse them, read from db and return them all in one.
+// reads new emails, parses them into events, and store them in DB
+func updateAccountEvents(c *gin.Context) {
+	var payload map[string]interface{}
+	if err := c.BindJSON(&payload); err != nil {
+		fmt.Println(io.ReadAll(c.Request.Body))
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	var email_address string
+	var user_secret string
+	var user_id int
+	var kwargs map[string]interface{}
+	var ok bool
+	if email_address, ok = payload["address"].(string); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("address not found: %v", payload)})
+		return
+	}
+	if _user_id, ok := payload["userId"].(float64); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("userId not found: %v", payload)})
+		return
+	} else {
+		user_id = int(_user_id)
+	}
+	if user_secret, ok = payload["userSecret"].(string); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("userSecret not found: %v", payload)})
+		return
+	}
+	if kwargs, ok = payload["kwargs"].(map[string]interface{}); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("kwargs not found: %v", payload)})
+		return
+	}
+	if ok, err := utils.ValidateUserSecret(user_id, user_secret); !ok || err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "fail to authenticate user secret"})
+		return
+	}
+	account, err := utils.GetUserEmailAccountFromAddress(user_id, email_address)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	for key, val := range kwargs {
+		account[key] = val
+	}
+	err = UpdateUserEventsForAccount(user_id, account)
+	if err != nil{
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusAccepted, gin.H{"errMsg": ""})
+}
+
+// getEvents only read from events DB
 func getEvents(c *gin.Context) {
 	q := c.Request.URL.Query()
 	user_id, err := strconv.Atoi(q.Get("user_id"))
@@ -66,13 +109,6 @@ func getEvents(c *gin.Context) {
 	secret := q.Get("secret")
 	if ok, err := utils.ValidateUserSecret(user_id, secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
-		return
-	}
-
-	err = updateUserEvents(user_id)
-
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "internal error"})
 		return
 	}
 
@@ -285,6 +321,7 @@ func main() {
 	}
 	router.Use(cors.New(config))
 	router.GET("/events", getEvents)
+	router.POST("/events", updateAccountEvents)
 	router.GET("/verify_email", getEmails)
 	router.GET("/verify_user", authenticateUser)
 	router.GET("/user_profile", getUserProfile)

@@ -115,6 +115,20 @@ func GetUserEmailAccounts(user_id int) ([]map[string]interface{}, error) {
 	return accounts, nil
 }
 
+func GetUserEmailAccountFromAddress(user_id int, email_address string) (map[string]interface{}, error) {
+	accounts, err := GetUserEmailAccounts(user_id)
+	if err != nil {
+		return nil, err
+	}
+	for _, account := range accounts {
+		if account["username"].(string) == email_address {
+			return account, nil
+		}
+	}
+	return nil, fmt.Errorf("cannot find mailbox with address %v for user with ID %v", 
+		email_address, user_id)
+}
+
 func ParseEmailToEvents(email map[string]interface{}, retry int) ([]map[string]string, error) {
 	events, err := clients.ParseEmail(email, "Asia/Shanghai", retry)
 	if err != nil {

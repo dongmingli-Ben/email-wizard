@@ -4,6 +4,18 @@ import (
 	"email-wizard/backend/clients"
 )
 
+func prepare_mailboxes(mailboxes interface{}) ([]map[string]interface{}, error) {
+	raw_mailboxes, ok := mailboxes.([]interface{})
+	ret_mailboxes := make([]map[string]interface{}, 0)
+	if !ok {
+		return ret_mailboxes, nil
+	}
+	for _, mbox := range raw_mailboxes {
+		ret_mailboxes = append(ret_mailboxes, mbox.(map[string]interface{}))
+	}
+	return ret_mailboxes, nil
+}
+
 func AddUserMailboxOutlook(user_id int, mailbox_address string) error {
 	res, err := clients.Query([]string{"mailboxes"}, map[string]interface{}{
 		"user_id": user_id,
@@ -11,12 +23,10 @@ func AddUserMailboxOutlook(user_id int, mailbox_address string) error {
 	if err != nil {
 		return err
 	}
-	// raw_mailboxes := res[0]["mailboxes"].([]interface{})
-	// mailboxes := make([]map[string]interface{}, 0)
-	// for _, mbox := range raw_mailboxes {
-	// 	mailboxes = append(mailboxes, mbox.(map[string]interface{}))
-	// }
-	mailboxes := res[0]["mailboxes"].([]map[string]interface{})
+	mailboxes, err := prepare_mailboxes(res[0]["mailboxes"])
+	if err != nil {
+		return err
+	}
 	mailboxes = append(mailboxes, map[string]interface{}{
 		"username": mailbox_address,
 		"protocol": "outlook",
@@ -34,11 +44,9 @@ func AddUserMailboxIMAP(user_id int, mailbox_address string, password string, im
 	if err != nil {
 		return err
 	}
-	var mailboxes []map[string]interface{}
-	if _, ok := res[0]["mailboxes"].([]map[string]interface{}); !ok {
-		mailboxes = make([]map[string]interface{}, 0)
-	} else {
-		mailboxes = res[0]["mailboxes"].([]map[string]interface{})
+	mailboxes, err := prepare_mailboxes(res[0]["mailboxes"])
+	if err != nil {
+		return err
 	}
 	mailboxes = append(mailboxes, map[string]interface{}{
 		"username":    mailbox_address,
@@ -59,10 +67,13 @@ func AddUserMailboxPOP3(user_id int, mailbox_address string, password string, po
 	if err != nil {
 		return err
 	}
-	mailboxes := res[0]["mailboxes"].([]map[string]interface{})
+	mailboxes, err := prepare_mailboxes(res[0]["mailboxes"])
+	if err != nil {
+		return err
+	}
 	mailboxes = append(mailboxes, map[string]interface{}{
 		"username":    mailbox_address,
-		"protocol":    "IMAP",
+		"protocol":    "POP3",
 		"password":    password,
 		"pop3_server": pop3_server,
 	})
