@@ -75,8 +75,8 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] `query`
     <!-- - [ ] `execute` -->
   - [x] testing
-- [ ] deploy as a microservice
-  - [ ] testing
+- [x] deploy as a microservice
+  - [x] testing
   - [ ] benchmark microservice performance
 
 #### C2. API requests
@@ -88,18 +88,10 @@ Codes in this repo should be able to parse raw email contents into structured co
   - [x] implement logic with prepared microservices
     - [x] retrieve emails from user mailboxes
     - [x] extract new emails
-      - [ ] `get_email_ids`
     - [x] parse to events
     - [x] store results to database
-      - [ ] `store_event`
     - [x] query database for results
-      - [ ] `store_event`
-    - [ ] user registration
-      - [ ] `get_user_profile`
-      - [ ] `get_user_credential_by_name`
-      - [ ] `get_user_secret`
-      - [ ] `get_user_password`
-      - [ ] `add_user`
+    - [x] user registration
 - [x] deploy with microservice
 
 #### C3. calendar view UI
@@ -115,6 +107,7 @@ Codes in this repo should be able to parse raw email contents into structured co
     - [x] implement intro page
     - [x] implement account authorization grants
     - [x] integrate with backend API
+      - [ ] integrate with updated APIs
 - [x] deploy to production server
 
 ### Stage 2
