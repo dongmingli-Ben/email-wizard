@@ -34,22 +34,24 @@ function getTokenPopup(request, username: string) {
 
   return msalInstance.acquireTokenSilent(request).catch((error) => {
     console.warn("silent token acquisition fails. acquiring token using popup");
-    if (error instanceof InteractionRequiredAuthError) {
-      // fallback to interaction when silent call fails
-      return msalInstance
-        .acquireTokenPopup(request)
-        .then((tokenResponse) => {
-          console.log(tokenResponse);
-          return tokenResponse;
-        })
-        .catch((error) => {
-          console.error(error);
-          return String(error);
-        });
-    } else {
-      console.warn(error);
-      return String(error);
-    }
+    // if (error instanceof InteractionRequiredAuthError) {
+    // fallback to interaction when silent call fails
+    request.loginHint = username;
+    console.log(request);
+    return msalInstance
+      .acquireTokenPopup(request)
+      .then((tokenResponse) => {
+        console.log(tokenResponse);
+        return tokenResponse;
+      })
+      .catch((error) => {
+        console.error(error);
+        return String(error);
+      });
+    // } else {
+    //   console.warn(error);
+    //   return String(error);
+    // }
   });
 }
 
