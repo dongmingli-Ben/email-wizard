@@ -58,6 +58,10 @@ const SideBar = (props: SideBarProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (props.userId <= 0 || props.userSecret.length === 0) {
+      console.log("null user id and secret. Waiting for next render ...");
+      return;
+    }
     getUserInfoAPI(props.userId, props.userSecret)
       .then(({ userName, userAccounts, errMsg }) => {
         console.log(userName);
@@ -70,7 +74,7 @@ const SideBar = (props: SideBarProps) => {
       .catch((e) => {
         console.log("fail to fetch user profile:", e);
       });
-  }, []);
+  }, [props.userId, props.userSecret]);
 
   return (
     <div className="sidebar-container">
@@ -90,6 +94,8 @@ const SideBar = (props: SideBarProps) => {
           onClick={(e) => {
             props.setUserId(-1);
             props.setUserSecret("");
+            sessionStorage.setItem("userId", (-1).toString());
+            sessionStorage.setItem("userSecret", "");
             navigate("/");
           }}
         >

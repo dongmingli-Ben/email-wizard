@@ -25,10 +25,23 @@ const CalendarPage = (props: CalendarPageProps) => {
 
   const navigate = useNavigate();
   useEffect(() => {
-    if (props.userId <= 0) {
-      navigate("/login");
-    }
-  });
+    const delay = 100;
+
+    // Introduce a delay using setTimeout
+    const timerId = setTimeout(() => {
+      // Check user id here
+      if (props.userId <= 0 || props.userSecret.length === 0) {
+        // Navigate the user to the login page
+        console.log(
+          `current user id: ${props.userId}, secret: ${props.userSecret}`
+        );
+        navigate("/login");
+      }
+    }, delay);
+
+    // Clear the timeout if the component unmounts or the effect is re-executed
+    return () => clearTimeout(timerId);
+  }, [props.userId, props.userSecret]);
 
   return (
     // <> is like a <div>, but won't show

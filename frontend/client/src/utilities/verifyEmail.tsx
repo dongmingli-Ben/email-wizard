@@ -1,9 +1,5 @@
 import { msalInstance } from "../index";
-import {
-  InteractionRequiredAuthError,
-  AuthenticationResult,
-} from "@azure/msal-browser";
-import { graphConfig, tokenRequest, loginRequest } from "./msalAuthConfig";
+import { graphConfig, tokenRequest } from "./msalAuthConfig";
 import { backendConfig, get } from "./requestUtility";
 
 async function callMSGraph(endpoint: string, token: string) {
@@ -53,21 +49,6 @@ function getTokenPopup(request, username: string) {
     //   return String(error);
     // }
   });
-}
-
-function seeProfile(username: string) {
-  getTokenPopup(loginRequest, username)
-    .then((response) => {
-      if (typeof response !== "string") {
-        callMSGraph(graphConfig.graphMeEndpoint, response.accessToken);
-        return;
-      }
-      console.log("err: auth token not obtained");
-      console.log(response);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 }
 
 async function readMail(username: string, token: string) {

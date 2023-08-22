@@ -23,6 +23,26 @@ type AppProps = {
 const App = ({ pca }: AppProps) => {
   const [userId, setUserId] = useState(-1);
   const [userSecret, setUserSecret] = useState("");
+
+  useEffect(() => {
+    if (userId > 0 && userSecret.length > 0) {
+      console.log("setting userId and userSecret to", userId, userSecret);
+      sessionStorage.setItem("userId", userId.toString());
+      sessionStorage.setItem("userSecret", userSecret);
+    }
+  }, [userId, userSecret]);
+
+  useEffect(() => {
+    const storedId = sessionStorage.getItem("userId");
+    const storedSecret = sessionStorage.getItem("userSecret");
+    if (storedId !== null && storedSecret !== null) {
+      console.log("loading id and secret from session storage ...");
+      setUserId(parseInt(storedId));
+      setUserSecret(storedSecret);
+      console.log(`current id: ${userId}, secret: ${userSecret}`);
+    }
+  }, []);
+
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
