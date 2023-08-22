@@ -5,7 +5,7 @@ import Calendar from "./Calendar";
 import "./Feed.css";
 
 type FeedProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
 };
 

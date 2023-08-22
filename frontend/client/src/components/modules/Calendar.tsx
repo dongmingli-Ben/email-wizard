@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import { backendConfig, get } from "../../utilities/requestUtility";
 
 type calendarProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
   query: string;
 };
@@ -15,7 +15,7 @@ type EventType = {
 };
 
 const getEventsAPI = async (
-  userId: string,
+  userId: number,
   userSecret: string
 ): Promise<EventType[]> => {
   return get(backendConfig.events, {

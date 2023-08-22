@@ -7,9 +7,9 @@ import "../../utility.css";
 import { backendConfig, get } from "../../utilities/requestUtility";
 
 type LoginPageProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
-  setUserId: (userId: string) => void;
+  setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
   path: string;
 };
@@ -17,7 +17,7 @@ type LoginPageProps = {
 const authenticateUserPassword = async (
   username: string,
   password: string
-): Promise<{ userId: string; userSecret: string; errMsg: string }> => {
+): Promise<{ userId: number; userSecret: string; errMsg: string }> => {
   return get(backendConfig.verify_user, {
     username: username,
     password: password,
@@ -32,7 +32,7 @@ const authenticateUserPassword = async (
     .catch((e) => {
       console.log(`error in user verification: ${e}`);
       return {
-        userId: "",
+        userId: -1,
         userSecret: "",
         errMsg: "Cannot verify your user name and password",
       };
@@ -56,9 +56,10 @@ const LoginPage = (props: LoginPageProps) => {
     setLoading(true);
     setErrorMsg("");
     authenticateUserPassword(username, password).then(
-      (resp: { userId: string; userSecret: string; errMsg: string }) => {
+      (resp: { userId: number; userSecret: string; errMsg: string }) => {
         console.log(resp);
-        if (resp.userId.length > 0) {
+        if (resp.userId > 0) {
+          console.log("redirecting to /calendar");
           props.setUserId(resp.userId);
           props.setUserSecret(resp.userSecret);
           navigate("/calendar");

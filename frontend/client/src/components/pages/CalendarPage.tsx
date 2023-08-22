@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import Feed from "../modules/Feed";
 import SideBar, { userInfoType } from "../modules/SideBar";
 import AddAccountWindow from "../modules/AddAccountWindow";
+import { useNavigate } from "@reach/router";
 
 // to use styles, import the necessary CSS files
 import "./CalendarPage.css";
 import "../../utility.css";
 
 type CalendarPageProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
-  setUserId: (userId: string) => void;
+  setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
   path: string;
 };
@@ -21,6 +22,14 @@ type CalendarPageProps = {
 const CalendarPage = (props: CalendarPageProps) => {
   const [addAccount, setAddAccount] = useState(false);
   const [userInfo, setUserInfo] = useState<userInfoType>();
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (props.userId <= 0) {
+      navigate("/login");
+    }
+  });
+
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree

@@ -12,17 +12,17 @@ type userInfoType = {
 };
 
 type SideBarProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
-  setUserId: (userId: string) => void;
+  setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
 };
 
 const getUserInfoAPI = async (
-  userId: string,
+  userId: number,
   userSecret: string
 ): Promise<{ userName: string; userAccounts: string[]; errMsg: string }> => {
   return get(backendConfig.user_profile, {
@@ -30,9 +30,11 @@ const getUserInfoAPI = async (
     userSecret: userSecret,
   })
     .then((resp) => {
+      console.log("mailboxes: ", resp.mailboxes);
+      let mailboxes = resp.mailboxes.length > 0 ? resp.mailboxes : [];
       return {
         userName: resp.user_name,
-        userAccounts: resp.user_accounts.map((ele) => ele.username),
+        userAccounts: mailboxes.map((ele) => ele.username),
         errMsg: "",
       };
     })
@@ -44,11 +46,6 @@ const getUserInfoAPI = async (
         errMsg: "fail to get user profile",
       };
     });
-  // return {
-  //   userName: "Jake",
-  //   userAccounts: [],
-  //   errMsg: "",
-  // };
 };
 
 const SideBar = (props: SideBarProps) => {
@@ -74,7 +71,9 @@ const SideBar = (props: SideBarProps) => {
       <UserAccountInfo
         userName={props.userInfo ? props.userInfo.username : ""}
         userAccounts={
-          props.userInfo ? props.userInfo.useraccounts : ["No accounts"]
+          props.userInfo && props.userInfo.useraccounts.length > 0
+            ? props.userInfo.useraccounts
+            : ["No accounts"]
         }
         setAddAccount={props.setAddAccount}
       />
@@ -83,7 +82,7 @@ const SideBar = (props: SideBarProps) => {
           className="u-button logout-btn u-link"
           type="button"
           onClick={(e) => {
-            props.setUserId("");
+            props.setUserId(-1);
             props.setUserSecret("");
             navigate("/");
           }}

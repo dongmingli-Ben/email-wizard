@@ -21,7 +21,7 @@ type AppProps = {
  * Define the "App" component as a function.
  */
 const App = ({ pca }: AppProps) => {
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState(-1);
   const [userSecret, setUserSecret] = useState("");
   return (
     // <> is like a <div>, but won't show

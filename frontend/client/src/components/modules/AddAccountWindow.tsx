@@ -10,7 +10,7 @@ import "./AddAccountWindow.css";
 import { backendConfig, post } from "../../utilities/requestUtility";
 
 type AddAccountWindowProps = {
-  userId: string;
+  userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
   setUserInfo: (info: userInfoType) => void;
