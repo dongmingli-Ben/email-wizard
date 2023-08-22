@@ -32,7 +32,7 @@ const updateEvents = async (
       );
     } catch (error) {
       console.log(error);
-      throw error;
+      console.log(`fail to update events for mailbox: ${mailbox}`);
     }
   }
 };
@@ -48,6 +48,7 @@ const updateAccountEventsAPI = async (
       user_id: userId,
       user_secret: userSecret,
       address: address,
+      kwargs: {},
     });
   } else if (protocol == "outlook") {
     let access_token = await getAccessToken(address);
@@ -63,6 +64,8 @@ const updateAccountEventsAPI = async (
         auth_token: access_token,
       },
     });
+  } else {
+    throw `un-recognized mailbox type: ${protocol}`;
   }
 };
 
@@ -124,13 +127,23 @@ const Calendar = (props: calendarProps) => {
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
-      updateEvents(props.userId, props.userSecret, props.userInfo).then(() => {
-        getEventsAPI(props.userId, props.userSecret).then(
-          (_events: EventType[]) => {
-            setEvents(_events);
+      getEventsAPI(props.userId, props.userSecret)
+        .then((_events: EventType[]) => {
+          setEvents(_events);
+        })
+        .then(() => {
+          if (props.userInfo !== undefined) {
+            updateEvents(props.userId, props.userSecret, props.userInfo).then(
+              () => {
+                getEventsAPI(props.userId, props.userSecret).then(
+                  (_events: EventType[]) => {
+                    setEvents(_events);
+                  }
+                );
+              }
+            );
           }
-        );
-      });
+        });
     }
   }, [props.userInfo]);
 

@@ -52,8 +52,12 @@ func parse_email_no_retry(email map[string]interface{}, timezone string) ([]map[
 		return []map[string]string{}, err
 	}
 	// collect as events
-	raw_events := response["events"].([]interface{})
 	events := make([]map[string]string, 0)
+	if response["events"] == nil {
+		fmt.Println("get empty events", response)
+		return events, nil
+	}
+	raw_events := response["events"].([]interface{})
 	// fmt.Println(events)
 	for i := 0; i < len(raw_events); i = i + 1 {
 		raw_event := raw_events[i].(map[string]interface{})

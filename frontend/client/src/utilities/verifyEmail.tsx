@@ -73,38 +73,20 @@ async function readMail(username: string, token: string) {
 }
 
 const getAccessToken = async (address: string): Promise<string> => {
-  let req = loginRequest;
-  req.loginHint = address;
-  let username: string;
-  console.log(`msal login:`);
-  console.log(req);
-  let token = await msalInstance.loginPopup(req).then(async (response) => {
-    console.log("logged user in");
-    if (response !== null) {
-      if (response.account === null) {
-        console.log("empty username from msal login response");
-        return "";
+  let token = await getTokenPopup(tokenRequest, address)
+    .then(async (response) => {
+      if (typeof response !== "string") {
+        return response.accessToken;
       }
-      username = response.account.username;
-      let t = await getTokenPopup(tokenRequest, username)
-        .then(async (response) => {
-          if (typeof response !== "string") {
-            return response.accessToken;
-          }
-          console.log("err: fail to get access token");
-          console.log(response);
-          return "";
-        })
-        .catch((error) => {
-          console.error(error);
-          console.log(error);
-          return "";
-        });
-      return t;
-    }
-    console.log("fail to log user in their outlook mailboxes");
-    return "";
-  });
+      console.log("err: fail to get access token");
+      console.log(response);
+      return "";
+    })
+    .catch((error) => {
+      console.error(error);
+      console.log(error);
+      return "";
+    });
   return token;
 };
 
@@ -115,7 +97,7 @@ const verifyOutlook = async (address: string): Promise<string> => {
       console.log("fail to get access token, got:", token);
       return;
     }
-    readMail(address, token);
+    await readMail(address, token);
   });
 
   return errMsg;
