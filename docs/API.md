@@ -163,7 +163,7 @@ Params:
 
 ```yaml
 user_id: int
-secret: string
+user_secret: string
 ```
 
 Response:
@@ -190,8 +190,8 @@ Endpoint: `http://public-ip:8080/events`
 Params:
 
 ```yaml
-userId: int
-userSecret: string
+user_id: int
+user_secret: string
 address: string
 kwargs: JSON
 ```
@@ -242,8 +242,8 @@ Method: POST
 Payload:
 
 ```yaml
-userId: string
-userSecret: string
+user_id: string
+user_secret: string
 type: string # mailbox type
 address: string # mailbox address
 password: string # needed for IMAP/POP3
@@ -270,8 +270,8 @@ Method: GET
 Payload:
 
 ```yaml
-userId: string
-userSecret: string
+user_id: string
+user_secret: string
 ```
 
 Response:

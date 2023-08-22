@@ -64,14 +64,14 @@ func updateAccountEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("address not found: %v", payload)})
 		return
 	}
-	if _user_id, ok := payload["userId"].(float64); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("userId not found: %v", payload)})
+	if _user_id, ok := payload["user_id"].(float64); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("user_id not found: %v", payload)})
 		return
 	} else {
 		user_id = int(_user_id)
 	}
-	if user_secret, ok = payload["userSecret"].(string); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("userSecret not found: %v", payload)})
+	if user_secret, ok = payload["user_secret"].(string); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("user_secret not found: %v", payload)})
 		return
 	}
 	if kwargs, ok = payload["kwargs"].(map[string]interface{}); !ok {
@@ -91,7 +91,7 @@ func updateAccountEvents(c *gin.Context) {
 		account[key] = val
 	}
 	err = UpdateUserEventsForAccount(user_id, account)
-	if err != nil{
+	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
 	}
@@ -106,7 +106,7 @@ func getEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
 		return
 	}
-	secret := q.Get("secret")
+	secret := q.Get("user_secret")
 	if ok, err := utils.ValidateUserSecret(user_id, secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
@@ -174,14 +174,14 @@ func addUserMailbox(c *gin.Context) {
 	} else {
 		mailbox_type = _mailbox_type
 	}
-	if _user_id, ok := payload["userId"].(float64); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userId"})
+	if _user_id, ok := payload["user_id"].(float64); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: user_id"})
 		return
 	} else {
 		user_id = int(_user_id)
 	}
-	if _user_secret, ok := payload["userSecret"].(string); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: userSecret"})
+	if _user_secret, ok := payload["user_secret"].(string); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: user_secret"})
 		return
 	} else {
 		user_secret = _user_secret
@@ -271,11 +271,11 @@ func addUser(c *gin.Context) {
 
 func getUserProfile(c *gin.Context) {
 	q := c.Request.URL.Query()
-	user_id, err := strconv.Atoi(q.Get("userId"))
+	user_id, err := strconv.Atoi(q.Get("user_id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("non-integer user_id: %v", q.Get("userId"))})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("non-integer user_id: %v", q.Get("user_id"))})
 	}
-	user_secret := q.Get("userSecret")
+	user_secret := q.Get("user_secret")
 	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return

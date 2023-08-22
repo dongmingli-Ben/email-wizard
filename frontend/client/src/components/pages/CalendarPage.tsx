@@ -50,7 +50,11 @@ const CalendarPage = (props: CalendarPageProps) => {
           setUserInfo={setUserInfo}
           setAddAccount={setAddAccount}
         />
-        <Feed userId={props.userId} userSecret={props.userSecret} />
+        <Feed
+          userId={props.userId}
+          userSecret={props.userSecret}
+          userInfo={userInfo}
+        />
       </div>
       {addAccount ? (
         <AddAccountWindow

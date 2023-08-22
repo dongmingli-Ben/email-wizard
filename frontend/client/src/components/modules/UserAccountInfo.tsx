@@ -4,7 +4,7 @@ import "./UserAccountInfo.css";
 
 type UserAccountInfoProps = {
   userName: string;
-  userAccounts: string[];
+  userAccounts: { address: string; protocol: string }[];
   setAddAccount: (status: boolean) => void;
 };
 
@@ -12,17 +12,21 @@ const UserNameBar = (props: { userName: string }) => {
   return <div className="username-container">{props.userName}</div>;
 };
 
-const UserAccountBars = (props: { userAccounts: string[] }) => {
+const UserAccountBars = (props: {
+  userAccounts: { address: string; protocol: string }[];
+}) => {
   console.log(props.userAccounts.map((ele) => ele));
   return (
     <div className="useraccounts-container">
-      {props.userAccounts.map((account: string, index: number) => {
-        return (
-          <div className="useraccount-cell-container" key={index}>
-            {account}
-          </div>
-        );
-      })}
+      {props.userAccounts.map(
+        (account: { address: string; protocol: string }, index: number) => {
+          return (
+            <div className="useraccount-cell-container" key={index}>
+              {account.address}
+            </div>
+          );
+        }
+      )}
     </div>
   );
 };

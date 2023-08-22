@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import { backendConfig, get } from "../../utilities/requestUtility";
+import { backendConfig, get, post } from "../../utilities/requestUtility";
+import { getAccessToken } from "../../utilities/verifyEmail";
+import { userInfoType } from "./SideBar";
 
 type calendarProps = {
   userId: number;
   userSecret: string;
   query: string;
+  userInfo: userInfoType | undefined;
 };
 
 type EventType = {
@@ -14,13 +17,62 @@ type EventType = {
   date: string;
 };
 
+const updateEvents = async (
+  userId: number,
+  userSecret: string,
+  userInfo: userInfoType
+): Promise<void> => {
+  for (const mailbox of userInfo.useraccounts) {
+    try {
+      await updateAccountEventsAPI(
+        userId,
+        userSecret,
+        mailbox.address,
+        mailbox.protocol
+      );
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+};
+
+const updateAccountEventsAPI = async (
+  userId: number,
+  userSecret: string,
+  address: string,
+  protocol: string
+): Promise<void> => {
+  if (protocol === "IMAP" || protocol == "POP3") {
+    return post(backendConfig.events, {
+      user_id: userId,
+      user_secret: userSecret,
+      address: address,
+    });
+  } else if (protocol == "outlook") {
+    let access_token = await getAccessToken(address);
+    if (access_token.length === 0) {
+      console.log("fail to get access token, got: ", access_token);
+      return;
+    }
+    return post(backendConfig.events, {
+      user_id: userId,
+      user_secret: userSecret,
+      address: address,
+      kwargs: {
+        auth_token: access_token,
+      },
+    });
+  }
+};
+
 const getEventsAPI = async (
   userId: number,
   userSecret: string
 ): Promise<EventType[]> => {
   return get(backendConfig.events, {
-    userId: userId,
-    userSecret: userSecret,
+    user_id: userId,
+    user_secret: userSecret,
   })
     .then((resp) => {
       console.log(`events returned`);
@@ -70,12 +122,17 @@ const Calendar = (props: calendarProps) => {
   const [displayEvents, setDisplayEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
-    getEventsAPI(props.userId, props.userSecret).then(
-      (_events: EventType[]) => {
-        setEvents(_events);
-      }
-    );
-  }, []);
+    console.log("updating events for:", props.userInfo);
+    if (props.userInfo !== undefined) {
+      updateEvents(props.userId, props.userSecret, props.userInfo).then(() => {
+        getEventsAPI(props.userId, props.userSecret).then(
+          (_events: EventType[]) => {
+            setEvents(_events);
+          }
+        );
+      });
+    }
+  }, [props.userInfo]);
 
   useEffect(() => {
     let _events = search(events, props.query);

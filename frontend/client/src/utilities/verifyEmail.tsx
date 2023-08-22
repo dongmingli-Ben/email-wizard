@@ -68,43 +68,54 @@ function seeProfile(username: string) {
     });
 }
 
-async function readMail(username: string) {
-  await getTokenPopup(tokenRequest, username)
-    .then(async (response) => {
-      if (typeof response !== "string") {
-        await callMSGraph(graphConfig.graphMailEndpoint, response.accessToken);
-        return;
-      }
-      console.log("err: fail to read emails");
-      console.log(response);
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log(error);
-    });
+async function readMail(username: string, token: string) {
+  await callMSGraph(graphConfig.graphMailEndpoint, token);
 }
 
-const verifyOutlook = async (address: string): Promise<string> => {
+const getAccessToken = async (address: string): Promise<string> => {
   let req = loginRequest;
   req.loginHint = address;
-  let errMsg = "";
   let username: string;
   console.log(`msal login:`);
   console.log(req);
-  await msalInstance.loginPopup(req).then(async (response) => {
+  let token = await msalInstance.loginPopup(req).then(async (response) => {
     console.log("logged user in");
     if (response !== null) {
       if (response.account === null) {
         console.log("empty username from msal login response");
-        errMsg = "error: empty username from msal login response";
-        return;
+        return "";
       }
       username = response.account.username;
-      await readMail(username);
-    } else {
-      console.log("null response from msal");
-      errMsg = "error: null response from msal";
+      let t = await getTokenPopup(tokenRequest, username)
+        .then(async (response) => {
+          if (typeof response !== "string") {
+            return response.accessToken;
+          }
+          console.log("err: fail to get access token");
+          console.log(response);
+          return "";
+        })
+        .catch((error) => {
+          console.error(error);
+          console.log(error);
+          return "";
+        });
+      return t;
     }
+    console.log("fail to log user in their outlook mailboxes");
+    return "";
+  });
+  return token;
+};
+
+const verifyOutlook = async (address: string): Promise<string> => {
+  let errMsg = "";
+  await getAccessToken(address).then(async (token) => {
+    if (token.length === 0) {
+      console.log("fail to get access token, got:", token);
+      return;
+    }
+    readMail(address, token);
   });
 
   return errMsg;
@@ -139,4 +150,4 @@ const verifyPOP3 = async (
   return "";
 };
 
-export { verifyOutlook, verifyIMAP, verifyPOP3 };
+export { verifyOutlook, verifyIMAP, verifyPOP3, getAccessToken };

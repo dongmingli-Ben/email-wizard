@@ -3,10 +3,12 @@ import ToolBar from "./ToolBar";
 import Calendar from "./Calendar";
 
 import "./Feed.css";
+import { userInfoType } from "./SideBar";
 
 type FeedProps = {
   userId: number;
   userSecret: string;
+  userInfo: userInfoType | undefined;
 };
 
 const Feed = (props: FeedProps) => {
@@ -19,6 +21,7 @@ const Feed = (props: FeedProps) => {
           userId={props.userId}
           userSecret={props.userSecret}
           query={query}
+          userInfo={props.userInfo}
         />
       </div>
     </div>

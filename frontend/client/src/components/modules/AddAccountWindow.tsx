@@ -36,8 +36,8 @@ const verifyEmailAccount = async (req): Promise<string> => {
 const addEmailAccountDBAPI = async (req): Promise<string> => {
   let add_req: { [key: string]: string };
   add_req = {
-    userId: req.userId,
-    userSecret: req.userSecret,
+    user_id: req.userId,
+    user_secret: req.userSecret,
     type: req.emailtype,
     address: req.emailaddress,
   };
@@ -79,8 +79,8 @@ const newEmailAccount = async (
   }
   return {
     userInfo: {
-      username: "jake",
-      useraccounts: ["jake@outlook.com", "jake@gmail.com", req.emailaddress],
+      username: "",
+      useraccounts: [{ address: req.emailaddress, protocol: req.emailtype }],
     },
     errMsg: "",
   };
@@ -118,6 +118,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
       .then((resp: { userInfo: userInfoType; errMsg: string }) => {
         setLoading(false);
         if (resp.errMsg === "") {
+          console.log("adding new mailbox to user:", resp);
           props.setUserInfo({
             username: props.userInfo ? props.userInfo.username : "No User Name",
             useraccounts: props.userInfo

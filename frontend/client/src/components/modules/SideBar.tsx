@@ -8,7 +8,7 @@ import { backendConfig } from "../../utilities/requestUtility";
 
 type userInfoType = {
   username: string;
-  useraccounts: string[];
+  useraccounts: { address: string; protocol: string }[];
 };
 
 type SideBarProps = {
@@ -24,17 +24,23 @@ type SideBarProps = {
 const getUserInfoAPI = async (
   userId: number,
   userSecret: string
-): Promise<{ userName: string; userAccounts: string[]; errMsg: string }> => {
+): Promise<{
+  userName: string;
+  userAccounts: { address: string; protocol: string }[];
+  errMsg: string;
+}> => {
   return get(backendConfig.user_profile, {
-    userId: userId,
-    userSecret: userSecret,
+    user_id: userId,
+    user_secret: userSecret,
   })
     .then((resp) => {
       console.log("mailboxes: ", resp.mailboxes);
       let mailboxes = resp.mailboxes.length > 0 ? resp.mailboxes : [];
       return {
         userName: resp.user_name,
-        userAccounts: mailboxes.map((ele) => ele.username),
+        userAccounts: mailboxes.map((ele) => {
+          return { address: ele.username, protocol: ele.protocol };
+        }),
         errMsg: "",
       };
     })
@@ -73,7 +79,7 @@ const SideBar = (props: SideBarProps) => {
         userAccounts={
           props.userInfo && props.userInfo.useraccounts.length > 0
             ? props.userInfo.useraccounts
-            : ["No accounts"]
+            : [{ address: "No accounts", protocol: "null" }]
         }
         setAddAccount={props.setAddAccount}
       />
