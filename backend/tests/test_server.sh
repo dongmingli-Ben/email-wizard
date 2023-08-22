@@ -14,16 +14,18 @@ resp=$(curl -G -d "username=toymaker&password=12345678" https://toymaker-ben.onl
 user_id="$(echo $resp | jq -r '.user_id')"
 user_secret="$(echo $resp | jq -r '.user_secret')"
 
+password=$(cat test_126_password.txt)
+
 echo "adding mailbox 126.com for user..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
     -d '{
             "type": "IMAP",
-            "userId": '$user_id',
-            "userSecret": "'"$user_secret"'",
+            "user_id": '$user_id',
+            "user_secret": "'"$user_secret"'",
             "address": "dongmingli_Ben@126.com",
             "imap_server": "imap.126.com",
-            "password": "JPOSQUNLDYZXBPRO"
+            "password": "'"$password"'"
         }' \
     https://toymaker-ben.online/api/add_mailbox
 
@@ -31,21 +33,21 @@ echo "updating event for mailbox 126.com..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
     -d '{
-            "userId": '$user_id',
-            "userSecret": "'"$user_secret"'",
+            "user_id": '$user_id',
+            "user_secret": "'"$user_secret"'",
             "address": "dongmingli_Ben@126.com",
             "kwargs": {}
         }' \
     https://toymaker-ben.online/api/events
-curl -G -d "user_id=$user_id&secret=$user_secret" https://toymaker-ben.online/api/events
+curl -G -d "user_id=$user_id&user_secret=$user_secret" https://toymaker-ben.online/api/events
 
 echo "adding mailbox outlook for user..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
     -d '{
             "type": "outlook",
-            "userId": '$user_id',
-            "userSecret": "'"$user_secret"'",
+            "user_id": '$user_id',
+            "user_secret": "'"$user_secret"'",
             "address": "guangtouqiang@outlook.com"
         }' \
     https://toymaker-ben.online/api/add_mailbox
@@ -55,10 +57,10 @@ auth_token=$(cat test_auth_token.txt)
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
     -d '{
-            "userId": '$user_id',
-            "userSecret": "'"$user_secret"'",
+            "user_id": '$user_id',
+            "user_secret": "'"$user_secret"'",
             "address": "guangtouqiang@outlook.com",
             "kwargs": {"auth_token": "'"$auth_token"'"}
         }' \
     https://toymaker-ben.online/api/events
-curl -G -d "user_id=$user_id&secret=$user_secret" https://toymaker-ben.online/api/events
+curl -G -d "user_id=$user_id&user_secret=$user_secret" https://toymaker-ben.online/api/events
