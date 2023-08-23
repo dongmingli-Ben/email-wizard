@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-var N_EMAIL_RETREIVAL int32 = 5
+var N_EMAIL_RETREIVAL int32 = 15
 
 func ParsedUserEmailIDs(user_id int) ([]map[string]interface{}, error) {
 	res, err := clients.Query([]string{"email_id", "email_address"},
