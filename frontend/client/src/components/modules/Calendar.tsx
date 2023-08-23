@@ -71,11 +71,13 @@ const updateAccountEventsAPI = async (
 
 const getEventsAPI = async (
   userId: number,
-  userSecret: string
+  userSecret: string,
+  query: string
 ): Promise<EventType[]> => {
   return get(backendConfig.events, {
     user_id: userId,
     user_secret: userSecret,
+    query: query,
   })
     .then((resp) => {
       console.log(`events returned`);
@@ -92,6 +94,7 @@ const getEventsAPI = async (
           ];
         }
       }
+      console.log("parsed events:")
       console.log(events);
       return events;
     })
@@ -101,33 +104,13 @@ const getEventsAPI = async (
     });
 };
 
-const match = (event: EventType, query: string): boolean => {
-  // use a naive match for now
-  let event_words = event.title.toLowerCase().split(" ");
-  let matched_words = event_words.filter(
-    (word) => query.toLowerCase().search(word) !== -1
-  );
-  return matched_words.length > 0;
-};
-
-const search = (events: EventType[], query: string): EventType[] => {
-  console.log("query:", query);
-  if (query === "") {
-    return events;
-  }
-  let matched_events: EventType[] = [];
-  matched_events = events.filter((event) => match(event, query));
-  return matched_events;
-};
-
 const Calendar = (props: calendarProps) => {
   const [events, setEvents] = useState<EventType[]>([]);
-  const [displayEvents, setDisplayEvents] = useState<EventType[]>([]);
 
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
-      getEventsAPI(props.userId, props.userSecret)
+      getEventsAPI(props.userId, props.userSecret, props.query)
         .then((_events: EventType[]) => {
           setEvents(_events);
         })
@@ -135,7 +118,7 @@ const Calendar = (props: calendarProps) => {
           if (props.userInfo !== undefined) {
             updateEvents(props.userId, props.userSecret, props.userInfo).then(
               () => {
-                getEventsAPI(props.userId, props.userSecret).then(
+                getEventsAPI(props.userId, props.userSecret, props.query).then(
                   (_events: EventType[]) => {
                     setEvents(_events);
                   }
@@ -148,9 +131,14 @@ const Calendar = (props: calendarProps) => {
   }, [props.userInfo]);
 
   useEffect(() => {
-    let _events = search(events, props.query);
-    setDisplayEvents(_events);
-  }, [events, props.query]);
+    getEventsAPI(props.userId, props.userSecret, props.query).then(
+      (resp: EventType[]) => {
+        console.log("query result:")
+        console.log(resp);
+        setEvents(resp);
+      }
+    );
+  }, [props.query]);
 
   return (
     <div className="calendar-container u-block">
@@ -158,7 +146,7 @@ const Calendar = (props: calendarProps) => {
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
         weekends={true}
-        events={displayEvents}
+        events={events}
       />
     </div>
   );

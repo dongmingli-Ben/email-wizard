@@ -63,4 +63,4 @@ curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
             "kwargs": {"auth_token": "'"$auth_token"'"}
         }' \
     https://toymaker-ben.online/api/events
-curl -G -d "user_id=$user_id&user_secret=$user_secret" https://toymaker-ben.online/api/events
+curl -G -d "user_id=$user_id&user_secret=$user_secret&query=f" https://toymaker-ben.online/api/events

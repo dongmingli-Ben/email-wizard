@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-var N_EMAIL_RETREIVAL int32 = 15
+var N_EMAIL_RETREIVAL int32 = 5
 
 func ParsedUserEmailIDs(user_id int) ([]map[string]interface{}, error) {
 	res, err := clients.Query([]string{"email_id", "email_address"},
@@ -146,6 +146,11 @@ func StoreUserEvents(events []map[string]string, user_id int, email_id string, e
 			"email_address": email_address,
 			"event_content": event,
 		}, "events")
+		if err != nil {
+			return err
+		}
+		event_id := int(pk_values["event_id"].(float64))
+		err = AddEventToElasticSearch(event, event_id, user_id)
 		if err != nil {
 			return err
 		}

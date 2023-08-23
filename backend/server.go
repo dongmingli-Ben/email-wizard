@@ -99,7 +99,7 @@ func updateAccountEvents(c *gin.Context) {
 }
 
 // getEvents only read from events DB
-func getEvents(c *gin.Context) {
+func searchEvents(c *gin.Context) {
 	q := c.Request.URL.Query()
 	user_id, err := strconv.Atoi(q.Get("user_id"))
 	if err != nil {
@@ -111,13 +111,26 @@ func getEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
 	}
-
-	// read events from db
-	events, err := utils.GetUserEvents(user_id)
-	if err != nil {
-		fmt.Println(err.Error())
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "fail to load events"})
-		return
+	
+	query := q.Get("query")
+	var events []map[string]interface{}
+	if query == "" {
+		// read events from db
+		events, err = utils.GetUserEvents(user_id)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "fail to load events"})
+			return
+		}
+	} else {
+		// search from elastic
+		events, err = utils.SearchUserEvents(user_id, query)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": 
+				fmt.Sprintf("fail to search for events with query: %s", query)})
+			return
+		}
 	}
 
 	c.IndentedJSON(http.StatusOK, events)
@@ -320,7 +333,7 @@ func main() {
 		"Access-Control-Allow-Methods",
 	}
 	router.Use(cors.New(config))
-	router.GET("/events", getEvents)
+	router.GET("/events", searchEvents)
 	router.POST("/events", updateAccountEvents)
 	router.GET("/verify_email", getEmails)
 	router.GET("/verify_user", authenticateUser)
