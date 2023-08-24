@@ -21,8 +21,15 @@ const IntroPage = (props: IntroPageProps) => {
     <>
       <div className="intro-page-container">
         <div className="intro-container">
-          <div className="intro-title-container">
-            Email Wizard: View Your Emails in Calendar with AI
+          <div className="intro-title-container u-flex u-flex-alignCenter">
+            <span>Email Wizard: View Your Emails in Calendar with AI</span>
+            <a href="https://github.com/dongmingli-Ben/email-wizard">
+              <img
+                src="./static/github-mark.svg"
+                alt="GitHub Logo"
+                className="github-logo"
+              />
+            </a>
           </div>
           <div className="intro-feature-container">
             Streamline event management with Email Wizard. Our web app reads
