@@ -94,7 +94,7 @@ const getEventsAPI = async (
           ];
         }
       }
-      console.log("parsed events:")
+      console.log("parsed events:");
       console.log(events);
       return events;
     })
@@ -131,9 +131,15 @@ const Calendar = (props: calendarProps) => {
   }, [props.userInfo]);
 
   useEffect(() => {
+    if (props.query.length > 0) {
+      alert(
+        "Elastic search is temperarily disabled due to limited resources. Please try later!"
+      );
+    }
+    return;
     getEventsAPI(props.userId, props.userSecret, props.query).then(
       (resp: EventType[]) => {
-        console.log("query result:")
+        console.log("query result:");
         console.log(resp);
         setEvents(resp);
       }
