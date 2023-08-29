@@ -182,6 +182,7 @@ test
 *.key
 *.pem
 bundle.js
+tests/**
 
 # go
 go.work
