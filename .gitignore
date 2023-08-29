@@ -169,8 +169,11 @@ dev.py
 test.txt
 jbang*
 config-outlook.json
+credentials.json
+token.json
 *bin
 test_msal.py
+test_gmail.py
 tmp
 predictions
 data
