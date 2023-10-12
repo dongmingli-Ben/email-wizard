@@ -15,7 +15,7 @@ import (
 func RequestElasticSearch(req *http.Request) (*http.Response, error) {
     // Username and password for HTTP basic authentication
 	username := "elastic"
-	password := "c7-FR3Fr2rWbbS*tDckZ"
+	password := "nR6dX7pUh9wT3XqtYXZB"
 
 	// Path to the CA certificate for SSL/TLS certificate verification
 	caCertPath := "../search/config/http_ca.crt"

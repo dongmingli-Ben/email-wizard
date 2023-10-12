@@ -38,12 +38,12 @@ or
 
 ## Run as a service
 
-The parser can be setup as a microservice with gRPC. 
+The parser can be setup as a microservice with gRPC.
 
 First setup OPENAI_API_KEY:
 
 ```bash
-export OPENAI_API_KEY=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
+export OPENAI_API_KEY=xxx
 ```
 
 Second (optional) (re)generate the gRPC codes with proto file:
@@ -68,7 +68,7 @@ bash test_server.sh
 Upon success, you should see something like this:
 
 ```json
-GetEmails client received: 
+GetEmails client received:
 {
     "events": [
         {
