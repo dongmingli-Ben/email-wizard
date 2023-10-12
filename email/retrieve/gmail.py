@@ -36,9 +36,14 @@ def retrieve_email_gmail(user_config: dict, n_mails: int = 50):
         creds = Credentials.from_authorized_user_info(user_config['token'], SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
+        need_grant = True
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+                need_grant = False
+            except Exception as e:
+                print(f'Encounter error when refreshing expired token: {e}')
+        if need_grant:
             raise RuntimeError('Invalid credentials: please sign in first.')
         token = creds.to_json()
 
