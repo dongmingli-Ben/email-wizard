@@ -47,6 +47,8 @@ export async function post(endpoint: string, params = {}) {
     });
 }
 
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export const backendConfig = {
   verify_email: "https://www.toymaker-ben.online/api/verify_email",
   events: "https://www.toymaker-ben.online/api/events",

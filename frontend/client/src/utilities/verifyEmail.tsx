@@ -1,6 +1,6 @@
 import { msalInstance } from "../index";
 import { graphConfig, tokenRequest, gmailConfig } from "./authConfig";
-import { backendConfig, get } from "./requestUtility";
+import { backendConfig, get, sleep } from "./requestUtility";
 
 type VerifyResposne = {
   errMsg: string;
@@ -134,11 +134,37 @@ const verifyGmail = async (address: string): Promise<VerifyResposne> => {
   }&response_type=${gmailConfig.response_type}&redirect_uri=${
     gmailConfig.redirect_uri
   }&client_id=${gmailConfig.client_id}&login_hint=${address}`;
-  // redirect to oauth url
-  window.location.href = oauth_url;
+  // pop up a new window for oauth url
+  const popupWindow = window.open(
+    oauth_url,
+    "Gmail Auth",
+    "popup,width=350,height=500"
+  );
+  if (popupWindow === null) {
+    console.log("fail to pop up window for gmail oauth");
+    return { errMsg: "open popup window fail", credentials: {} };
+  }
   // after redirecting back
-  let url = window.location.search;
-  let urlParams = new URLSearchParams(url);
+  let url: string;
+  while (true) {
+    if (popupWindow.closed) {
+      console.log("user closed gmail auth window before granting access");
+      return {
+        errMsg: "Please grant access in the pop up window",
+        credentials: {},
+      };
+    }
+    try {
+      url = popupWindow.window.location.href;
+      if (url.startsWith(gmailConfig.redirect_uri)) {
+        console.log(url);
+        popupWindow.close();
+        break;
+      }
+    } catch (error) {}
+    await sleep(500);
+  }
+  let urlParams = new URLSearchParams(url.split("?")[1]);
   let error = urlParams.get("error");
   let authCode = urlParams.get("code");
   if (error !== null) {
