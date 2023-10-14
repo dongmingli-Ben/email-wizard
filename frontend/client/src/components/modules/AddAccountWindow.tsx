@@ -4,6 +4,8 @@ import {
   verifyOutlook,
   verifyIMAP,
   verifyPOP3,
+  verifyGmail,
+  VerifyResposne,
 } from "../../utilities/verifyEmail";
 
 import "./AddAccountWindow.css";
@@ -17,37 +19,39 @@ type AddAccountWindowProps = {
   setAddAccount: (status: boolean) => void;
 };
 
-const verifyEmailAccount = async (req): Promise<string> => {
-  let errMsg: string;
+const verifyEmailAccount = async (req): Promise<VerifyResposne> => {
+  let resp: VerifyResposne;
   if (req.emailtype === "outlook") {
-    errMsg = await verifyOutlook(req.emailaddress);
+    resp = await verifyOutlook(req.emailaddress);
   } else if (req.emailtype === "IMAP") {
-    errMsg = await verifyIMAP(req.emailaddress, req.password, req.imapServer);
-  } else if (req.emailaddress === "POP3") {
-    errMsg = await verifyPOP3(req.emailaddress, req.password, req.pop3Server);
+    resp = await verifyIMAP(req.emailaddress, req.password, req.imapServer);
+  } else if (req.emailtype === "POP3") {
+    resp = await verifyPOP3(req.emailaddress, req.password, req.pop3Server);
+  } else if (req.emailtype === "gmail") {
+    resp = await verifyGmail(req.emailaddress);
   } else {
     console.log(`Un-recognized account type: ${req.emailtype}`);
-    errMsg = `Un-recognized account type: ${req.emailtype}`;
+    let errMsg = `Un-recognized account type: ${req.emailtype}`;
+    resp = {
+      errMsg: errMsg,
+      credentials: {},
+    };
   }
-  console.log(errMsg);
-  return errMsg;
+  console.log(resp);
+  return resp;
 };
 
-const addEmailAccountDBAPI = async (req): Promise<string> => {
-  let add_req: { [key: string]: string };
-  add_req = {
+const addEmailAccountDBAPI = async (
+  req,
+  credentials: { [key: string]: string }
+): Promise<string> => {
+  let add_req = {
     user_id: req.userId,
     user_secret: req.userSecret,
     type: req.emailtype,
     address: req.emailaddress,
+    credentials: credentials,
   };
-  if (req.emailtype === "IMAP") {
-    add_req.password = req.password;
-    add_req.imap_server = req.imapServer;
-  } else if (req.emailtype === "POP3") {
-    add_req.password = req.password;
-    add_req.pop3_server = req.pop3Server;
-  }
   let errMsg = await post(backendConfig.add_mailbox, add_req)
     .then((resp) => {
       return "";
@@ -63,14 +67,14 @@ const addEmailAccountDBAPI = async (req): Promise<string> => {
 const newEmailAccount = async (
   req
 ): Promise<{ userInfo: userInfoType; errMsg: string }> => {
-  let errMsg = await verifyEmailAccount(req);
-  if (errMsg !== "") {
+  let resp = await verifyEmailAccount(req);
+  if (resp.errMsg !== "") {
     return {
       userInfo: { username: "", useraccounts: [] },
-      errMsg: errMsg,
+      errMsg: resp.errMsg,
     };
   }
-  errMsg = await addEmailAccountDBAPI(req);
+  let errMsg = await addEmailAccountDBAPI(req, resp.credentials);
   if (errMsg !== "") {
     return {
       userInfo: { username: "", useraccounts: [] },
@@ -163,6 +167,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
             >
               <option value="">-- Select --</option>
               <option value="outlook">Outlook</option>
+              <option value="gmail">Gmail</option>
               <option value="IMAP">IMAP</option>
               <option value="POP3">POP3</option>
             </select>

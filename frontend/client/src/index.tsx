@@ -9,7 +9,7 @@ import {
   EventMessage,
   AuthenticationResult,
 } from "@azure/msal-browser";
-import { msalConfig } from "./utilities/msalAuthConfig";
+import { msalConfig } from "./utilities/authConfig";
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 

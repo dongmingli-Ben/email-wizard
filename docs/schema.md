@@ -10,7 +10,7 @@
 | user password | string  | not null          |
 | mailboxes     | JSON    | list of mailboxes |
 
-Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type. And can optionally have the following field depending on the mailbox type:
+Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type; 3. user credentials. User credentials may contain the following:
 
 - mailbox password
 - mailbox server address, such as the server of IMAP/POP3 mailboxes
