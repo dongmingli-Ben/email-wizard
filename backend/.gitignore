@@ -2,5 +2,6 @@ tests/outlook.json
 tests/test_server_secret.sh
 tests/test_auth_token.txt
 tests/test_126_password.txt
+tests/test_gmail_token_exchange.sh
 main
 __debug_bin*
