@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 )
 
 func prepare_mailboxes(mailboxes interface{}) ([]map[string]interface{}, error) {
@@ -67,12 +68,19 @@ func prepare_credentials(mailbox_type string, mailbox_address string,
 		if err = json.Unmarshal(body, &creds); err != nil {
 			return nil, err
 		}
+		// set expire timestamp
+		creds["expire_timestamp"] = time.Now().Unix() + int64(creds["expires_in"].(float64))
+		creds["client_id"] = app_creds["client_id"]
+		creds["client_secret"] = app_creds["client_secret"]
 		return creds, nil
 	}
 	return credentials, nil
 }
 
 func AddUserMailbox(user_id int, mailbox_type string, mailbox_address string, credentials map[string]interface{}) error {
+	if _, err := GetUserEmailAccountFromAddress(user_id, mailbox_address); err == nil {
+		return fmt.Errorf("mailbox %v already added", mailbox_address)
+	}
 	creds, err := prepare_credentials(mailbox_type, mailbox_address, credentials)
 	if err != nil {
 		return err

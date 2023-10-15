@@ -41,7 +41,7 @@ func GetEmails(user_config map[string]interface{}, n_mails int32) (EmailCollecti
 	c := pb.NewEmailHelperClient(conn)
 
 	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	config_json, err := json.Marshal(user_config)
 	// fmt.Printf("config: %v\n", user_config)

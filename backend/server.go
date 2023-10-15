@@ -90,7 +90,7 @@ func updateAccountEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
 	}
-	creds, ok := account["credentials"].(map[string]interface{})
+	creds, err := utils.PrepareAndRefreshEmailAccountCredentials(user_id, account)
 	if !ok {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "credentials not found in database for this account"})
 		return
@@ -161,15 +161,19 @@ func getEmails(c *gin.Context) {
 		account = map[string]interface{}{
 			"protocol":    "IMAP",
 			"username":    username,
-			"password":    password,
-			"imap_server": q.Get("imap_server"),
+			"credentials": map[string]interface{} {
+				"password":    password,
+				"imap_server": q.Get("imap_server"),
+			},
 		}
 	} else {
 		account = map[string]interface{}{
 			"protocol":    "POP3",
 			"username":    username,
-			"password":    password,
-			"imap_server": q.Get("imap_server"),
+			"credentials": map[string]interface{} {
+				"password":    password,
+				"imap_server": q.Get("imap_server"),
+			},
 		}
 	}
 	emails, err := utils.GetUserEmailsFromAccount(account)

@@ -5,9 +5,10 @@ import (
 	"email-wizard/backend/clients"
 	"encoding/hex"
 	"fmt"
+	"time"
 )
 
-var N_EMAIL_RETREIVAL int32 = 5
+var N_EMAIL_RETREIVAL int32 = 25
 
 func ParsedUserEmailIDs(user_id int) ([]map[string]interface{}, error) {
 	res, err := clients.Query([]string{"email_id", "email_address"},
@@ -149,11 +150,11 @@ func StoreUserEvents(events []map[string]string, user_id int, email_id string, e
 		if err != nil {
 			return err
 		}
-		event_id := int(pk_values["event_id"].(float64))
-		err = AddEventToElasticSearch(event, event_id, user_id)
-		if err != nil {
-			return err
-		}
+		// event_id := int(pk_values["event_id"].(float64))
+		// err = AddEventToElasticSearch(event, event_id, user_id)
+		// if err != nil {
+		// 	return err
+		// }
 		event_ids[i] = int(pk_values["event_id"].(float64))
 	}
 	// update email
@@ -244,6 +245,54 @@ func AddUserDB(username string, password string) error {
 		"user_secret":   secret,
 		"user_name":     username,
 		"user_password": password,
+	}, "users")
+	return err
+}
+
+func PrepareAndRefreshEmailAccountCredentials(user_id int, account map[string]interface{}) (map[string]interface{}, error) {
+	mailbox_type, ok := account["protocol"].(string)
+	if !ok {
+		return nil, fmt.Errorf("mailbox_type not in account %v", account)
+	}
+	creds, ok := account["credentials"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("credentials not in account %v", account)
+	}
+	if mailbox_type == "gmail" {
+		if time.Now().Unix() < int64(creds["expire_timestamp"].(float64)) - 60 {
+			return creds, nil
+		}
+		// refresh token
+		creds, err := RefreshGmailToken(creds)
+		if err != nil {
+			return nil, err
+		}
+		if err = UpdateUserEmailAccountCredentials(user_id, account["username"].(string), creds); err == nil {
+			return nil, err
+		}
+		return creds, nil
+	}
+	return creds, nil
+}
+
+func UpdateUserEmailAccountCredentials(user_id int, address string, credentials map[string]interface{}) error {
+	accounts, err := GetUserEmailAccounts(user_id)
+	if err != nil {
+		return err
+	}
+	found := false
+	for _, account := range accounts {
+		if account["username"].(string) == address {
+			account["credentials"] = credentials
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("account %v not found for user %v", address, user_id)
+	}
+	err = clients.UpdateValue("mailboxes", accounts, map[string]interface{}{
+		"user_id": user_id,
 	}, "users")
 	return err
 }
