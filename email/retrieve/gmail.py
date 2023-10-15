@@ -1,5 +1,6 @@
 from __future__ import print_function
 import base64
+from datetime import datetime
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,6 +14,19 @@ def decode_base64url(s: str):
     while len(s) % 4 != 0:
         s += '='
     return base64.b64decode(s).decode('utf-8')
+
+def convert_timestamp(timestamp: str) -> str:
+    # Parse the Gmail API timestamp into a datetime object
+    try:
+        parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z (%Z)")
+    except ValueError as e:
+        parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z")
+
+    # Define the desired output format
+    desired_output_format = "%Y-%m-%d %H:%M:%S%z"
+
+    # Format the time in the desired output format
+    return parsed_time.strftime(desired_output_format)
 
 # Function to decode base64 and quoted-printable encoded content
 def get_raw_texts(message):
@@ -54,7 +68,7 @@ def retrieve_email_gmail(user_config: dict, n_mails: int = 50):
             elif header['name'] == 'From':
                 sender = header['value']
             elif header['name'] == 'Date':
-                date = header['value']
+                date = convert_timestamp(header['value'])
             elif header['name'] == 'To':
                 recipient = header['value']
         contents = get_raw_texts(msg['payload'])
