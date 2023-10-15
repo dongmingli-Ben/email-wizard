@@ -9,6 +9,8 @@
  */
 import axios, { AxiosResponse, AxiosError } from "axios";
 
+const timeoutMillis = 100 * 1000;
+
 // Helper code to make a get request. Default parameter of empty JSON Object for params.
 // Returns a Promise to a JSON Object.
 export async function get(endpoint: string, params = {}) {
@@ -36,6 +38,7 @@ export async function post(endpoint: string, params = {}) {
   return axios
     .post(endpoint, params, {
       headers: { "Content-type": "application/json" },
+      timeout: timeoutMillis,
     })
     .then((resp: AxiosResponse) => {
       console.log(resp);
