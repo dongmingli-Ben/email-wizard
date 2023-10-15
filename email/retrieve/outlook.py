@@ -9,7 +9,7 @@ APP_CLIENT_ID = "34fe7958-6ad4-438e-8218-cb028e47fe40"
 
 
 def retrieve_email_outlook(user_config, n_mails: int = 50):
-    access_token = user_config["auth_token"]
+    access_token = user_config['credentials']["auth_token"]
 
     # Set up the API request
     url = f"https://graph.microsoft.com/v1.0/me/messages"
