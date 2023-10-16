@@ -116,7 +116,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### A1. retrieve emails
 
-- [ ] support gmail mailboxes
+- [x] support gmail mailboxes
 - [ ] support exchange protocol
 - [ ] optimize QPS
 
