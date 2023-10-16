@@ -6,9 +6,10 @@ def retrieve_email_bytes(
     user_config, n_mails: int = 50
 ) -> List[Tuple[str, ByteString]]:
     """Retrieve the last n_mails emails"""
-    pop_server = poplib.POP3_SSL(user_config["pop3_server"])
+    credentials = user_config['credentials']
+    pop_server = poplib.POP3_SSL(credentials["pop3_server"])
     pop_server.user(user_config["username"])
-    pop_server.pass_(user_config["password"])
+    pop_server.pass_(credentials["password"])
     num_emails = len(pop_server.list()[1])
 
     raw_emails = []

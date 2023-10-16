@@ -26,7 +26,8 @@ config:
 ```json
 {
   "username": "xxx@outlook.com",
-  "protocol": "outlook"
+  "protocol": "outlook",
+  "credentials": {}
 }
 ```
 
@@ -34,8 +35,10 @@ config:
 {
   "imap_server": "imap.126.com",
   "username": "xxx@126.com",
-  "password": "xxx",
-  "protocol": "IMAP"
+  "credentials": {
+    "password": "xxx",
+    "protocol": "IMAP"
+  }
 }
 ```
 
@@ -193,7 +196,7 @@ Params:
 user_id: int
 user_secret: string
 address: string
-kwargs: JSON
+kwargs: JSON  # to be deprecated
 ```
 
 Response:
@@ -246,9 +249,7 @@ user_id: string
 user_secret: string
 type: string # mailbox type
 address: string # mailbox address
-password: string # needed for IMAP/POP3
-imap_server: string # for IMAP
-pop3_server: string # for POP3
+credentials: JSON # other necessary fields such as password, IMAP/POP3 server, auth code, etc
 ```
 
 Response:

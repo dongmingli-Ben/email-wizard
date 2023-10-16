@@ -9,6 +9,8 @@
  */
 import axios, { AxiosResponse, AxiosError } from "axios";
 
+const timeoutMillis = 100 * 1000;
+
 // Helper code to make a get request. Default parameter of empty JSON Object for params.
 // Returns a Promise to a JSON Object.
 export async function get(endpoint: string, params = {}) {
@@ -36,6 +38,7 @@ export async function post(endpoint: string, params = {}) {
   return axios
     .post(endpoint, params, {
       headers: { "Content-type": "application/json" },
+      timeout: timeoutMillis,
     })
     .then((resp: AxiosResponse) => {
       console.log(resp);
@@ -46,6 +49,8 @@ export async function post(endpoint: string, params = {}) {
       throw `POST request to ${endpoint} failed with error:\n${error}`;
     });
 }
+
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const backendConfig = {
   verify_email: "https://www.toymaker-ben.online/api/verify_email",

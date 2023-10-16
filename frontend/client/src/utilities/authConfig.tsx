@@ -35,3 +35,13 @@ export const graphConfig = {
   graphMeEndpoint: "https://graph.microsoft.com/v1.0/me",
   graphMailEndpoint: "https://graph.microsoft.com/v1.0/me/messages",
 };
+
+export const gmailConfig = {
+  client_id:
+    "242378580939-kkgf0o88qh5so9jlvls0i1gm2c48fdcl.apps.googleusercontent.com",
+  redirect_uri: "http://localhost:39017/calendar",
+  response_type: "code",
+  scope: ["https://www.googleapis.com/auth/gmail.readonly"],
+  access_type: "offline",
+  include_granted_scopes: true,
+};

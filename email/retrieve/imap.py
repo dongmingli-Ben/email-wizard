@@ -6,8 +6,9 @@ def retrieve_email_bytes(
     user_config, n_mails: int = 50
 ) -> List[Tuple[str, ByteString]]:
     """Retrieve the last n_mails emails"""
-    imap_server = imaplib.IMAP4_SSL(user_config["imap_server"])
-    status, resp = imap_server.login(user_config["username"], user_config["password"])
+    credentials = user_config['credentials']
+    imap_server = imaplib.IMAP4_SSL(credentials["imap_server"])
+    status, resp = imap_server.login(user_config["username"], credentials["password"])
     if status != "OK":
         print(f'Login to {user_config["username"]} failed with {resp}')
 

@@ -43,7 +43,7 @@ const updateAccountEventsAPI = async (
   address: string,
   protocol: string
 ): Promise<void> => {
-  if (protocol === "IMAP" || protocol == "POP3") {
+  if (protocol === "IMAP" || protocol == "POP3" || protocol == "gmail") {
     return post(backendConfig.events, {
       user_id: userId,
       user_secret: userSecret,

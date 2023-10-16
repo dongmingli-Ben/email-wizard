@@ -1,6 +1,11 @@
 import { msalInstance } from "../index";
-import { graphConfig, tokenRequest } from "./msalAuthConfig";
-import { backendConfig, get } from "./requestUtility";
+import { graphConfig, tokenRequest, gmailConfig } from "./authConfig";
+import { backendConfig, get, sleep } from "./requestUtility";
+
+type VerifyResposne = {
+  errMsg: string;
+  credentials: { [key: string]: string };
+};
 
 async function callMSGraph(endpoint: string, token: string) {
   const headers = new Headers();
@@ -73,7 +78,7 @@ const getAccessToken = async (address: string): Promise<string> => {
   return token;
 };
 
-const verifyOutlook = async (address: string): Promise<string> => {
+const verifyOutlook = async (address: string): Promise<VerifyResposne> => {
   let errMsg = "";
   await getAccessToken(address).then(async (token) => {
     if (token.length === 0) {
@@ -83,14 +88,14 @@ const verifyOutlook = async (address: string): Promise<string> => {
     await readMail(address, token);
   });
 
-  return errMsg;
+  return { errMsg: errMsg, credentials: {} };
 };
 
 const verifyIMAP = async (
   address: string,
   password: string,
   imapServer: string
-): Promise<string> => {
+): Promise<VerifyResposne> => {
   let resp = await get(backendConfig.verify_email, {
     username: address,
     password: password,
@@ -102,17 +107,83 @@ const verifyIMAP = async (
   });
   console.log(resp);
   if ("errMsg" in resp) {
-    return resp.errMsg;
+    return { errMsg: resp.errMsg, credentials: {} };
   }
-  return "";
+  return {
+    errMsg: "",
+    credentials: {
+      imap_server: imapServer,
+      password: password,
+    },
+  };
 };
 const verifyPOP3 = async (
   address: string,
   password: string,
   pop3Server: string
-): Promise<string> => {
+): Promise<VerifyResposne> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return "";
+  return { errMsg: "", credentials: {} };
 };
 
-export { verifyOutlook, verifyIMAP, verifyPOP3, getAccessToken };
+const verifyGmail = async (address: string): Promise<VerifyResposne> => {
+  let oauth_url = `https://accounts.google.com/o/oauth2/v2/auth?scope=${gmailConfig.scope.join(
+    " "
+  )}&access_type=${gmailConfig.access_type}&include_granted_scopes=${
+    gmailConfig.include_granted_scopes
+  }&response_type=${gmailConfig.response_type}&redirect_uri=${
+    gmailConfig.redirect_uri
+  }&client_id=${gmailConfig.client_id}&login_hint=${address}`;
+  // pop up a new window for oauth url
+  const popupWindow = window.open(
+    oauth_url,
+    "Gmail Auth",
+    "popup,width=350,height=500"
+  );
+  if (popupWindow === null) {
+    console.log("fail to pop up window for gmail oauth");
+    return { errMsg: "open popup window fail", credentials: {} };
+  }
+  // after redirecting back
+  let url: string;
+  while (true) {
+    if (popupWindow.closed) {
+      console.log("user closed gmail auth window before granting access");
+      return {
+        errMsg: "Please grant access in the pop up window",
+        credentials: {},
+      };
+    }
+    try {
+      url = popupWindow.window.location.href;
+      if (url.startsWith(gmailConfig.redirect_uri)) {
+        console.log(url);
+        popupWindow.close();
+        break;
+      }
+    } catch (error) {}
+    await sleep(500);
+  }
+  let urlParams = new URLSearchParams(url.split("?")[1]);
+  let error = urlParams.get("error");
+  let authCode = urlParams.get("code");
+  if (error !== null) {
+    return { errMsg: error, credentials: {} };
+  } else if (authCode === null) {
+    return {
+      errMsg: `No error in Gmail Oauth2 response but cannot find auth code`,
+      credentials: {},
+    };
+  }
+  console.log("Auth code for gmail:", authCode);
+  return { errMsg: "", credentials: { auth_code: authCode } };
+};
+
+export {
+  VerifyResposne,
+  verifyOutlook,
+  verifyIMAP,
+  verifyPOP3,
+  verifyGmail,
+  getAccessToken,
+};

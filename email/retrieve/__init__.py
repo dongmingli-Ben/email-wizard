@@ -1,6 +1,7 @@
 from .utils import bytes_to_texts
 from .imap import retrieve_email_bytes as retrieve_email_imap
 from .pop3 import retrieve_email_bytes as retrieve_email_pop3
+from .gmail import retrieve_email_gmail
 from .outlook import retrieve_email_outlook
 
 
@@ -22,6 +23,8 @@ def retrieve_email_raw_texts(user_config, n_mails: int = 50):
             emails.append((email_id, email_raw_texts))
     elif user_config["username"].endswith("outlook.com"):
         emails = retrieve_email_outlook(user_config, n_mails)
+    elif user_config["protocol"] == "gmail":
+        emails = retrieve_email_gmail(user_config, n_mails)
     else:
         ValueError(f"config {user_config} is not recognized")
     return emails

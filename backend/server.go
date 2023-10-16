@@ -47,7 +47,10 @@ func UpdateUserEventsForAccount(user_id int, account map[string]interface{}) err
 	return nil
 }
 
-// reads new emails, parses them into events, and store them in DB
+/* reads new emails, parses them into events, and store them in DB
+
+ TODO: update client auth flow to auth code flow and eliminate the need of kwargs in the request
+ */
 func updateAccountEvents(c *gin.Context) {
 	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
@@ -87,9 +90,15 @@ func updateAccountEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
 	}
-	for key, val := range kwargs {
-		account[key] = val
+	creds, err := utils.PrepareAndRefreshEmailAccountCredentials(user_id, account)
+	if !ok {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "credentials not found in database for this account"})
+		return
 	}
+	for key, val := range kwargs {
+		creds[key] = val
+	}
+	account["credentials"] = creds
 	err = UpdateUserEventsForAccount(user_id, account)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
@@ -152,15 +161,19 @@ func getEmails(c *gin.Context) {
 		account = map[string]interface{}{
 			"protocol":    "IMAP",
 			"username":    username,
-			"password":    password,
-			"imap_server": q.Get("imap_server"),
+			"credentials": map[string]interface{} {
+				"password":    password,
+				"imap_server": q.Get("imap_server"),
+			},
 		}
 	} else {
 		account = map[string]interface{}{
 			"protocol":    "POP3",
 			"username":    username,
-			"password":    password,
-			"imap_server": q.Get("imap_server"),
+			"credentials": map[string]interface{} {
+				"password":    password,
+				"imap_server": q.Get("imap_server"),
+			},
 		}
 	}
 	emails, err := utils.GetUserEmailsFromAccount(account)
@@ -181,6 +194,7 @@ func addUserMailbox(c *gin.Context) {
 	var user_id int
 	var user_secret string
 	var mailbox_address string
+	var credentials map[string]interface{}
 	if _mailbox_type, ok := payload["type"].(string); !ok {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: type"})
 		return
@@ -205,58 +219,21 @@ func addUserMailbox(c *gin.Context) {
 	} else {
 		mailbox_address = _mailbox_address
 	}
+	if _credentials, ok := payload["credentials"].(map[string]interface{}); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: address"})
+		return
+	} else {
+		credentials = _credentials
+	}
 
 	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
 	}
 
-	if mailbox_type == "outlook" {
-		err := utils.AddUserMailboxOutlook(user_id, mailbox_address)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
-			return
-		}
-	} else if mailbox_type == "IMAP" {
-		var password string
-		var imap_server string
-		if _password, ok := payload["password"].(string); !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
-			return
-		} else {
-			password = _password
-		}
-		if _imap_server, ok := payload["imap_server"].(string); !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: imap_server"})
-			return
-		} else {
-			imap_server = _imap_server
-		}
-		err := utils.AddUserMailboxIMAP(user_id, mailbox_address, password, imap_server)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
-			return
-		}
-	} else if mailbox_type == "POP3" {
-		var password string
-		var pop3_server string
-		if _password, ok := payload["password"].(string); !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: password"})
-			return
-		} else {
-			password = _password
-		}
-		if _pop3_server, ok := payload["pop3_server"].(string); !ok {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: pop3_server"})
-			return
-		} else {
-			pop3_server = _pop3_server
-		}
-		err := utils.AddUserMailboxPOP3(user_id, mailbox_address, password, pop3_server)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
-			return
-		}
+	if err := utils.AddUserMailbox(user_id, mailbox_type, mailbox_address, credentials); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
 	}
 	c.IndentedJSON(http.StatusCreated, "")
 }
