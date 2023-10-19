@@ -45,6 +45,9 @@ def get_raw_texts(message):
 
 
 def retrieve_email_gmail(user_config: dict, n_mails: int = 50):
+    if 'access_token' in user_config['credentials']:
+        user_config['credentials']['token'] = user_config['credentials']['access_token']
+        user_config['credentials'].pop('access_token')
     creds = Credentials.from_authorized_user_info(user_config['credentials'], SCOPES)
 
     # List the user's Gmail inbox messages
