@@ -21,7 +21,7 @@ def get_emails(user_config, n_mails: int) -> dict:
             'item': plain_text
         }
         clean_mails.append(email)
-        print(email_id, plain_text, sep="\n", end="\n\n")
+        # print(email_id, plain_text, sep="\n", end="\n\n")
     emails = {
         'items': clean_mails
     }
