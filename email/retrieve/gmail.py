@@ -1,6 +1,7 @@
 from __future__ import print_function
 import base64
 from datetime import datetime
+import re
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -17,10 +18,11 @@ def decode_base64url(s: str):
 
 def convert_timestamp(timestamp: str) -> str:
     # Parse the Gmail API timestamp into a datetime object
-    try:
-        parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z (%Z)")
-    except ValueError as e:
+    m = re.search('(.*) \(.*\)', timestamp)
+    if m is None:
         parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z")
+    else:
+        parsed_time = datetime.strptime(m.group(1), "%a, %d %b %Y %H:%M:%S %z")
 
     # Define the desired output format
     desired_output_format = "%Y-%m-%d %H:%M:%S%z"
