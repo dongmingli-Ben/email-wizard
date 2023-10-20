@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import UserAccountInfo from "./UserAccountInfo";
-import { useNavigate } from "@reach/router";
+import { useNavigate } from "react-router-dom";
 
 import "./SideBar.css";
 import { get } from "../../utilities/requestUtility";

@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "@reach/router";
+import { useNavigate } from "react-router-dom";
 
 // to use styles, import the necessary CSS files
 import "./IntroPage.css";
 import "../../utility.css";
 
-type IntroPageProps = {
-  path: string;
-};
-
 /**
  * Define the "IntroPage" component as a function.
  */
-const IntroPage = (props: IntroPageProps) => {
+const IntroPage = (props: {}) => {
   const navigate = useNavigate();
 
   return (

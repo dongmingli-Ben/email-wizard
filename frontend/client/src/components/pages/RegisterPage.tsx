@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "@reach/router";
+import { Link, useNavigate } from "react-router-dom";
 
 // to use styles, import the necessary CSS files
 import "./RegisterPage.css";
 import "../../utility.css";
 import { backendConfig, post } from "../../utilities/requestUtility";
-
-type RegisterPageProps = {
-  path: string;
-};
 
 const registerUserPassword = async (
   username: string,
@@ -32,7 +28,7 @@ const registerUserPassword = async (
 /**
  * Define the "CalendarPage" component as a function.
  */
-const RegisterPage = (props: RegisterPageProps) => {
+const RegisterPage = (props: {}) => {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");

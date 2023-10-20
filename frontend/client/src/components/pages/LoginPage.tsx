@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "@reach/router";
+import { Link, useNavigate } from "react-router-dom";
 
 // to use styles, import the necessary CSS files
 import "./LoginPage.css";
@@ -11,7 +11,6 @@ type LoginPageProps = {
   userSecret: string;
   setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
-  path: string;
 };
 
 const authenticateUserPassword = async (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Router } from "@reach/router";
+import { Routes, Route } from "react-router-dom";
 import CalendarPage from "./pages/CalendarPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -48,24 +48,43 @@ const App = ({ pca }: AppProps) => {
     // up in the DOM tree
     <MsalProvider instance={pca}>
       <div className="app-container body">
-        <Router>
-          <CalendarPage
+        <Routes>
+          <Route
             path="/calendar"
-            userId={userId}
-            userSecret={userSecret}
-            setUserId={setUserId}
-            setUserSecret={setUserSecret}
+            element={
+              <CalendarPage
+                userId={userId}
+                userSecret={userSecret}
+                setUserId={setUserId}
+                setUserSecret={setUserSecret}
+              />
+            }
           />
-          <LoginPage
+          <Route
             path="/login"
-            userId={userId}
-            userSecret={userSecret}
-            setUserId={setUserId}
-            setUserSecret={setUserSecret}
+            element={
+              <LoginPage
+                userId={userId}
+                userSecret={userSecret}
+                setUserId={setUserId}
+                setUserSecret={setUserSecret}
+              />
+            }
           />
-          <RegisterPage path="/register" />
-          <IntroPage path="/" />
-        </Router>
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                userId={userId}
+                userSecret={userSecret}
+                setUserId={setUserId}
+                setUserSecret={setUserSecret}
+              />
+            }
+          />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/" element={<IntroPage />} />
+        </Routes>
       </div>
     </MsalProvider>
   );

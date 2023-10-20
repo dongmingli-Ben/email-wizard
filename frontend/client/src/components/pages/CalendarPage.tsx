@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Feed from "../modules/Feed";
 import SideBar, { userInfoType } from "../modules/SideBar";
 import AddAccountWindow from "../modules/AddAccountWindow";
-import { useNavigate } from "@reach/router";
+import { useNavigate } from "react-router-dom";
 
 // to use styles, import the necessary CSS files
 import "./CalendarPage.css";
@@ -13,7 +13,6 @@ type CalendarPageProps = {
   userSecret: string;
   setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
-  path: string;
 };
 
 /**
