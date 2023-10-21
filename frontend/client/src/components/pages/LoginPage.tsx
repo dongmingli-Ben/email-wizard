@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import "../../utility.css";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -18,6 +18,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { backendConfig, get } from "../../utilities/requestUtility";
+import { Alert } from "@mui/material";
 
 function Copyright(props: any) {
   return (
@@ -121,11 +122,19 @@ const LoginPage = (props: LoginPageProps) => {
   };
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container
+        component="main"
+        maxWidth="xs"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
+      >
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -143,6 +152,11 @@ const LoginPage = (props: LoginPageProps) => {
             // noValidate
             sx={{ mt: 1 }}
           >
+            {errorMsg === "" ? (
+              <></>
+            ) : (
+              <Alert severity="error">{errorMsg}</Alert>
+            )}
             <TextField
               margin="normal"
               required
@@ -167,14 +181,15 @@ const LoginPage = (props: LoginPageProps) => {
               control={<Checkbox value="yes" color="primary" name="remember" />}
               label="Remember me"
             />
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              loading={loading}
             >
               Sign In
-            </Button>
+            </LoadingButton>
             <Grid container>
               <Grid item xs>
                 <Link

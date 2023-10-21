@@ -26,6 +26,7 @@
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/react": "^6.1.8",
     "@mui/icons-material": "^5.14.14",
+    "@mui/lab": "^5.0.0-alpha.149",
     "@mui/material": "^5.14.14",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.3",
