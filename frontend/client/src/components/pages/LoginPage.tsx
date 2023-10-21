@@ -19,24 +19,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { backendConfig, get } from "../../utilities/requestUtility";
 import { Alert } from "@mui/material";
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://www.toymaker-ben.online/">
-        Email Wizard
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { Copyright } from "../modules/CopyWrite";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
