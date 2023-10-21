@@ -12,6 +12,8 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import "./App.css";
 import "../utility.css";
 import IntroPage from "./pages/IntroPage";
+import NotFound from "./pages/NotFound";
+import { tryLoadUserCredentials } from "../utilities/credentialUtility";
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -25,22 +27,7 @@ const App = ({ pca }: AppProps) => {
   const [userSecret, setUserSecret] = useState("");
 
   useEffect(() => {
-    if (userId > 0 && userSecret.length > 0) {
-      console.log("setting userId and userSecret to", userId, userSecret);
-      sessionStorage.setItem("userId", userId.toString());
-      sessionStorage.setItem("userSecret", userSecret);
-    }
-  }, [userId, userSecret]);
-
-  useEffect(() => {
-    const storedId = sessionStorage.getItem("userId");
-    const storedSecret = sessionStorage.getItem("userSecret");
-    if (storedId !== null && storedSecret !== null) {
-      console.log("loading id and secret from session storage ...");
-      setUserId(parseInt(storedId));
-      setUserSecret(storedSecret);
-      console.log(`current id: ${userId}, secret: ${userSecret}`);
-    }
+    tryLoadUserCredentials(setUserId, setUserSecret);
   }, []);
 
   return (
@@ -84,6 +71,7 @@ const App = ({ pca }: AppProps) => {
           />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<IntroPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </MsalProvider>
