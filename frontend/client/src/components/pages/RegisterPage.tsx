@@ -45,7 +45,7 @@ const registerUserPassword = async (
 /**
  * Define the "CalendarPage" component as a function.
  */
-const RegisterPage = (props: {}) => {
+const RegisterPage = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
