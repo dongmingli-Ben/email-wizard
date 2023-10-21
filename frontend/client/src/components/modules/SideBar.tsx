@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./SideBar.css";
 import { get } from "../../utilities/requestUtility";
 import { backendConfig } from "../../utilities/requestUtility";
+import { clearCurrentUserCredentials } from "../../utilities/credentialUtility";
 
 type userInfoType = {
   username: string;
@@ -92,10 +93,11 @@ const SideBar = (props: SideBarProps) => {
           className="u-button logout-btn u-link"
           type="button"
           onClick={(e) => {
+            // log out the current user
+            // clear current user credential from user local/session storage
+            clearCurrentUserCredentials(props.userId);
             props.setUserId(-1);
             props.setUserSecret("");
-            sessionStorage.setItem("userId", (-1).toString());
-            sessionStorage.setItem("userSecret", "");
             navigate("/");
           }}
         >
