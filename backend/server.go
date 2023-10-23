@@ -58,23 +58,17 @@ func updateAccountEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
 		return
 	}
+	user_id, err := strconv.Atoi(c.Param("user_id"));
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
+		return
+	}
+	user_secret := c.Request.Header.Get("X-User-Secret");
 	var email_address string
-	var user_secret string
-	var user_id int
 	var kwargs map[string]interface{}
 	var ok bool
 	if email_address, ok = payload["address"].(string); !ok {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("address not found: %v", payload)})
-		return
-	}
-	if _user_id, ok := payload["user_id"].(float64); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("user_id not found: %v", payload)})
-		return
-	} else {
-		user_id = int(_user_id)
-	}
-	if user_secret, ok = payload["user_secret"].(string); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("user_secret not found: %v", payload)})
 		return
 	}
 	if kwargs, ok = payload["kwargs"].(map[string]interface{}); !ok {
@@ -91,7 +85,7 @@ func updateAccountEvents(c *gin.Context) {
 		return
 	}
 	creds, err := utils.PrepareAndRefreshEmailAccountCredentials(user_id, account)
-	if !ok {
+	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "credentials not found in database for this account"})
 		return
 	}
@@ -109,19 +103,18 @@ func updateAccountEvents(c *gin.Context) {
 
 // getEvents only read from events DB
 func searchEvents(c *gin.Context) {
-	q := c.Request.URL.Query()
-	user_id, err := strconv.Atoi(q.Get("user_id"))
+	user_id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
 		return
 	}
-	secret := q.Get("user_secret")
+	secret := c.Request.Header.Get("X-User-Secret")
 	if ok, err := utils.ValidateUserSecret(user_id, secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
 	}
 	
-	query := q.Get("query")
+	query := c.Request.URL.Query().Get("query")
 	var events []map[string]interface{}
 	if query == "" {
 		// read events from db
@@ -190,9 +183,13 @@ func addUserMailbox(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
 		return
 	}
+	user_id, err := strconv.Atoi(c.Param(("user_id")))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
+		return
+	}
+	user_secret := c.Request.Header.Get("X-User-Secret");
 	var mailbox_type string
-	var user_id int
-	var user_secret string
 	var mailbox_address string
 	var credentials map[string]interface{}
 	if _mailbox_type, ok := payload["type"].(string); !ok {
@@ -200,18 +197,6 @@ func addUserMailbox(c *gin.Context) {
 		return
 	} else {
 		mailbox_type = _mailbox_type
-	}
-	if _user_id, ok := payload["user_id"].(float64); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: user_id"})
-		return
-	} else {
-		user_id = int(_user_id)
-	}
-	if _user_secret, ok := payload["user_secret"].(string); !ok {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: user_secret"})
-		return
-	} else {
-		user_secret = _user_secret
 	}
 	if _mailbox_address, ok := payload["address"].(string); !ok {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: address"})
@@ -260,12 +245,11 @@ func addUser(c *gin.Context) {
 }
 
 func getUserProfile(c *gin.Context) {
-	q := c.Request.URL.Query()
-	user_id, err := strconv.Atoi(q.Get("user_id"))
+	user_id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("non-integer user_id: %v", q.Get("user_id"))})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
 	}
-	user_secret := q.Get("user_secret")
+	user_secret := c.Request.Header.Get("X-User-Secret")
 	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
@@ -279,9 +263,18 @@ func getUserProfile(c *gin.Context) {
 }
 
 func authenticateUser(c *gin.Context) {
-	q := c.Request.URL.Query()
-	username := q.Get("username")
-	password := q.Get("password")
+	var payload map[string]interface{}
+	if err := c.BindJSON(&payload); err != nil {
+		fmt.Println(io.ReadAll(c.Request.Body))
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	username, ok_username := payload["username"].(string)
+	password, ok_password := payload["password"].(string)
+	if !(ok_username && ok_password) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
 	if ok, err := utils.ValidateUserPassword(username, password); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("fail to validate user name %v with password %v", username, password)})
 		return
@@ -291,7 +284,7 @@ func authenticateUser(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"user_id": user_id, "user_secret": user_secret})
+	c.IndentedJSON(http.StatusCreated, gin.H{"user_id": user_id, "user_secret": user_secret})
 }
 
 func main() {
@@ -310,13 +303,13 @@ func main() {
 		"Access-Control-Allow-Methods",
 	}
 	router.Use(cors.New(config))
-	router.GET("/events", searchEvents)
-	router.POST("/events", updateAccountEvents)
+	router.GET("/users/:user_id/events", searchEvents)
+	router.POST("/users/:user_id/events", updateAccountEvents)
 	router.GET("/verify_email", getEmails)
-	router.GET("/verify_user", authenticateUser)
-	router.GET("/user_profile", getUserProfile)
-	router.POST("/add_mailbox", addUserMailbox)
-	router.POST("/add_user", addUser)
+	router.POST("/authenticate", authenticateUser)
+	router.GET("/users/:user_id/profile", getUserProfile)
+	router.POST("/users/:user_id/mailboxes", addUserMailbox)
+	router.POST("/users", addUser)
 
 	// router.Run(":8080")
 	router.RunTLS(":8080", "cert/www.toymaker-ben.online.pem", "cert/www.toymaker-ben.online.key")

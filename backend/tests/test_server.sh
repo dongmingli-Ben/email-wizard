@@ -8,9 +8,13 @@ cd $script_dir
 echo "adding user..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
-    -d '{"username": "toymaker", "password": "12345678"}' https://toymaker-ben.online/api/add_user
+    -d '{"username": "toymaker", "password": "12345678"}' \
+     https://toymaker-ben.online/api/users
 
-resp=$(curl -G -d "username=toymaker&password=12345678" https://toymaker-ben.online/api/verify_user)
+resp=$(curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
+    -H "Accept: application/json, text/plain, */*" \
+    -d '{"username": "toymaker", "password": "12345678"}' \
+     https://toymaker-ben.online/api/authenticate)
 user_id="$(echo $resp | jq -r '.user_id')"
 user_secret="$(echo $resp | jq -r '.user_secret')"
 
@@ -19,48 +23,49 @@ password=$(cat test_126_password.txt)
 echo "adding mailbox 126.com for user..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
+    -H "X-User-Secret: $user_secret" \
     -d '{
             "type": "IMAP",
-            "user_id": '$user_id',
-            "user_secret": "'"$user_secret"'",
             "address": "dongmingli_Ben@126.com",
-            "imap_server": "imap.126.com",
-            "password": "'"$password"'"
+            "credentials": {
+                "imap_server": "imap.126.com",
+                "password": "'"$password"'"
+            }
         }' \
-    https://toymaker-ben.online/api/add_mailbox
+    https://toymaker-ben.online/api/users/${user_id}/mailboxes
 
 echo "updating event for mailbox 126.com..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
+    -H "X-User-Secret: $user_secret" \
     -d '{
-            "user_id": '$user_id',
-            "user_secret": "'"$user_secret"'",
             "address": "dongmingli_Ben@126.com",
             "kwargs": {}
         }' \
-    https://toymaker-ben.online/api/events
-curl -G -d "user_id=$user_id&user_secret=$user_secret" https://toymaker-ben.online/api/events
+    https://toymaker-ben.online/api/users/$user_id/events
+curl -G -H "X-User-Secret: $user_secret" \
+    https://toymaker-ben.online/api/users/$user_id/events
 
 echo "adding mailbox outlook for user..."
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
+    -H "X-User-Secret: $user_secret" \
     -d '{
             "type": "outlook",
-            "user_id": '$user_id',
-            "user_secret": "'"$user_secret"'",
-            "address": "guangtouqiang@outlook.com"
+            "address": "guangtouqiang@outlook.com",
+            "credentials": {}
         }' \
-    https://toymaker-ben.online/api/add_mailbox
+    https://toymaker-ben.online/api/users/$user_id/mailboxes
 
 echo "updating event for mailbox outlook..."
 auth_token=$(cat test_auth_token.txt)
 curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     -H "Accept: application/json, text/plain, */*" \
+    -H "X-User-Secret: $user_secret" \
     -d '{
-            "user_id": '$user_id',
-            "user_secret": "'"$user_secret"'",
             "address": "guangtouqiang@outlook.com",
             "kwargs": {"auth_token": "'"$auth_token"'"}
         }' \
-    https://toymaker-ben.online/api/events
-curl -G -d "user_id=$user_id&user_secret=$user_secret&query=f" https://toymaker-ben.online/api/events
+    https://toymaker-ben.online/api/users/$user_id/events
+curl -G -H "X-User-Secret: $user_secret" \
+    https://toymaker-ben.online/api/users/$user_id/events
