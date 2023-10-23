@@ -17,7 +17,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { backendConfig, get } from "../../utilities/requestUtility";
+import { backendConfig, post } from "../../utilities/requestUtility";
 import { Alert } from "@mui/material";
 import { Copyright } from "../modules/CopyWrite";
 
@@ -35,7 +35,7 @@ const authenticateUserPassword = async (
   username: string,
   password: string
 ): Promise<{ userId: number; userSecret: string; errMsg: string }> => {
-  return get(backendConfig.verify_user, {
+  return post(backendConfig.verify_user, {
     username: username,
     password: password,
   })

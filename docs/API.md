@@ -156,11 +156,20 @@ The event database should store the parsed events from users' emails.
 
 ## Backend API Endpoint
 
-### `events` endpoint - GET
+### Passing user credentials
+
+After the APIs are redesigned to follow REST, user id is passed in the URL and user secret should be passed in the headers with `X-User-Secret`. Here is an example:
+
+```bash
+curl -G -H "X-User-Secret: $user_secret" \
+    https://toymaker-ben.online/api/users/$user_id/events
+```
+
+### `users/:id/events` endpoint - GET
 
 This API is meant for querying events already in DB.
 
-Endpoint: `http://public-ip:8080/events`
+Endpoint: `https://public-ip:8080/users/:id/events`
 
 Params:
 
@@ -184,17 +193,15 @@ A json string of events (something like the below)
 ]
 ```
 
-### `events` endpoint - POST
+### `users/:id/events` endpoint - POST
 
 This API is meant for updating new events of a mailbox of a user.
 
-Endpoint: `http://public-ip:8080/events`
+Endpoint: `https://public-ip:8080/users/:id/events`
 
 Params:
 
 ```yaml
-user_id: int
-user_secret: string
 address: string
 kwargs: JSON  # to be deprecated
 ```
@@ -211,7 +218,9 @@ A json of error message
 
 This API is meant to verify whether our service can retrieve emails from users' IMAP or POP3 mailboxes.
 
-Endpoint: `http://public-ip:8080/verify_email`
+Endpoint: `https://public-ip:8080/verify_email`
+
+Method: GET
 
 Params:
 
@@ -234,19 +243,17 @@ If there is an internal error, it will return:
 }
 ```
 
-### `add_mailbox` endpoint
+### `users/:id/mailboxes` endpoint
 
 This API is meant to add users' mailbox info to the user DB.
 
-Endpoint: `http://public-ip:8080/add_mailbox`
+Endpoint: `https://public-ip:8080/users/:id/mailboxes`
 
 Method: POST
 
 Payload:
 
 ```yaml
-user_id: string
-user_secret: string
 type: string # mailbox type
 address: string # mailbox address
 credentials: JSON # other necessary fields such as password, IMAP/POP3 server, auth code, etc
@@ -260,20 +267,15 @@ If the request is not successful:
 errMsg: string
 ```
 
-### `user_profile` endpoint
+### `users/:id/profile` endpoint
 
 This API is meant to get user name and their added mailboxes information for display.
 
-Endpoint: `http://public-ip:8080/user_profile`
+Endpoint: `https://public-ip:8080/users/:id/profile`
 
 Method: GET
 
-Payload:
-
-```yaml
-user_id: string
-user_secret: string
-```
+No payload.
 
 Response:
 
@@ -292,13 +294,13 @@ user_accounts:
   - protocal: string # mailbox type
 ```
 
-### `verify_user` endpoint
+### `authenticate` endpoint
 
 This API is meant to autheticate user name and password then return the user id and user secret for future API call.
 
-Endpoint: `http://public-ip:8080/user_profile`
+Endpoint: `https://public-ip:8080/authenticate`
 
-Method: GET
+Method: POST
 
 Payload:
 
@@ -322,13 +324,13 @@ user_id: string
 user_secret: string
 ```
 
-### `add_user` endpoint
+### `users` endpoint
 
 This API is meant to add user name and password to backend database.
 
-Endpoint: `http://public-ip:8080/add_user`
+Endpoint: `https://public-ip:8080/users`
 
-Method: GET
+Method: POST
 
 Payload:
 

@@ -9,7 +9,7 @@ import {
 } from "../../utilities/verifyEmail";
 
 import "./AddAccountWindow.css";
-import { backendConfig, post } from "../../utilities/requestUtility";
+import { appPost, backendConfig, post } from "../../utilities/requestUtility";
 
 type AddAccountWindowProps = {
   userId: number;
@@ -46,13 +46,16 @@ const addEmailAccountDBAPI = async (
   credentials: { [key: string]: string }
 ): Promise<string> => {
   let add_req = {
-    user_id: req.userId,
-    user_secret: req.userSecret,
     type: req.emailtype,
     address: req.emailaddress,
     credentials: credentials,
   };
-  let errMsg = await post(backendConfig.add_mailbox, add_req)
+  let errMsg = await appPost(
+    backendConfig.add_mailbox,
+    req.userId,
+    req.userSecret,
+    add_req
+  )
     .then((resp) => {
       return "";
     })
