@@ -3,7 +3,7 @@ import UserAccountInfo from "./UserAccountInfo";
 import { useNavigate } from "react-router-dom";
 
 import "./SideBar.css";
-import { get } from "../../utilities/requestUtility";
+import { appGet, get } from "../../utilities/requestUtility";
 import { backendConfig } from "../../utilities/requestUtility";
 import { clearCurrentUserCredentials } from "../../utilities/credentialUtility";
 
@@ -30,10 +30,7 @@ const getUserInfoAPI = async (
   userAccounts: { address: string; protocol: string }[];
   errMsg: string;
 }> => {
-  return get(backendConfig.user_profile, {
-    user_id: userId,
-    user_secret: userSecret,
-  })
+  return appGet(backendConfig.user_profile, userId, userSecret, {})
     .then((resp) => {
       console.log("mailboxes: ", resp.mailboxes);
       let mailboxes = resp.mailboxes.length > 0 ? resp.mailboxes : [];

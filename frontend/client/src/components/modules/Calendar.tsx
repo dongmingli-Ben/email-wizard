@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import { backendConfig, get, post } from "../../utilities/requestUtility";
+import {
+  appGet,
+  appPost,
+  backendConfig,
+  get,
+  post,
+} from "../../utilities/requestUtility";
 import { getAccessToken } from "../../utilities/verifyEmail";
 import { userInfoType } from "./SideBar";
 
@@ -44,9 +50,7 @@ const updateAccountEventsAPI = async (
   protocol: string
 ): Promise<void> => {
   if (protocol === "IMAP" || protocol == "POP3" || protocol == "gmail") {
-    return post(backendConfig.events, {
-      user_id: userId,
-      user_secret: userSecret,
+    return appPost(backendConfig.events, userId, userSecret, {
       address: address,
       kwargs: {},
     });
@@ -56,9 +60,7 @@ const updateAccountEventsAPI = async (
       console.log("fail to get access token, got: ", access_token);
       return;
     }
-    return post(backendConfig.events, {
-      user_id: userId,
-      user_secret: userSecret,
+    return appPost(backendConfig.events, userId, userSecret, {
       address: address,
       kwargs: {
         auth_token: access_token,
@@ -74,9 +76,7 @@ const getEventsAPI = async (
   userSecret: string,
   query: string
 ): Promise<EventType[]> => {
-  return get(backendConfig.events, {
-    user_id: userId,
-    user_secret: userSecret,
+  return appGet(backendConfig.events, userId, userSecret, {
     query: query,
   })
     .then((resp) => {

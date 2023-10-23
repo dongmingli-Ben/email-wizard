@@ -13,13 +13,14 @@ const timeoutMillis = 100 * 1000;
 
 // Helper code to make a get request. Default parameter of empty JSON Object for params.
 // Returns a Promise to a JSON Object.
-export async function get(endpoint: string, params = {}) {
+export async function get(endpoint: string, params = {}, extraHeaders = {}) {
   return axios
     .get(endpoint, {
       params: params,
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS,DELETE,PUT",
+        ...extraHeaders,
       },
     })
     .then((resp: AxiosResponse) => {
@@ -34,10 +35,10 @@ export async function get(endpoint: string, params = {}) {
 
 // Helper code to make a post request. Default parameter of empty JSON Object for params.
 // Returns a Promise to a JSON Object.
-export async function post(endpoint: string, params = {}) {
+export async function post(endpoint: string, params = {}, extraHeaders = {}) {
   return axios
     .post(endpoint, params, {
-      headers: { "Content-type": "application/json" },
+      headers: { "Content-type": "application/json", ...extraHeaders },
       timeout: timeoutMillis,
     })
     .then((resp: AxiosResponse) => {
@@ -50,13 +51,35 @@ export async function post(endpoint: string, params = {}) {
     });
 }
 
+export async function appGet(
+  endpoint: string,
+  user_id: number,
+  user_secret: string,
+  params = {}
+) {
+  return get(endpoint.replace("{user_id}", user_id.toString()), params, {
+    "X-User-Secret": user_secret,
+  });
+}
+
+export async function appPost(
+  endpoint: string,
+  user_id: number,
+  user_secret: string,
+  params = {}
+) {
+  return post(endpoint.replace("{user_id}", user_id.toString()), params, {
+    "X-User-Secret": user_secret,
+  });
+}
+
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const backendConfig = {
   verify_email: "https://www.toymaker-ben.online/api/verify_email",
-  events: "https://www.toymaker-ben.online/api/events",
-  add_user: "https://www.toymaker-ben.online/api/add_user",
-  verify_user: "https://www.toymaker-ben.online/api/verify_user",
-  add_mailbox: "https://www.toymaker-ben.online/api/add_mailbox",
-  user_profile: "https://www.toymaker-ben.online/api/user_profile",
+  events: "https://www.toymaker-ben.online/api/users/{user_id}/events",
+  add_user: "https://www.toymaker-ben.online/api/users",
+  verify_user: "https://www.toymaker-ben.online/api/authenticate",
+  add_mailbox: "https://www.toymaker-ben.online/api/users/{user_id}/mailboxes",
+  user_profile: "https://www.toymaker-ben.online/api/users/{user_id}/profile",
 };

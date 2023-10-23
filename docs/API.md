@@ -220,6 +220,8 @@ This API is meant to verify whether our service can retrieve emails from users' 
 
 Endpoint: `https://public-ip:8080/verify_email`
 
+Method: GET
+
 Params:
 
 ```yaml

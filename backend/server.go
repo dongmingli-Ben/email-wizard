@@ -301,6 +301,7 @@ func main() {
 		"Authorization",
 		"Access-Control-Allow-Origin",
 		"Access-Control-Allow-Methods",
+		"X-User-Secret",
 	}
 	router.Use(cors.New(config))
 	router.GET("/users/:user_id/events", searchEvents)
