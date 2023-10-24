@@ -46,12 +46,12 @@ If the API endpoint is up and healthy, you should see something like (it is slow
 
 ```json
 [
-    {
-        "end_time": "2023-04-06T12:00:00 Asia/Shanghai",
-        "event_type": "registration",
-        "summary": "2023大学杰出毕业生奖提名者自荐材料征集",
-        "venue": "https://wj.cuhk.edu.cn/vm/YVgulbu.aspx"
-    }
+  {
+    "end_time": "2023-04-06T12:00:00 Asia/Shanghai",
+    "event_type": "registration",
+    "summary": "2023大学......",
+    "venue": "https://....../vm/YVgulbu.aspx"
+  }
 ]
 ```
 
