@@ -1,8 +1,3 @@
-.app-active-container {
-  background-color: var(--primary);
-}
-
 .app-inactive-container {
-  background-color: var(--primary);
   z-index: 10;
 }

@@ -6,6 +6,7 @@ import "./SideBar.css";
 import { appGet, get } from "../../utilities/requestUtility";
 import { backendConfig } from "../../utilities/requestUtility";
 import { clearCurrentUserCredentials } from "../../utilities/credentialUtility";
+import { Container } from "@mui/material";
 
 type userInfoType = {
   username: string;
@@ -75,7 +76,15 @@ const SideBar = (props: SideBarProps) => {
   }, [props.userId, props.userSecret]);
 
   return (
-    <div className="sidebar-container">
+    <Container
+      component="main"
+      fixed
+      disableGutters
+      sx={{
+        bgcolor: "primary.main",
+        width: "20vw",
+      }}
+    >
       <UserAccountInfo
         userName={props.userInfo ? props.userInfo.username : ""}
         userAccounts={
@@ -101,7 +110,7 @@ const SideBar = (props: SideBarProps) => {
           Log Out
         </button>
       </div>
-    </div>
+    </Container>
   );
 };
 
