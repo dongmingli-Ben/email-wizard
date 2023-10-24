@@ -10,6 +10,22 @@ import {
 
 import "./AddAccountWindow.css";
 import { appPost, backendConfig, post } from "../../utilities/requestUtility";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 type AddAccountWindowProps = {
   userId: number;
@@ -95,10 +111,6 @@ const newEmailAccount = async (
 
 const AddAccountWindow = (props: AddAccountWindowProps) => {
   const [emailType, setEmailType] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [password, setPassword] = useState("");
-  const [imapServer, setIMAPServer] = useState("");
-  const [pop3Server, setPOP3Server] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -108,17 +120,18 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
     return needPasswordEmails.includes(emailType);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (event) => {
     setLoading(true);
-    e.preventDefault();
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
     let req = {
       emailtype: emailType,
-      emailaddress: emailAddress,
-      password: password,
+      emailaddress: data.get("address") as string,
+      password: data.get("password") as string,
       userId: props.userId,
       userSecret: props.userSecret,
-      imapServer: imapServer,
-      pop3Server: pop3Server,
+      imapServer: data.get("server") as string,
+      pop3Server: data.get("server") as string,
     };
     console.log(req);
     newEmailAccount(req)
@@ -153,125 +166,153 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
 
   return (
     <div className="add-account-overlay-container">
-      <div className="add-account-container">
-        <h3 className="u-textCenter">New Email Account</h3>
-        <form onSubmit={handleSubmit} className="add-account-form u-flexColumn">
-          <div className="u-form-group u-flexColumn">
-            <label htmlFor="Email Type" className="u-form-lable">
-              Select Mailbox Type
-            </label>
-            <select
-              className="dropdown-cell-container u-input"
-              value={emailType}
-              onChange={(e) => {
-                setEmailType(e.target.value);
-              }}
-              required
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <Container
+          maxWidth="xs"
+          fixed
+          sx={{
+            bgcolor: "common.white",
+            pt: 1.5,
+          }}
+        >
+          <CssBaseline />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+              <EmailIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              New Mailbox
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              // noValidate
+              sx={{ mt: 2, width: "80%" }}
             >
-              <option value="">-- Select --</option>
-              <option value="outlook">Outlook</option>
-              <option value="gmail">Gmail</option>
-              <option value="IMAP">IMAP</option>
-              <option value="POP3">POP3</option>
-            </select>
-          </div>
-          <div className="u-form-group u-flexColumn">
-            <label htmlFor="Email Address" className="u-form-lable">
-              Email Address
-            </label>
-            <input
-              type="email"
-              className="form-input-container u-input"
-              value={emailAddress}
-              onChange={(e) => {
-                setEmailAddress(e.target.value);
-              }}
-              required
-            />
-            {errorMsg === "" ? (
-              <></>
-            ) : (
-              <div className="u-error-msg">{errorMsg}</div>
-            )}
-          </div>
-          {requirePassword(emailType) ? (
-            <div className="u-form-group u-flexColumn">
-              <label htmlFor="Email Password" className="u-form-lable">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-input-container u-input"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-              />
-            </div>
-          ) : (
-            <></>
-          )}
-          {emailType === "IMAP" ? (
-            <div className="u-form-group u-flexColumn">
-              <label htmlFor="IMAP server" className="u-form-lable">
-                IMAP server
-              </label>
-              <input
-                type="text"
-                className="form-input-container u-input"
-                value={imapServer}
-                onChange={(e) => {
-                  setIMAPServer(e.target.value);
-                }}
-              />
-            </div>
-          ) : (
-            <></>
-          )}
-          {emailType === "POP3" ? (
-            <div className="u-form-group u-flexColumn">
-              <label htmlFor="POP3 server" className="u-form-lable">
-                POP3 server
-              </label>
-              <input
-                type="text"
-                className="form-input-container u-input"
-                value={pop3Server}
-                onChange={(e) => {
-                  setPOP3Server(e.target.value);
-                }}
-              />
-            </div>
-          ) : (
-            <></>
-          )}
-          <div className="u-form-group u-flex u-flex-justifyCenter">
-            <button
-              type="submit"
-              className="u-submit-btn u-link u-button"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="u-spin-btn u-flex u-flex-justifyCenter">
-                  <img src="./static/refresh.svg" className="u-btn-image" />
-                </div>
+              {errorMsg === "" ? (
+                <></>
               ) : (
-                "Submit"
+                <Alert
+                  severity="error"
+                  sx={{
+                    mb: 2,
+                  }}
+                >
+                  {errorMsg}
+                </Alert>
               )}
-            </button>
-            <button
-              type="button"
-              className="u-cancel-btn u-link u-button"
-              onClick={(e) => {
-                props.setAddAccount(false);
-                console.log("setting addAccount to false");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+              <FormControl fullWidth>
+                <InputLabel>Mailbox Type</InputLabel>
+                <Select
+                  value={emailType}
+                  onChange={(e) => {
+                    setEmailType(e.target.value);
+                  }}
+                  label="Mailbox Type"
+                  required
+                >
+                  <MenuItem value={"outlook"}>Outlook</MenuItem>
+                  <MenuItem value={"gmail"}>Gmail</MenuItem>
+                  <MenuItem value={"IMAP"}>IMAP</MenuItem>
+                  <MenuItem value={"POP3"}>POP3</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="address"
+                label="Email Address"
+                name="address"
+                autoComplete="john@example.com"
+                autoFocus
+              />
+              {requirePassword(emailType) ? (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                />
+              ) : (
+                <></>
+              )}
+              {emailType === "IMAP" ? (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="server"
+                  label="IMAP Server"
+                  type="text"
+                  id="server"
+                  autoComplete="xxx.imap.com"
+                />
+              ) : (
+                <></>
+              )}
+              {emailType === "POP3" ? (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="server"
+                  label="POP3 Server"
+                  type="text"
+                  id="server"
+                  autoComplete="xxx.pop3.com"
+                />
+              ) : (
+                <></>
+              )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  m: 1,
+                }}
+              >
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  sx={{ m: 1 }}
+                  loading={loading}
+                >
+                  Submit
+                </LoadingButton>
+                <Button
+                  variant="text"
+                  color="secondary"
+                  sx={{ m: 1 }}
+                  onClick={() => {
+                    props.setAddAccount(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
     </div>
   );
 };
