@@ -16,13 +16,9 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { backendConfig, post } from "../../utilities/requestUtility";
 import { Alert } from "@mui/material";
 import { Copyright } from "../modules/CopyWrite";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
 
 type LoginPageProps = {
   userId: number;
@@ -104,104 +100,98 @@ const LoginPage = (props: LoginPageProps) => {
     );
   };
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container
-        component="main"
-        maxWidth="xs"
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <CssBaseline />
+      <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          minHeight: "100vh",
+          alignItems: "center",
         }}
       >
-        <CssBaseline />
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
         <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+          component="form"
+          onSubmit={handleSubmit}
+          // noValidate
+          sx={{ mt: 1 }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            // noValidate
-            sx={{ mt: 1 }}
+          {errorMsg === "" ? <></> : <Alert severity="error">{errorMsg}</Alert>}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="User Name"
+            name="username"
+            autoComplete="user name"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+          <FormControlLabel
+            control={<Checkbox value="yes" color="primary" name="remember" />}
+            label="Remember me"
+          />
+          <LoadingButton
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            loading={loading}
           >
-            {errorMsg === "" ? (
-              <></>
-            ) : (
-              <Alert severity="error">{errorMsg}</Alert>
-            )}
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="username"
-              label="User Name"
-              name="username"
-              autoComplete="user name"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="yes" color="primary" name="remember" />}
-              label="Remember me"
-            />
-            <LoadingButton
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              loading={loading}
-            >
-              Sign In
-            </LoadingButton>
-            <Grid container>
-              <Grid item xs>
-                <Link
-                  variant="body2"
-                  component="button"
-                  onClick={() => {
-                    navigate("/reset");
-                  }}
-                >
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link
-                  variant="body2"
-                  component="button"
-                  onClick={() => {
-                    navigate("/register");
-                  }}
-                >
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
+            Sign In
+          </LoadingButton>
+          <Grid container>
+            <Grid item xs>
+              <Link
+                variant="body2"
+                component="button"
+                onClick={() => {
+                  navigate("/reset");
+                }}
+              >
+                Forgot password?
+              </Link>
             </Grid>
-          </Box>
+            <Grid item>
+              <Link
+                variant="body2"
+                component="button"
+                onClick={() => {
+                  navigate("/register");
+                }}
+              >
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
-      </Container>
-    </ThemeProvider>
+      </Box>
+      <Copyright sx={{ mt: 8, mb: 4 }} />
+    </Container>
   );
 };
 

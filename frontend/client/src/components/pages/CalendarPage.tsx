@@ -49,7 +49,7 @@ const CalendarPage = (props: CalendarPageProps) => {
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
-    <ThemeProvider theme={defaultTheme}>
+    <>
       <div
         className={`
             ${
@@ -83,7 +83,7 @@ const CalendarPage = (props: CalendarPageProps) => {
       ) : (
         <></>
       )}
-    </ThemeProvider>
+    </>
   );
 };
 

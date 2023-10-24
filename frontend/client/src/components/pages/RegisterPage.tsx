@@ -16,12 +16,8 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Alert } from "@mui/material";
 import { Copyright } from "../modules/CopyWrite";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
 
 const registerUserPassword = async (
   username: string,
@@ -81,106 +77,100 @@ const RegisterPage = () => {
     );
   };
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Container
-        component="main"
-        maxWidth="xs"
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <CssBaseline />
+      <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          minHeight: "100vh",
+          alignItems: "center",
         }}
       >
-        <CssBaseline />
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign up
+        </Typography>
         <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+          component="form"
+          // noValidate
+          onSubmit={handleSubmit}
+          sx={{ mt: 1 }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          <Box
-            component="form"
-            // noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 1 }}
+          {errorMsg === "" ? <></> : <Alert severity="error">{errorMsg}</Alert>}
+          {registerSuccess ? (
+            <Alert severity="success">
+              You have successfully registered a new account! Now{" "}
+              <Link
+                variant="body2"
+                component="button"
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                Sign in
+              </Link>
+              !
+            </Alert>
+          ) : (
+            <></>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="User Name"
+            name="username"
+            autoComplete="user-name"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+          />
+          <LoadingButton
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            loading={loading}
           >
-            {errorMsg === "" ? (
-              <></>
-            ) : (
-              <Alert severity="error">{errorMsg}</Alert>
-            )}
-            {registerSuccess ? (
-              <Alert severity="success">
-                You have successfully registered a new account! Now{" "}
-                <Link
-                  variant="body2"
-                  component="button"
-                  onClick={() => {
-                    navigate("/login");
-                  }}
-                >
-                  Sign in
-                </Link>
-                !
-              </Alert>
-            ) : (
-              <></>
-            )}
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="username"
-              label="User Name"
-              name="username"
-              autoComplete="user-name"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="new-password"
-            />
-            <LoadingButton
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              loading={loading}
-            >
-              Sign Up
-            </LoadingButton>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link
-                  variant="body2"
-                  component="button"
-                  onClick={() => {
-                    navigate("/login");
-                  }}
-                >
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
+            Sign Up
+          </LoadingButton>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link
+                variant="body2"
+                component="button"
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                Already have an account? Sign in
+              </Link>
             </Grid>
-          </Box>
+          </Grid>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
-      </Container>
-    </ThemeProvider>
+      </Box>
+      <Copyright sx={{ mt: 5 }} />
+    </Container>
   );
 };
 

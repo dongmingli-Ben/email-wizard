@@ -6,7 +6,7 @@ import "./SideBar.css";
 import { appGet, get } from "../../utilities/requestUtility";
 import { backendConfig } from "../../utilities/requestUtility";
 import { clearCurrentUserCredentials } from "../../utilities/credentialUtility";
-import { Container } from "@mui/material";
+import { Button, Container } from "@mui/material";
 
 type userInfoType = {
   username: string;
@@ -94,22 +94,26 @@ const SideBar = (props: SideBarProps) => {
         }
         setAddAccount={props.setAddAccount}
       />
-      <div className="logout-btn-container">
-        <button
-          className="u-button logout-btn u-link"
-          type="button"
-          onClick={(e) => {
-            // log out the current user
-            // clear current user credential from user local/session storage
-            clearCurrentUserCredentials(props.userId);
-            props.setUserId(-1);
-            props.setUserSecret("");
-            navigate("/");
-          }}
-        >
-          Log Out
-        </button>
-      </div>
+      <Button
+        fullWidth
+        variant="contained"
+        color="secondary"
+        onClick={(e) => {
+          // log out the current user
+          // clear current user credential from user local/session storage
+          clearCurrentUserCredentials(props.userId);
+          props.setUserId(-1);
+          props.setUserSecret("");
+          navigate("/");
+        }}
+        sx={{
+          position: "absolute",
+          bottom: "0%",
+          width: "inherit",
+        }}
+      >
+        Log Out
+      </Button>
     </Container>
   );
 };
