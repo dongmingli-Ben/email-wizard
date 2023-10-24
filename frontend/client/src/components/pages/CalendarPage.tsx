@@ -3,14 +3,10 @@ import Feed from "../modules/Feed";
 import SideBar, { userInfoType } from "../modules/SideBar";
 import AddAccountWindow from "../modules/AddAccountWindow";
 import { useNavigate } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 // to use styles, import the necessary CSS files
 import "./CalendarPage.css";
 import "../../utility.css";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
 
 type CalendarPageProps = {
   userId: number;
