@@ -12,13 +12,14 @@ type UserAccountInfoProps = {
 
 const UserAccountInfo = (props: UserAccountInfoProps) => {
   let rows = props.userAccounts.map(
-    (account: { address: string; protocol: string }) => {
+    (account: { address: string; protocol: string }, index: number) => {
       return (
         <Grid
           item
           sx={{
             width: "100%",
           }}
+          key={index}
         >
           <Box
             sx={{
