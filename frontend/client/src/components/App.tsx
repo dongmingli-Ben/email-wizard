@@ -19,7 +19,8 @@ import { tryLoadUserCredentials } from "../utilities/credentialUtility";
 
 const theme = createTheme({
   typography: {
-    fontFamily: "OpenSans",
+    fontFamily: `"Open Sans", sans-serif`,
+    fontWeightRegular: 400,
   },
 });
 
