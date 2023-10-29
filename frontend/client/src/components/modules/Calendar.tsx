@@ -10,17 +10,20 @@ import {
 } from "../../utilities/requestUtility";
 import { getAccessToken } from "../../utilities/verifyEmail";
 import { userInfoType } from "./SideBar";
+import SearchBar from "./SearchBar";
+import { Box, Link, Tooltip, Typography } from "@mui/material";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import CelebrationIcon from "@mui/icons-material/Celebration";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import PlaceIcon from "@mui/icons-material/Place";
 
 type calendarProps = {
   userId: number;
   userSecret: string;
   query: string;
+  setQuery: (query: string) => void;
   userInfo: userInfoType | undefined;
-};
-
-type EventType = {
-  title: string;
-  date: string;
 };
 
 const updateEvents = async (
@@ -75,21 +78,26 @@ const getEventsAPI = async (
   userId: number,
   userSecret: string,
   query: string
-): Promise<EventType[]> => {
+): Promise<{ [key: string]: any }[]> => {
   return appGet(backendConfig.events, userId, userSecret, {
     query: query,
   })
     .then((resp) => {
       console.log(`events returned`);
       console.log(resp);
-      let events: EventType[] = [];
+      let events: { [key: string]: any }[] = [];
       for (const e of resp) {
-        if ("end_time" in e) {
+        if ("end_time" in e && e.end_time != "unspecified") {
+          let startTime = "start_time" in e ? e.start_time : e.end_time;
           events = [
             ...events,
             {
               title: e.summary,
-              date: e.end_time.split("T")[0],
+              start: startTime.split(" ")[0],
+              end: e.end_time.split(" ")[0],
+              extendedProps: {
+                event: e,
+              },
             },
           ];
         }
@@ -104,14 +112,117 @@ const getEventsAPI = async (
     });
 };
 
+const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
+  const getLocalTime = (time: string) => {
+    let localtime = time.split(" ")[0].split("T")[1];
+    return localtime.split(":").slice(0, 2).join(":");
+  };
+  console.log(event);
+  return (
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Box pr={1}>
+          {event.event_type === "registration" ? (
+            <HowToRegIcon></HowToRegIcon>
+          ) : (
+            <CelebrationIcon></CelebrationIcon>
+          )}
+        </Box>
+        <Typography>{event.summary}</Typography>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Box pr={1}>
+          <ScheduleIcon></ScheduleIcon>
+        </Box>
+        {"start_time" in event ? (
+          <Typography>
+            {getLocalTime(event.start_time)} - {getLocalTime(event.end_time)}
+          </Typography>
+        ) : (
+          <Typography>{getLocalTime(event.end_time)}</Typography>
+        )}
+      </Box>
+      {event.venue === "" || event.venue === "unspecified" ? (
+        <></>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box pr={1}>
+            <PlaceIcon></PlaceIcon>
+          </Box>
+          <Typography>
+            {event.venue.startsWith("http") ? (
+              <Link href={event.venue} color="inherit">
+                URL Link
+              </Link>
+            ) : (
+              event.venue
+            )}
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+const CustomEvent = ({ event }) => {
+  const e = event.extendedProps.event;
+  console.log(e);
+  return (
+    <Tooltip
+      title={<EventPopupDisplay event={e}></EventPopupDisplay>}
+      sx={{
+        width: "inherit",
+      }}
+    >
+      <Box
+        sx={{
+          fontSize: "inherit",
+          color: "primary.main",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        <FiberManualRecordIcon fontSize="inherit"></FiberManualRecordIcon>
+        <Typography
+          fontSize="inherit"
+          noWrap
+          sx={{
+            width: "100%",
+          }}
+        >
+          {e.summary}
+        </Typography>
+      </Box>
+    </Tooltip>
+  );
+};
+
 const Calendar = (props: calendarProps) => {
-  const [events, setEvents] = useState<EventType[]>([]);
+  const [events, setEvents] = useState<{ [key: string]: any }[]>([]);
 
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
       getEventsAPI(props.userId, props.userSecret, props.query)
-        .then((_events: EventType[]) => {
+        .then((_events: { [key: string]: any }[]) => {
           setEvents(_events);
         })
         .then(() => {
@@ -119,7 +230,7 @@ const Calendar = (props: calendarProps) => {
             updateEvents(props.userId, props.userSecret, props.userInfo).then(
               () => {
                 getEventsAPI(props.userId, props.userSecret, props.query).then(
-                  (_events: EventType[]) => {
+                  (_events: { [key: string]: any }[]) => {
                     setEvents(_events);
                   }
                 );
@@ -138,7 +249,7 @@ const Calendar = (props: calendarProps) => {
     }
     return;
     getEventsAPI(props.userId, props.userSecret, props.query).then(
-      (resp: EventType[]) => {
+      (resp: { [key: string]: string }[]) => {
         console.log("query result:");
         console.log(resp);
         setEvents(resp);
@@ -153,6 +264,23 @@ const Calendar = (props: calendarProps) => {
         initialView="dayGridMonth"
         weekends={true}
         events={events}
+        headerToolbar={{
+          left: "title",
+          center: "",
+          right: "today prev,next",
+        }}
+        eventBackgroundColor="white"
+        // eventDidMount={(info) => {
+        //   const tooltip = (
+        //     <Tooltip title={info.event.title}>
+        //       <div dangerouslySetInnerHTML={{ __html: info.el.outerHTML }} />
+        //     </Tooltip>
+        //   );
+        //   info.el.innerHTML = '';
+        //   info.el.appendChild(tooltip);
+        //   console.log(info);
+        // }}
+        eventContent={(arg) => <CustomEvent event={arg.event} />}
       />
     </div>
   );

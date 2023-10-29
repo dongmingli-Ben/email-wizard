@@ -21,6 +21,7 @@ const Feed = (props: FeedProps) => {
           userId={props.userId}
           userSecret={props.userSecret}
           query={query}
+          setQuery={setQuery}
           userInfo={props.userInfo}
         />
       </div>
