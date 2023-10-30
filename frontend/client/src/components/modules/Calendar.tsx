@@ -192,6 +192,9 @@ const CustomEvent = ({ event }) => {
           alignItems: "center",
           width: "100%",
           boxSizing: "border-box",
+          "&:hover": {
+            cursor: "default",
+          },
         }}
       >
         <FiberManualRecordIcon fontSize="inherit"></FiberManualRecordIcon>
