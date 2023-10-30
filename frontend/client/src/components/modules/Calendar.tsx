@@ -186,6 +186,7 @@ const CustomEvent = ({ event }) => {
   return (
     <Tooltip
       title={<EventPopupDisplay event={e}></EventPopupDisplay>}
+      placement="right"
       sx={{
         width: "inherit",
       }}

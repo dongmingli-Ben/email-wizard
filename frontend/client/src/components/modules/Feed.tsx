@@ -4,6 +4,7 @@ import Calendar from "./Calendar";
 
 import "./Feed.css";
 import { userInfoType } from "./SideBar";
+import { Box } from "@mui/material";
 
 type FeedProps = {
   userId: number;
@@ -14,18 +15,25 @@ type FeedProps = {
 const Feed = (props: FeedProps) => {
   const [query, setQuery] = useState("");
   return (
-    <div className="feed-container u-relative">
-      <div className="feed-inner-container">
-        <ToolBar setQuery={setQuery} />
-        <Calendar
-          userId={props.userId}
-          userSecret={props.userSecret}
-          query={query}
-          setQuery={setQuery}
-          userInfo={props.userInfo}
-        />
-      </div>
-    </div>
+    <Box
+      sx={{
+        width: "80%",
+        height: "100%",
+        boxSizing: "border-box",
+        overflow: "auto",
+      }}
+      m={0}
+      p="3%"
+    >
+      <ToolBar setQuery={setQuery} />
+      <Calendar
+        userId={props.userId}
+        userSecret={props.userSecret}
+        query={query}
+        setQuery={setQuery}
+        userInfo={props.userInfo}
+      />
+    </Box>
   );
 };
 

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 // to use styles, import the necessary CSS files
 import "./CalendarPage.css";
 import "../../utility.css";
+import { Box, Container } from "@mui/material";
 
 type CalendarPageProps = {
   userId: number;
@@ -45,13 +46,23 @@ const CalendarPage = (props: CalendarPageProps) => {
   return (
     // <> is like a <div>, but won't show
     // up in the DOM tree
-    <>
-      <div
-        className={`
-            ${
-              addAccount ? "app-inactive-container" : "app-active-container"
-            } u-flex
-          `}
+    <Container
+      disableGutters
+      component="main"
+      sx={{
+        minWidth: "100%",
+        height: "100vh",
+        boxSizing: "border-box",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          zIndex: addAccount ? 10 : 0,
+          height: "100%",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
       >
         <SideBar
           userId={props.userId}
@@ -67,7 +78,7 @@ const CalendarPage = (props: CalendarPageProps) => {
           userSecret={props.userSecret}
           userInfo={userInfo}
         />
-      </div>
+      </Box>
       {addAccount ? (
         <AddAccountWindow
           userId={props.userId}
@@ -79,7 +90,7 @@ const CalendarPage = (props: CalendarPageProps) => {
       ) : (
         <></>
       )}
-    </>
+    </Container>
   );
 };
 
