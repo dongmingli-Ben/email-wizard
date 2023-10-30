@@ -146,7 +146,9 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
           <Typography>{getLocalTime(event.end_time)}</Typography>
         )}
       </Box>
-      {event.venue === "" || event.venue === "unspecified" ? (
+      {event.venue === undefined ||
+      event.venue === "" ||
+      event.venue === "unspecified" ? (
         <></>
       ) : (
         <Box
