@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// to use styles, import the necessary CSS files
-import "./LoginPage.css";
-import "../../utility.css";
 import Avatar from "@mui/material/Avatar";
 import LoadingButton from "@mui/lab/LoadingButton";
 import CssBaseline from "@mui/material/CssBaseline";

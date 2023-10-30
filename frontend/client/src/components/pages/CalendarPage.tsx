@@ -3,10 +3,6 @@ import Feed from "../modules/Feed";
 import SideBar, { userInfoType } from "../modules/SideBar";
 import AddAccountWindow from "../modules/AddAccountWindow";
 import { useNavigate } from "react-router-dom";
-
-// to use styles, import the necessary CSS files
-import "./CalendarPage.css";
-import "../../utility.css";
 import { Box, Container } from "@mui/material";
 
 type CalendarPageProps = {

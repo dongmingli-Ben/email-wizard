@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-// to use styles, import the necessary CSS files
-import "./RegisterPage.css";
-import "../../utility.css";
 import { backendConfig, post } from "../../utilities/requestUtility";
 
 import Avatar from "@mui/material/Avatar";

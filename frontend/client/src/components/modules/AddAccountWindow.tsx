@@ -7,9 +7,7 @@ import {
   verifyGmail,
   VerifyResposne,
 } from "../../utilities/verifyEmail";
-
-import "./AddAccountWindow.css";
-import { appPost, backendConfig, post } from "../../utilities/requestUtility";
+import { appPost, backendConfig } from "../../utilities/requestUtility";
 import {
   Alert,
   Avatar,
@@ -165,7 +163,17 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
   };
 
   return (
-    <div className="add-account-overlay-container">
+    <Box
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        zIndex: 1,
+      }}
+    >
       <Box
         display="flex"
         justifyContent="center"
@@ -313,7 +321,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
           </Box>
         </Container>
       </Box>
-    </div>
+    </Box>
   );
 };
 

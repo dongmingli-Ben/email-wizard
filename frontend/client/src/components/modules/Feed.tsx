@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import ToolBar from "./ToolBar";
 import Calendar from "./Calendar";
-
-import "./Feed.css";
 import { userInfoType } from "./SideBar";
 import { Box } from "@mui/material";
 

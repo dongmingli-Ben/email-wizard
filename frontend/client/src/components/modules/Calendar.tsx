@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import {
-  appGet,
-  appPost,
-  backendConfig,
-  get,
-  post,
-} from "../../utilities/requestUtility";
+import { appGet, appPost, backendConfig } from "../../utilities/requestUtility";
 import { getAccessToken } from "../../utilities/verifyEmail";
 import { userInfoType } from "./SideBar";
-import SearchBar from "./SearchBar";
 import { Box, Link, Tooltip, Typography } from "@mui/material";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CelebrationIcon from "@mui/icons-material/Celebration";

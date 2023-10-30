@@ -41,7 +41,12 @@ function IntroductionPage() {
           }}
         >
           <Typography variant="h2" color="common.white">
-            <div className="u-flex u-flex-alignCenter">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <span>Email Wizard</span>
               <IconButton
                 sx={{ fontSize: "inherit", ml: 2, color: "inherit" }}
@@ -51,7 +56,7 @@ function IntroductionPage() {
               >
                 <GitHubIcon fontSize="inherit"></GitHubIcon>
               </IconButton>
-            </div>
+            </Box>
           </Typography>
           <Typography variant="h4" color="common.white">
             Email {<EastIcon></EastIcon>} Calendar

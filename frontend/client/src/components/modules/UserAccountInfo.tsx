@@ -1,6 +1,4 @@
 import React from "react";
-
-import "./UserAccountInfo.css";
 import { Box, Grid, IconButton, Typography } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
@@ -116,28 +114,29 @@ const UserAccountInfo = (props: UserAccountInfoProps) => {
             sx={{
               color: "inherit",
               pl: 0,
-              pb: 0,
+              pb: 1,
             }}
           >
-            <div className="u-flex u-flex-alignCenter">
-              <span>
-                <AddCircleOutlineIcon color="inherit"></AddCircleOutlineIcon>
-              </span>
-              <span>
-                <Typography
-                  color="inherit"
-                  sx={{
-                    width: "100%",
-                    fontWeight: "bold",
-                    ml: 0.5,
-                  }}
-                  noWrap
-                  gutterBottom
-                >
-                  Add Mailbox
-                </Typography>
-              </span>
-            </div>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <AddCircleOutlineIcon color="inherit"></AddCircleOutlineIcon>
+              <Typography
+                color="inherit"
+                sx={{
+                  width: "100%",
+                  fontWeight: "bold",
+                  ml: 0.5,
+                }}
+                noWrap
+                // gutterBottom
+              >
+                Add Mailbox
+              </Typography>
+            </Box>
           </IconButton>
         </Box>
       </Grid>

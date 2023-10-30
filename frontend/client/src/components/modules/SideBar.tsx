@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import UserAccountInfo from "./UserAccountInfo";
 import { useNavigate } from "react-router-dom";
-
-import "./SideBar.css";
-import { appGet, get } from "../../utilities/requestUtility";
+import { appGet } from "../../utilities/requestUtility";
 import { backendConfig } from "../../utilities/requestUtility";
 import { clearCurrentUserCredentials } from "../../utilities/credentialUtility";
-import { Box, Button, Container } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 type userInfoType = {
   username: string;

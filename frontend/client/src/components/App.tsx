@@ -11,7 +11,6 @@ import { MsalProvider } from "@azure/msal-react";
 import { IPublicClientApplication } from "@azure/msal-browser";
 
 // to use styles, import the necessary CSS files
-import "./App.css";
 import "../utility.css";
 import IntroPage from "./pages/IntroPage";
 import NotFound from "./pages/NotFound";
