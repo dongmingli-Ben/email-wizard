@@ -149,7 +149,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [x] refine API interface
 - [ ] add email registration and forget password functionaility
 - [ ] make the UI more beautiful
-  - [ ] iterate with @mui
+  - [x] iterate with @mui
 
 #### C4. update calendar
 
