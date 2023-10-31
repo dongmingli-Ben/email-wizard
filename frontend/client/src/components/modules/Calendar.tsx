@@ -112,6 +112,31 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
     let localtime = time.split(" ")[0].split("T")[1];
     return localtime.split(":").slice(0, 2).join(":");
   };
+
+  const processURLinVenue = (venue: string) => {
+    let expression =
+      /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=;!\$]*)/g;
+    let place: React.JSX.Element[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = expression.exec(venue)) !== null) {
+      const url = match[0];
+      const index = match.index;
+      place = [
+        ...place,
+        <> {venue.substring(lastIndex, index)} </>,
+        <Link href={url} color="inherit">
+          URL Link
+        </Link>,
+      ];
+      lastIndex = index + url.length;
+    }
+    if (lastIndex !== venue.length) {
+      place = [...place, <> {venue.substring(lastIndex)}</>];
+    }
+    return <>{place}</>;
+  };
+
   console.log(event);
   return (
     <Box>
@@ -162,15 +187,7 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
           <Box pr={1}>
             <PlaceIcon></PlaceIcon>
           </Box>
-          <Typography>
-            {event.venue.startsWith("http") ? (
-              <Link href={event.venue} color="inherit">
-                URL Link
-              </Link>
-            ) : (
-              event.venue
-            )}
-          </Typography>
+          <Typography>{processURLinVenue(event.venue)}</Typography>
         </Box>
       )}
     </Box>
