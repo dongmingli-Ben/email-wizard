@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import ToolBar from "./ToolBar";
 import Calendar from "./Calendar";
 import { userInfoType } from "./SideBar";
 import { Box } from "@mui/material";
@@ -11,7 +10,6 @@ type FeedProps = {
 };
 
 const Feed = (props: FeedProps) => {
-  const [query, setQuery] = useState("");
   return (
     <Box
       sx={{
@@ -20,15 +18,14 @@ const Feed = (props: FeedProps) => {
         boxSizing: "border-box",
         overflow: "auto",
       }}
-      m={0}
-      p="3%"
+      pb="3%"
+      pr="3%"
+      pl="3%"
+      pt={3}
     >
-      <ToolBar setQuery={setQuery} />
       <Calendar
         userId={props.userId}
         userSecret={props.userSecret}
-        query={query}
-        setQuery={setQuery}
         userInfo={props.userInfo}
       />
     </Box>

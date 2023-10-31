@@ -92,7 +92,7 @@ const SideBar = (props: SideBarProps) => {
       <Button
         fullWidth
         variant="contained"
-        color="secondary"
+        color="primary"
         onClick={(e) => {
           // log out the current user
           // clear current user credential from user local/session storage
