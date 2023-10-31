@@ -110,16 +110,16 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
       const index = match.index;
       place = [
         ...place,
-        <> {venue.substring(lastIndex, index)} </>,
-        <Link href={url} color="inherit" key={i}>
+        <span key={i}> {venue.substring(lastIndex, index)} </span>,
+        <Link href={url} color="inherit" key={i + 1}>
           URL Link
         </Link>,
       ];
       lastIndex = index + url.length;
-      i++;
+      i += 2;
     }
     if (lastIndex !== venue.length) {
-      place = [...place, <> {venue.substring(lastIndex)}</>];
+      place = [...place, <span key={i}> {venue.substring(lastIndex)}</span>];
     }
     return <>{place}</>;
   };
