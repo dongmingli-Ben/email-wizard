@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { appGet, appPost, backendConfig } from "../../utilities/requestUtility";
 import { getAccessToken } from "../../utilities/verifyEmail";
 import { userInfoType } from "./SideBar";
-import { Box, Link, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Link, Tooltip, Typography } from "@mui/material";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import PlaceIcon from "@mui/icons-material/Place";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
 
 type calendarProps = {
   userId: number;
   userSecret: string;
-  query: string;
-  setQuery: (query: string) => void;
   userInfo: userInfoType | undefined;
 };
 
@@ -177,7 +179,7 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
 
 const CustomEvent = ({ event }) => {
   const e = event.extendedProps.event;
-  console.log(e);
+  // console.log(e);
   return (
     <Tooltip
       title={<EventPopupDisplay event={e}></EventPopupDisplay>}
@@ -214,13 +216,132 @@ const CustomEvent = ({ event }) => {
   );
 };
 
+function SearchBar({ setQuery }) {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    console.log("query:", data.get("query") as string);
+    setQuery(data.get("query") as string);
+  };
+
+  return (
+    <Paper
+      component="form"
+      sx={{
+        p: "2px 4px",
+        display: "flex",
+        alignItems: "center",
+        maxWidth: "40%",
+      }}
+      onSubmit={handleSubmit}
+    >
+      <InputBase
+        sx={{ ml: 1, flex: 1 }}
+        placeholder="Search Events"
+        inputProps={{ "aria-label": "search events" }}
+        name="query"
+      />
+      <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+        <SearchIcon />
+      </IconButton>
+    </Paper>
+  );
+}
+
+const HeaderToolBar = ({ calendarRef, setQuery }) => {
+  const [title, setTitle] = useState<string>("");
+
+  const updateTitle = () => {
+    let date = new Date(calendarRef.current.getApi().getDate());
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    setTitle(`${monthNames[date.getMonth()]} ${date.getFullYear()}`);
+  };
+
+  useEffect(() => {
+    updateTitle();
+  }, [calendarRef]);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+        mb: 2,
+      }}
+    >
+      <Typography
+        variant="h5"
+        noWrap
+        width="20%"
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
+        {title}
+      </Typography>
+      <SearchBar setQuery={setQuery} />
+      <Box
+        sx={{
+          width: "30%",
+          display: "flex",
+          justifyContent: "flex-end",
+          color: "secondary.main",
+        }}
+      >
+        <Button
+          onClick={() => {
+            calendarRef.current.getApi().today();
+            updateTitle();
+          }}
+          color="inherit"
+        >
+          Today
+        </Button>
+        <Button
+          onClick={() => {
+            calendarRef.current.getApi().prev();
+            updateTitle();
+          }}
+        >
+          Prev
+        </Button>
+        <Button
+          onClick={() => {
+            calendarRef.current.getApi().next();
+            updateTitle();
+          }}
+        >
+          Next
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
 const Calendar = (props: calendarProps) => {
   const [events, setEvents] = useState<{ [key: string]: any }[]>([]);
+  const [query, setQuery] = useState<string>("");
+  const calendarRef = useRef(null);
 
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
-      getEventsAPI(props.userId, props.userSecret, props.query)
+      getEventsAPI(props.userId, props.userSecret, query)
         .then((_events: { [key: string]: any }[]) => {
           setEvents(_events);
         })
@@ -228,7 +349,7 @@ const Calendar = (props: calendarProps) => {
           if (props.userInfo !== undefined) {
             updateEvents(props.userId, props.userSecret, props.userInfo).then(
               () => {
-                getEventsAPI(props.userId, props.userSecret, props.query).then(
+                getEventsAPI(props.userId, props.userSecret, query).then(
                   (_events: { [key: string]: any }[]) => {
                     setEvents(_events);
                   }
@@ -241,47 +362,35 @@ const Calendar = (props: calendarProps) => {
   }, [props.userInfo]);
 
   useEffect(() => {
-    if (props.query.length > 0) {
+    if (query.length > 0) {
       alert(
         "Elastic search is temperarily disabled due to limited resources. Please try later!"
       );
     }
     return;
-    getEventsAPI(props.userId, props.userSecret, props.query).then(
+    getEventsAPI(props.userId, props.userSecret, query).then(
       (resp: { [key: string]: string }[]) => {
         console.log("query result:");
         console.log(resp);
         setEvents(resp);
       }
     );
-  }, [props.query]);
+  }, [query]);
 
   return (
-    <div className="calendar-container u-block">
+    <Box sx={{ width: "100%" }}>
+      <HeaderToolBar calendarRef={calendarRef} setQuery={setQuery} />
       <FullCalendar
+        ref={calendarRef}
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
         weekends={true}
         events={events}
-        headerToolbar={{
-          left: "title",
-          center: "",
-          right: "today prev,next",
-        }}
+        headerToolbar={false}
         eventBackgroundColor="white"
-        // eventDidMount={(info) => {
-        //   const tooltip = (
-        //     <Tooltip title={info.event.title}>
-        //       <div dangerouslySetInnerHTML={{ __html: info.el.outerHTML }} />
-        //     </Tooltip>
-        //   );
-        //   info.el.innerHTML = '';
-        //   info.el.appendChild(tooltip);
-        //   console.log(info);
-        // }}
         eventContent={(arg) => <CustomEvent event={arg.event} />}
       />
-    </div>
+    </Box>
   );
 };
 
