@@ -117,6 +117,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### A1. retrieve emails
 
 - [x] support gmail mailboxes
+- [ ] update outlook oauth to auth code flow
 - [ ] support exchange protocol
 - [ ] optimize QPS
 
@@ -147,7 +148,11 @@ Codes in this repo should be able to parse raw email contents into structured co
 #### C3. calendar view UI
 
 - [x] refine API interface
-- [ ] add email registration and forget password functionaility
+- [ ] update outlook auth to auth code flow
+- [ ] add forget password functionaility
+- [ ] add remove mailbox functionality
+  - [ ] revoke authorized mailbox access
+- [x] add event search (pure frontend for now)
 - [ ] make the UI more beautiful
   - [x] iterate with @mui
 
