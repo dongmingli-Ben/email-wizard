@@ -14,6 +14,10 @@ import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
+import {
+  localSearch,
+  updateLocalSearchIndex,
+} from "../../utilities/searchUtility";
 
 type calendarProps = {
   userId: number;
@@ -80,26 +84,7 @@ const getEventsAPI = async (
     .then((resp) => {
       console.log(`events returned`);
       console.log(resp);
-      let events: { [key: string]: any }[] = [];
-      for (const e of resp) {
-        if ("end_time" in e && e.end_time != "unspecified") {
-          let startTime = "start_time" in e ? e.start_time : e.end_time;
-          events = [
-            ...events,
-            {
-              title: e.summary,
-              start: startTime.split(" ")[0],
-              end: e.end_time.split(" ")[0],
-              extendedProps: {
-                event: e,
-              },
-            },
-          ];
-        }
-      }
-      console.log("parsed events:");
-      console.log(events);
-      return events;
+      return resp;
     })
     .catch((e) => {
       console.log("fail to get user events:", e);
@@ -119,17 +104,19 @@ const EventPopupDisplay = ({ event }: { event: { [key: string]: string } }) => {
     let place: React.JSX.Element[] = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
+    let i = 0;
     while ((match = expression.exec(venue)) !== null) {
       const url = match[0];
       const index = match.index;
       place = [
         ...place,
         <> {venue.substring(lastIndex, index)} </>,
-        <Link href={url} color="inherit">
+        <Link href={url} color="inherit" key={i}>
           URL Link
         </Link>,
       ];
       lastIndex = index + url.length;
+      i++;
     }
     if (lastIndex !== venue.length) {
       place = [...place, <> {venue.substring(lastIndex)}</>];
@@ -351,48 +338,78 @@ const HeaderToolBar = ({ calendarRef, setQuery }) => {
 };
 
 const Calendar = (props: calendarProps) => {
+  const [eventStore, setEventStore] = useState<{ [key: string]: string }[]>([]);
   const [events, setEvents] = useState<{ [key: string]: any }[]>([]);
   const [query, setQuery] = useState<string>("");
   const calendarRef = useRef(null);
 
+  const prepareEventsForCalendar = (rawEvents: { [key: string]: string }[]) => {
+    let events: { [key: string]: any }[] = [];
+    for (const e of rawEvents) {
+      if ("end_time" in e && e.end_time != "unspecified") {
+        let startTime = "start_time" in e ? e.start_time : e.end_time;
+        events = [
+          ...events,
+          {
+            title: e.summary,
+            start: startTime.split(" ")[0],
+            end: e.end_time.split(" ")[0],
+            extendedProps: {
+              event: e,
+            },
+          },
+        ];
+      }
+    }
+    console.log("parsed events:");
+    console.log(events);
+    return events;
+  };
+
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
-      getEventsAPI(props.userId, props.userSecret, query)
-        .then((_events: { [key: string]: any }[]) => {
-          setEvents(_events);
-        })
-        .then(() => {
-          if (props.userInfo !== undefined) {
-            updateEvents(props.userId, props.userSecret, props.userInfo).then(
-              () => {
-                getEventsAPI(props.userId, props.userSecret, query).then(
-                  (_events: { [key: string]: any }[]) => {
-                    setEvents(_events);
-                  }
-                );
-              }
-            );
+      updateEvents(props.userId, props.userSecret, props.userInfo).then(() => {
+        getEventsAPI(props.userId, props.userSecret, query).then(
+          (_events: { [key: string]: string }[]) => {
+            setEventStore(_events);
+            updateLocalSearchIndex(_events);
           }
-        });
+        );
+      });
     }
   }, [props.userInfo]);
 
   useEffect(() => {
-    if (query.length > 0) {
-      alert(
-        "Elastic search is temperarily disabled due to limited resources. Please try later!"
+    console.log("retriving events for:", props.userInfo);
+    if (props.userInfo !== undefined) {
+      getEventsAPI(props.userId, props.userSecret, query).then(
+        (_events: { [key: string]: string }[]) => {
+          setEventStore(_events);
+          updateLocalSearchIndex(_events);
+        }
       );
     }
-    return;
-    getEventsAPI(props.userId, props.userSecret, query).then(
-      (resp: { [key: string]: string }[]) => {
-        console.log("query result:");
-        console.log(resp);
-        setEvents(resp);
-      }
-    );
-  }, [query]);
+  }, [props.userInfo]);
+
+  useEffect(() => {
+    if (query === "") {
+      setEvents(prepareEventsForCalendar(eventStore));
+      return;
+    }
+    let matchEvents = localSearch(query);
+    let readyEvents = prepareEventsForCalendar(matchEvents);
+    setEvents(readyEvents);
+
+    // return;
+    // getEventsAPI(props.userId, props.userSecret, query).then(
+    //   (resp: { [key: string]: string }[]) => {
+    //     console.log("query result:");
+    //     console.log(resp);
+    //     setEvents(resp);
+    //   }
+    // );
+  }, [query, eventStore]);
 
   return (
     <Box sx={{ width: "100%" }}>
