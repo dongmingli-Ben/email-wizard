@@ -49,6 +49,10 @@ func RefreshGmailToken(credentials map[string]interface{}) (map[string]interface
 	if err = json.Unmarshal(body, &creds); err != nil {
 		return nil, err
 	}
+	fmt.Printf("Google response to refresh: %v\n", string(body))
+	if _, ok := creds["error"]; ok {
+		return nil, fmt.Errorf("%v: %v", creds["error"], creds["error_description"])
+	}
 	credentials["access_token"] = creds["access_token"]
 	credentials["expires_in"] = creds["expires_in"]
 	// set expire timestamp
