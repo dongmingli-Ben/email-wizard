@@ -4,6 +4,7 @@ import SideBar, { userInfoType } from "../modules/SideBar";
 import AddAccountWindow from "../modules/AddAccountWindow";
 import { useNavigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
+import DeleteAccountConfirmWindow from "../modules/DeleteAccountWindow";
 
 type CalendarPageProps = {
   userId: number;
@@ -17,7 +18,14 @@ type CalendarPageProps = {
  */
 const CalendarPage = (props: CalendarPageProps) => {
   const [addAccount, setAddAccount] = useState(false);
+  const [deleteAccount, setDeleteAccount] = useState("");
   const [userInfo, setUserInfo] = useState<userInfoType>();
+
+  const [toGetUserInfo, setToGetUserInfo] = useState(false);
+
+  const callGetUserInfo = () => {
+    setToGetUserInfo(!toGetUserInfo);
+  };
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -54,7 +62,7 @@ const CalendarPage = (props: CalendarPageProps) => {
       <Box
         sx={{
           display: "flex",
-          zIndex: addAccount ? 10 : 0,
+          zIndex: addAccount || deleteAccount !== "" ? 10 : 0,
           height: "100%",
           width: "100%",
           boxSizing: "border-box",
@@ -68,6 +76,8 @@ const CalendarPage = (props: CalendarPageProps) => {
           userInfo={userInfo}
           setUserInfo={setUserInfo}
           setAddAccount={setAddAccount}
+          setDeleteAccount={setDeleteAccount}
+          toGetUserInfo={toGetUserInfo}
         />
         <Feed
           userId={props.userId}
@@ -82,6 +92,18 @@ const CalendarPage = (props: CalendarPageProps) => {
           userInfo={userInfo}
           setUserInfo={setUserInfo}
           setAddAccount={setAddAccount}
+          callGetUserInfo={callGetUserInfo}
+        />
+      ) : (
+        <></>
+      )}
+      {deleteAccount !== "" ? (
+        <DeleteAccountConfirmWindow
+          userId={props.userId}
+          userSecret={props.userSecret}
+          deleteAccount={deleteAccount}
+          setDeleteAccount={setDeleteAccount}
+          callGetUserInfo={callGetUserInfo}
         />
       ) : (
         <></>

@@ -31,6 +31,7 @@ type AddAccountWindowProps = {
   userInfo: userInfoType | undefined;
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
+  callGetUserInfo: () => void;
 };
 
 const verifyEmailAccount = async (req): Promise<VerifyResposne> => {
@@ -137,21 +138,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
         setLoading(false);
         if (resp.errMsg === "") {
           console.log("adding new mailbox to user:", resp);
-          props.setUserInfo({
-            username: props.userInfo ? props.userInfo.username : "No User Name",
-            useraccounts: props.userInfo
-              ? [
-                  ...props.userInfo.useraccounts,
-                  resp.userInfo.useraccounts[
-                    resp.userInfo.useraccounts.length - 1
-                  ],
-                ]
-              : [
-                  resp.userInfo.useraccounts[
-                    resp.userInfo.useraccounts.length - 1
-                  ],
-                ],
-          });
+          props.callGetUserInfo();
           props.setAddAccount(false);
         } else {
           setErrorMsg(resp.errMsg);
