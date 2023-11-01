@@ -17,7 +17,7 @@ Note that the service is under development, so it may be inaccessible sometimes.
 Extract events from various emails and present them in calendar
 
 - support search
-- support Outlook, IMAP/POP3 mailboxes
+- support Outlook, Gmail, IMAP/POP3 mailboxes
 - support different types of events
 
 See our upcoming feature [plan](./docs/plan.md).
