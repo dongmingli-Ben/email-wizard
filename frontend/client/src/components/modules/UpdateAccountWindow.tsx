@@ -32,8 +32,13 @@ const updateMailboxCredentialsAPI = async (
     .catch((e) => {
       console.log("caught error when adding mailbox:", e);
       console.log(add_req);
-      return "fail to add mailbox.";
+      if (e.response.status != 504) {
+        return e.response.data.errMsg;
+      } else {
+        return "Re-sync request timed out";
+      }
     });
+  console.log(errMsg);
   return errMsg;
 };
 
@@ -60,11 +65,15 @@ const UpdateAccountWindow = ({
   userSecret,
   updateAccount,
   setUpdateAccount,
+  callGetUserEvents,
+  removeMailboxFromError,
 }: {
   userId: number;
   userSecret: string;
   updateAccount: { address: string; protocol: string };
   setUpdateAccount: (mailbox: { address: string; protocol: string }) => void;
+  callGetUserEvents: () => void;
+  removeMailboxFromError: (address: string) => void;
 }) => {
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -92,8 +101,10 @@ const UpdateAccountWindow = ({
       .then((resp: { errMsg: string }) => {
         setLoading(false);
         if (resp.errMsg === "") {
-          console.log("adding new mailbox to user:", resp);
+          console.log("updating mailbox to user:", resp);
+          removeMailboxFromError(updateAccount.address);
           setUpdateAccount({ address: "", protocol: "" });
+          callGetUserEvents();
         } else {
           setErrMsg(resp.errMsg);
         }

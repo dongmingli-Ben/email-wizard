@@ -31,9 +31,19 @@ const CalendarPage = (props: CalendarPageProps) => {
   const [errorMailboxes, setErrorMailboxes] = useState<string[]>([]);
 
   const [toGetUserInfo, setToGetUserInfo] = useState(false);
+  const [toGetUserEvents, setToGetUserEvents] = useState(false);
 
   const callGetUserInfo = () => {
     setToGetUserInfo(!toGetUserInfo);
+  };
+
+  const callGetUserEvents = () => {
+    setToGetUserEvents(!toGetUserEvents);
+  };
+
+  const removeMailboxFromError = (address: string) => {
+    let mailboxes = errorMailboxes.filter((addr) => addr != address);
+    setErrorMailboxes(mailboxes);
   };
 
   const navigate = useNavigate();
@@ -95,6 +105,7 @@ const CalendarPage = (props: CalendarPageProps) => {
           userSecret={props.userSecret}
           userInfo={userInfo}
           setErrorMailboxes={setErrorMailboxes}
+          toGetUserEvents={toGetUserEvents}
         />
       </Box>
       {addAccount ? (
@@ -126,6 +137,8 @@ const CalendarPage = (props: CalendarPageProps) => {
           userSecret={props.userSecret}
           updateAccount={updateAccount}
           setUpdateAccount={setUpdateAccount}
+          callGetUserEvents={callGetUserEvents}
+          removeMailboxFromError={removeMailboxFromError}
         />
       ) : (
         <></>

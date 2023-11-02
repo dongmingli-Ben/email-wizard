@@ -24,6 +24,7 @@ type calendarProps = {
   userSecret: string;
   userInfo: userInfoType | undefined;
   setErrorMailboxes: (addresses: string[]) => void;
+  toGetUserEvents: boolean;
 };
 
 const updateEvents = async (
@@ -43,14 +44,12 @@ const updateEvents = async (
         return "";
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error.response.data);
         console.log(`fail to update events for mailbox:`, mailbox);
-        if (
-          error.response.data.errMsg ==
-          "invalid_grant: Token has been expired or revoked."
-        ) {
+        if (error.response.status != 504) {
           return mailbox.address;
         }
+        return "";
       });
     promises.push(p);
   }
@@ -410,7 +409,7 @@ const Calendar = (props: calendarProps) => {
         }
       );
     }
-  }, [props.userInfo]);
+  }, [props.userInfo, props.toGetUserEvents]);
 
   useEffect(() => {
     console.log("retriving events for:", props.userInfo);

@@ -7,6 +7,7 @@ type FeedProps = {
   userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
+  toGetUserEvents: boolean;
   setErrorMailboxes: (addresses: string[]) => void;
 };
 
@@ -29,6 +30,7 @@ const Feed = (props: FeedProps) => {
         userSecret={props.userSecret}
         userInfo={props.userInfo}
         setErrorMailboxes={props.setErrorMailboxes}
+        toGetUserEvents={props.toGetUserEvents}
       />
     </Box>
   );
