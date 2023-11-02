@@ -223,6 +223,39 @@ func addUserMailbox(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, "")
 }
 
+func updateUserMailbox(c *gin.Context) {
+	var payload map[string]interface{}
+	if err := c.BindJSON(&payload); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
+		return
+	}
+	user_id, err := strconv.Atoi(c.Param(("user_id")))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
+		return
+	}
+	user_secret := c.Request.Header.Get("X-User-Secret");
+	mailbox_address := c.Param("address")
+	var credentials map[string]interface{}
+	if _credentials, ok := payload["credentials"].(map[string]interface{}); !ok {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data: address"})
+		return
+	} else {
+		credentials = _credentials
+	}
+
+	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+		return
+	}
+
+	if err := utils.UpdateUserMailbox(user_id, mailbox_address, credentials); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, "")
+}
+
 func removeUserMailbox(c *gin.Context) {
 	user_id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -331,6 +364,7 @@ func main() {
 	router.GET("/users/:user_id/profile", getUserProfile)
 	router.POST("/users/:user_id/mailboxes", addUserMailbox)
 	router.DELETE("/users/:user_id/mailboxes/:address", removeUserMailbox)
+	router.PUT("/users/:user_id/mailboxes/:address", updateUserMailbox)
 	router.POST("/users", addUser)
 
 	// router.Run(":8080")
