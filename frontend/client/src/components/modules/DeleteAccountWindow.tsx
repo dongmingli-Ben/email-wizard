@@ -6,6 +6,7 @@ import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
+import { appDelete, backendConfig } from "../../utilities/requestUtility";
 
 const removeMailbox = async (
   userId: number,
@@ -13,7 +14,15 @@ const removeMailbox = async (
   address: string
 ): Promise<string> => {
   console.log("removing mailbox:", address);
-  return "";
+  let errMsg = await appDelete(backendConfig.remove_mailbox, {
+    userId: userId,
+    userSecret: userSecret,
+    address: address,
+  }).catch((err) => {
+    console.log("encounter error when removing mailbox:", err);
+    return `fail to remove mailbox: ${err}`;
+  });
+  return errMsg;
 };
 
 const DeleteAccountConfirmWindow = ({
@@ -66,7 +75,13 @@ const DeleteAccountConfirmWindow = ({
               mt: 2,
             }}
           >
-            {errMsg !== "" ? <Alert severity="error">{errMsg}</Alert> : <></>}
+            {errMsg !== "" ? (
+              <Alert severity="error" sx={{ width: "inherit" }}>
+                {errMsg}
+              </Alert>
+            ) : (
+              <></>
+            )}
             <Typography>
               Removing a mailbox will remove all events from that mailbox. Are
               you sure?
@@ -86,6 +101,7 @@ const DeleteAccountConfirmWindow = ({
                 sx={{ m: 1 }}
                 loading={loading}
                 onClick={() => {
+                  setLoading(true);
                   removeMailbox(userId, userSecret, deleteAccount).then(
                     (errMsg: string) => {
                       setErrMsg(errMsg);

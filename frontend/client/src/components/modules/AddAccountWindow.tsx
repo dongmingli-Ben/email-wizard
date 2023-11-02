@@ -67,8 +67,7 @@ const addEmailAccountDBAPI = async (
   };
   let errMsg = await appPost(
     backendConfig.add_mailbox,
-    req.userId,
-    req.userSecret,
+    { userId: req.userId, userSecret: req.userSecret },
     add_req
   )
     .then((resp) => {

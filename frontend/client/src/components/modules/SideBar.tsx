@@ -31,7 +31,11 @@ const getUserInfoAPI = async (
   userAccounts: { address: string; protocol: string }[];
   errMsg: string;
 }> => {
-  return appGet(backendConfig.user_profile, userId, userSecret, {})
+  return appGet(
+    backendConfig.user_profile,
+    { userId: userId, userSecret: userSecret },
+    {}
+  )
     .then((resp) => {
       console.log("mailboxes: ", resp.mailboxes);
       let mailboxes = resp.mailboxes.length > 0 ? resp.mailboxes : [];

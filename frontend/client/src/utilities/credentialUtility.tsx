@@ -13,6 +13,7 @@ export const tryLoadUserCredentials = (
     console.log("loading id and secret from session storage ...");
     setUserId(parseInt(storedId));
     setUserSecret(storedSecret);
+    console.log("credentials loaded.");
     return;
   }
   console.log("loading from localStorage ...");
@@ -21,6 +22,7 @@ export const tryLoadUserCredentials = (
   if (storedId !== null && storedSecret !== null) {
     setUserId(parseInt(storedId));
     setUserSecret(storedSecret);
+    console.log("credentials loaded.");
     return;
   }
   console.log("fail to load user credential");

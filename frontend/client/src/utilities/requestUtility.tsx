@@ -51,35 +51,83 @@ export async function post(endpoint: string, params = {}, extraHeaders = {}) {
     });
 }
 
+// Helper code to make a delete request. Default parameter of empty JSON Object for params.
+// Returns a Promise to a JSON Object.
+export async function del(endpoint: string, params = {}, extraHeaders = {}) {
+  return axios
+    .delete(endpoint, {
+      params: params,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS,DELETE,PUT",
+        ...extraHeaders,
+      },
+    })
+    .then((resp: AxiosResponse) => {
+      console.log(resp);
+      return resp.data;
+    })
+    .catch((error) => {
+      console.log(error.response?.data);
+      throw `PUT request to ${endpoint} failed with error:\n${error}`;
+    });
+}
+
+const prepareEndpointByParams = (
+  endpoint: string,
+  urlParams: { [key: string]: number | string | any }
+): [string, { [key: string]: string }] => {
+  let headers: { [key: string]: string } = {};
+  if ("userSecret" in urlParams) {
+    let { userSecret, ..._urlParams } = urlParams;
+    headers["X-User-Secret"] = userSecret as string;
+    urlParams = _urlParams;
+  }
+  for (const [key, val] of Object.entries(urlParams)) {
+    endpoint = endpoint.replace(
+      `{${key}}`,
+      val instanceof String ? val : val.toString()
+    );
+  }
+  return [endpoint, headers];
+};
+
 export async function appGet(
   endpoint: string,
-  user_id: number,
-  user_secret: string,
+  urlParams: { [key: string]: number | string },
   params = {}
 ) {
-  return get(endpoint.replace("{user_id}", user_id.toString()), params, {
-    "X-User-Secret": user_secret,
-  });
+  let [url, headers] = prepareEndpointByParams(endpoint, { ...urlParams });
+  return get(url, params, headers);
 }
 
 export async function appPost(
   endpoint: string,
-  user_id: number,
-  user_secret: string,
+  urlParams: { [key: string]: number | string },
   params = {}
 ) {
-  return post(endpoint.replace("{user_id}", user_id.toString()), params, {
-    "X-User-Secret": user_secret,
-  });
+  let [url, headers] = prepareEndpointByParams(endpoint, { ...urlParams });
+  return post(url, params, headers);
+}
+
+export async function appDelete(
+  endpoint: string,
+  urlParams: { [key: string]: number | string },
+  params = {}
+) {
+  let [url, headers] = prepareEndpointByParams(endpoint, { ...urlParams });
+  return del(url, params, headers);
 }
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const backendConfig = {
   verify_email: "https://www.toymaker-ben.online/api/verify_email",
-  events: "https://www.toymaker-ben.online/api/users/{user_id}/events",
+  events: "https://www.toymaker-ben.online/api/users/{userId}/events",
   add_user: "https://www.toymaker-ben.online/api/users",
   verify_user: "https://www.toymaker-ben.online/api/authenticate",
-  add_mailbox: "https://www.toymaker-ben.online/api/users/{user_id}/mailboxes",
-  user_profile: "https://www.toymaker-ben.online/api/users/{user_id}/profile",
+  add_mailbox: "https://www.toymaker-ben.online/api/users/{userId}/mailboxes",
+  remove_mailbox:
+    "https://www.toymaker-ben.online/api/users/{userId}/mailboxes/{address}",
+  user_profile: "https://www.toymaker-ben.online/api/users/{userId}/profile",
 };
