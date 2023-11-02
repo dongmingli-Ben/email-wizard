@@ -127,9 +127,10 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### B1. parse plain text for summary and dates
 
-- [ ] improve throughput with asynchronous service (possibly through message queues)
-- [ ] refine API interface
 - [ ] optimize QPS
+  - [ ] improve throughput with asynchronous service (possibly through message queues)
+  - [ ] async / multi-threading calling LLM API
+- [ ] refine API interface
 
 #### C1. store summary to database
 
@@ -150,8 +151,8 @@ Codes in this repo should be able to parse raw email contents into structured co
 - [x] refine API interface
 - [ ] update outlook auth to auth code flow
 - [ ] add forget password functionaility
-- [ ] add remove mailbox functionality
-  - [ ] revoke authorized mailbox access
+- [x] add remove mailbox functionality
+  - [x] revoke authorized mailbox access
 - [x] add event search (pure frontend for now)
 - [ ] make the UI more beautiful
   - [x] iterate with @mui
