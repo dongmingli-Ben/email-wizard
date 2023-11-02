@@ -29,7 +29,7 @@ export async function get(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error: AxiosError) => {
       console.log(error.response?.data);
-      throw `GET request to ${endpoint} failed with error:\n${error}`;
+      throw error;
     });
 }
 
@@ -47,7 +47,7 @@ export async function post(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error) => {
       console.log(error.response?.data);
-      throw `POST request to ${endpoint} failed with error:\n${error}`;
+      throw error;
     });
 }
 
@@ -69,7 +69,7 @@ export async function del(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error) => {
       console.log(error.response?.data);
-      throw `PUT request to ${endpoint} failed with error:\n${error}`;
+      throw error;
     });
 }
 

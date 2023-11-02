@@ -20,6 +20,7 @@ const CalendarPage = (props: CalendarPageProps) => {
   const [addAccount, setAddAccount] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState("");
   const [userInfo, setUserInfo] = useState<userInfoType>();
+  const [errorMailboxes, setErrorMailboxes] = useState<string[]>([]);
 
   const [toGetUserInfo, setToGetUserInfo] = useState(false);
 
@@ -78,11 +79,13 @@ const CalendarPage = (props: CalendarPageProps) => {
           setAddAccount={setAddAccount}
           setDeleteAccount={setDeleteAccount}
           toGetUserInfo={toGetUserInfo}
+          errorMailboxes={errorMailboxes}
         />
         <Feed
           userId={props.userId}
           userSecret={props.userSecret}
           userInfo={userInfo}
+          setErrorMailboxes={setErrorMailboxes}
         />
       </Box>
       {addAccount ? (

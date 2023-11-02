@@ -16,6 +16,7 @@ type SideBarProps = {
   userSecret: string;
   userInfo: userInfoType | undefined;
   toGetUserInfo: boolean;
+  errorMailboxes: string[];
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
   setDeleteAccount: (mailbox: string) => void;
@@ -95,6 +96,7 @@ const SideBar = (props: SideBarProps) => {
         }
         setAddAccount={props.setAddAccount}
         setDeleteAccount={props.setDeleteAccount}
+        errorMailboxes={props.errorMailboxes}
       />
       <Button
         fullWidth

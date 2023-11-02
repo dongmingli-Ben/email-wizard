@@ -7,6 +7,7 @@ type FeedProps = {
   userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
+  setErrorMailboxes: (addresses: string[]) => void;
 };
 
 const Feed = (props: FeedProps) => {
@@ -27,6 +28,7 @@ const Feed = (props: FeedProps) => {
         userId={props.userId}
         userSecret={props.userSecret}
         userInfo={props.userInfo}
+        setErrorMailboxes={props.setErrorMailboxes}
       />
     </Box>
   );
