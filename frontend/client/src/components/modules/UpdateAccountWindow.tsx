@@ -1,45 +1,29 @@
-import React, { useState } from "react";
-import { userInfoType } from "./SideBar";
-import { verifyEmailAccount } from "../../utilities/verifyEmail";
-import { appPost, backendConfig } from "../../utilities/requestUtility";
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { Alert, Avatar, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import EmailIcon from "@mui/icons-material/Email";
+import Container from "@mui/material/Container";
+import CssBaseline from "@mui/material/CssBaseline";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
+import { appPut, backendConfig } from "../../utilities/requestUtility";
+import { verifyEmailAccount } from "../../utilities/verifyEmail";
 
-type AddAccountWindowProps = {
-  userId: number;
-  userSecret: string;
-  userInfo: userInfoType | undefined;
-  setUserInfo: (info: userInfoType) => void;
-  setAddAccount: (status: boolean) => void;
-  callGetUserInfo: () => void;
-};
-
-const addEmailAccountDBAPI = async (
+const updateMailboxCredentialsAPI = async (
   req,
   credentials: { [key: string]: string }
 ): Promise<string> => {
   let add_req = {
-    type: req.emailtype,
-    address: req.emailaddress,
     credentials: credentials,
   };
-  let errMsg = await appPost(
-    backendConfig.add_mailbox,
-    { userId: req.userId, userSecret: req.userSecret },
+  let errMsg = await appPut(
+    backendConfig.update_mailbox,
+    {
+      userId: req.userId,
+      userSecret: req.userSecret,
+      address: req.emailaddress,
+    },
     add_req
   )
     .then((resp) => {
@@ -53,37 +37,37 @@ const addEmailAccountDBAPI = async (
   return errMsg;
 };
 
-const newEmailAccount = async (
-  req
-): Promise<{ userInfo: userInfoType; errMsg: string }> => {
+const resyncEmailAccount = async (req): Promise<{ errMsg: string }> => {
   let resp = await verifyEmailAccount(req);
   if (resp.errMsg !== "") {
     return {
-      userInfo: { username: "", useraccounts: [] },
       errMsg: resp.errMsg,
     };
   }
-  let errMsg = await addEmailAccountDBAPI(req, resp.credentials);
+  let errMsg = await updateMailboxCredentialsAPI(req, resp.credentials);
   if (errMsg !== "") {
     return {
-      userInfo: { username: "", useraccounts: [] },
       errMsg: errMsg,
     };
   }
   return {
-    userInfo: {
-      username: "",
-      useraccounts: [{ address: req.emailaddress, protocol: req.emailtype }],
-    },
     errMsg: "",
   };
 };
 
-const AddAccountWindow = (props: AddAccountWindowProps) => {
-  const [emailType, setEmailType] = useState("");
-
+const UpdateAccountWindow = ({
+  userId,
+  userSecret,
+  updateAccount,
+  setUpdateAccount,
+}: {
+  userId: number;
+  userSecret: string;
+  updateAccount: { address: string; protocol: string };
+  setUpdateAccount: (mailbox: { address: string; protocol: string }) => void;
+}) => {
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
 
   const requirePassword = (emailType: string): boolean => {
     let needPasswordEmails = ["IMAP", "POP3"];
@@ -95,24 +79,23 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     let req = {
-      emailtype: emailType,
-      emailaddress: data.get("address") as string,
+      emailtype: updateAccount.protocol,
+      emailaddress: updateAccount.address,
       password: data.get("password") as string,
-      userId: props.userId,
-      userSecret: props.userSecret,
+      userId: userId,
+      userSecret: userSecret,
       imapServer: data.get("server") as string,
       pop3Server: data.get("server") as string,
     };
     console.log(req);
-    newEmailAccount(req)
-      .then((resp: { userInfo: userInfoType; errMsg: string }) => {
+    resyncEmailAccount(req)
+      .then((resp: { errMsg: string }) => {
         setLoading(false);
         if (resp.errMsg === "") {
           console.log("adding new mailbox to user:", resp);
-          props.callGetUserInfo();
-          props.setAddAccount(false);
+          setUpdateAccount({ address: "", protocol: "" });
         } else {
-          setErrorMsg(resp.errMsg);
+          setErrMsg(resp.errMsg);
         }
       })
       .catch((err) => {
@@ -158,7 +141,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               <EmailIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              New Mailbox
+              Sync Mailbox
             </Typography>
             <Box
               component="form"
@@ -166,7 +149,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               // noValidate
               sx={{ mt: 2, width: "80%" }}
             >
-              {errorMsg === "" ? (
+              {errMsg === "" ? (
                 <></>
               ) : (
                 <Alert
@@ -175,25 +158,20 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                     mb: 2,
                   }}
                 >
-                  {errorMsg}
+                  {errMsg}
                 </Alert>
               )}
-              <FormControl fullWidth>
-                <InputLabel>Mailbox Type</InputLabel>
-                <Select
-                  value={emailType}
-                  onChange={(e) => {
-                    setEmailType(e.target.value);
-                  }}
-                  label="Mailbox Type"
-                  required
-                >
-                  <MenuItem value={"outlook"}>Outlook</MenuItem>
-                  <MenuItem value={"gmail"}>Gmail</MenuItem>
-                  <MenuItem value={"IMAP"}>IMAP</MenuItem>
-                  <MenuItem value={"POP3"}>POP3</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="type"
+                label="Email Type"
+                name="protocol"
+                value={updateAccount.protocol}
+                disabled
+                autoFocus
+              />
               <TextField
                 margin="normal"
                 required
@@ -201,10 +179,11 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                 id="address"
                 label="Email Address"
                 name="address"
-                autoComplete="john@example.com"
+                value={updateAccount.address}
+                disabled
                 autoFocus
               />
-              {requirePassword(emailType) ? (
+              {requirePassword(updateAccount.protocol) ? (
                 <TextField
                   margin="normal"
                   required
@@ -218,7 +197,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               ) : (
                 <></>
               )}
-              {emailType === "IMAP" ? (
+              {updateAccount.protocol === "IMAP" ? (
                 <TextField
                   margin="normal"
                   required
@@ -232,7 +211,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
               ) : (
                 <></>
               )}
-              {emailType === "POP3" ? (
+              {updateAccount.protocol === "POP3" ? (
                 <TextField
                   margin="normal"
                   required
@@ -269,7 +248,7 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
                   color="secondary"
                   sx={{ m: 1 }}
                   onClick={() => {
-                    props.setAddAccount(false);
+                    setUpdateAccount({ address: "", protocol: "" });
                   }}
                 >
                   Cancel
@@ -283,4 +262,4 @@ const AddAccountWindow = (props: AddAccountWindowProps) => {
   );
 };
 
-export default AddAccountWindow;
+export default UpdateAccountWindow;

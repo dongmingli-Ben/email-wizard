@@ -5,6 +5,7 @@ import AddAccountWindow from "../modules/AddAccountWindow";
 import { useNavigate } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import DeleteAccountConfirmWindow from "../modules/DeleteAccountWindow";
+import UpdateAccountWindow from "../modules/UpdateAccountWindow";
 
 type CalendarPageProps = {
   userId: number;
@@ -19,6 +20,13 @@ type CalendarPageProps = {
 const CalendarPage = (props: CalendarPageProps) => {
   const [addAccount, setAddAccount] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState("");
+  const [updateAccount, setUpdateAccount] = useState<{
+    address: string;
+    protocol: string;
+  }>({
+    address: "",
+    protocol: "",
+  });
   const [userInfo, setUserInfo] = useState<userInfoType>();
   const [errorMailboxes, setErrorMailboxes] = useState<string[]>([]);
 
@@ -78,6 +86,7 @@ const CalendarPage = (props: CalendarPageProps) => {
           setUserInfo={setUserInfo}
           setAddAccount={setAddAccount}
           setDeleteAccount={setDeleteAccount}
+          setUpdateAccount={setUpdateAccount}
           toGetUserInfo={toGetUserInfo}
           errorMailboxes={errorMailboxes}
         />
@@ -107,6 +116,16 @@ const CalendarPage = (props: CalendarPageProps) => {
           deleteAccount={deleteAccount}
           setDeleteAccount={setDeleteAccount}
           callGetUserInfo={callGetUserInfo}
+        />
+      ) : (
+        <></>
+      )}
+      {updateAccount.address !== "" ? (
+        <UpdateAccountWindow
+          userId={props.userId}
+          userSecret={props.userSecret}
+          updateAccount={updateAccount}
+          setUpdateAccount={setUpdateAccount}
         />
       ) : (
         <></>

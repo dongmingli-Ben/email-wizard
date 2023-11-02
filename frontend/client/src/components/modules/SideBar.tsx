@@ -20,6 +20,7 @@ type SideBarProps = {
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
   setDeleteAccount: (mailbox: string) => void;
+  setUpdateAccount: (mailbox: { address: string; protocol: string }) => void;
   setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
 };
@@ -96,6 +97,7 @@ const SideBar = (props: SideBarProps) => {
         }
         setAddAccount={props.setAddAccount}
         setDeleteAccount={props.setDeleteAccount}
+        setUpdateAccount={props.setUpdateAccount}
         errorMailboxes={props.errorMailboxes}
       />
       <Button

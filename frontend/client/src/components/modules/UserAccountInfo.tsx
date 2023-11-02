@@ -10,12 +10,14 @@ type UserAccountInfoProps = {
   errorMailboxes: string[];
   setAddAccount: (status: boolean) => void;
   setDeleteAccount: (address: string) => void;
+  setUpdateAccount: (mailbox: { address: string; protocol: string }) => void;
 };
 
 const UserMailboxRow = (props: {
   address: string;
   protocol: string;
   setDeleteAccount: (address: string) => void;
+  setUpdateAccount: (mailbox: { address: string; protocol: string }) => void;
   errorMailboxes: string[];
 }) => {
   const [inError, setInError] = useState(
@@ -68,7 +70,10 @@ const UserMailboxRow = (props: {
           {inError ? (
             <IconButton
               onClick={() => {
-                // props.setDeleteAccount(props.address);
+                props.setUpdateAccount({
+                  address: props.address,
+                  protocol: props.protocol,
+                });
               }}
               color="inherit"
             >
@@ -99,6 +104,7 @@ const UserAccountInfo = (props: UserAccountInfoProps) => {
           address={account.address}
           protocol={account.protocol}
           setDeleteAccount={props.setDeleteAccount}
+          setUpdateAccount={props.setUpdateAccount}
           errorMailboxes={props.errorMailboxes}
           key={index}
         />
