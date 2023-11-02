@@ -29,7 +29,7 @@ export async function get(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error: AxiosError) => {
       console.log(error.response?.data);
-      throw `GET request to ${endpoint} failed with error:\n${error}`;
+      throw error;
     });
 }
 
@@ -47,7 +47,24 @@ export async function post(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error) => {
       console.log(error.response?.data);
-      throw `POST request to ${endpoint} failed with error:\n${error}`;
+      throw error;
+    });
+}
+// Helper code to make a put request. Default parameter of empty JSON Object for params.
+// Returns a Promise to a JSON Object.
+export async function put(endpoint: string, params = {}, extraHeaders = {}) {
+  return axios
+    .put(endpoint, params, {
+      headers: { "Content-type": "application/json", ...extraHeaders },
+      timeout: timeoutMillis,
+    })
+    .then((resp: AxiosResponse) => {
+      console.log(resp);
+      return resp.data;
+    })
+    .catch((error) => {
+      console.log(error.response?.data);
+      throw error;
     });
 }
 
@@ -69,7 +86,7 @@ export async function del(endpoint: string, params = {}, extraHeaders = {}) {
     })
     .catch((error) => {
       console.log(error.response?.data);
-      throw `PUT request to ${endpoint} failed with error:\n${error}`;
+      throw error;
     });
 }
 
@@ -110,6 +127,15 @@ export async function appPost(
   return post(url, params, headers);
 }
 
+export async function appPut(
+  endpoint: string,
+  urlParams: { [key: string]: number | string },
+  params = {}
+) {
+  let [url, headers] = prepareEndpointByParams(endpoint, { ...urlParams });
+  return put(url, params, headers);
+}
+
 export async function appDelete(
   endpoint: string,
   urlParams: { [key: string]: number | string },
@@ -128,6 +154,8 @@ export const backendConfig = {
   verify_user: "https://www.toymaker-ben.online/api/authenticate",
   add_mailbox: "https://www.toymaker-ben.online/api/users/{userId}/mailboxes",
   remove_mailbox:
+    "https://www.toymaker-ben.online/api/users/{userId}/mailboxes/{address}",
+  update_mailbox:
     "https://www.toymaker-ben.online/api/users/{userId}/mailboxes/{address}",
   user_profile: "https://www.toymaker-ben.online/api/users/{userId}/profile",
 };

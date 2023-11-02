@@ -179,11 +179,34 @@ const verifyGmail = async (address: string): Promise<VerifyResposne> => {
   return { errMsg: "", credentials: { auth_code: authCode } };
 };
 
+const verifyEmailAccount = async (req): Promise<VerifyResposne> => {
+  let resp: VerifyResposne;
+  if (req.emailtype === "outlook") {
+    resp = await verifyOutlook(req.emailaddress);
+  } else if (req.emailtype === "IMAP") {
+    resp = await verifyIMAP(req.emailaddress, req.password, req.imapServer);
+  } else if (req.emailtype === "POP3") {
+    resp = await verifyPOP3(req.emailaddress, req.password, req.pop3Server);
+  } else if (req.emailtype === "gmail") {
+    resp = await verifyGmail(req.emailaddress);
+  } else {
+    console.log(`Un-recognized account type: ${req.emailtype}`);
+    let errMsg = `Un-recognized account type: ${req.emailtype}`;
+    resp = {
+      errMsg: errMsg,
+      credentials: {},
+    };
+  }
+  console.log(resp);
+  return resp;
+};
+
 export {
   VerifyResposne,
   verifyOutlook,
   verifyIMAP,
   verifyPOP3,
   verifyGmail,
+  verifyEmailAccount,
   getAccessToken,
 };

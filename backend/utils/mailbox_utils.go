@@ -106,6 +106,39 @@ func AddUserMailbox(user_id int, mailbox_type string, mailbox_address string, cr
 	return err
 }
 
+func UpdateUserMailbox(user_id int, mailbox_address string, credentials map[string]interface{}) error {
+	var mailbox map[string]interface{}
+	var err error
+	if mailbox, err = GetUserEmailAccountFromAddress(user_id, mailbox_address); err != nil {
+		return fmt.Errorf("mailbox %v not found", mailbox_address)
+	}
+	mailbox_type := mailbox["protocol"].(string)
+	creds, err := prepare_credentials(mailbox_type, mailbox_address, credentials)
+	if err != nil {
+		return err
+	}
+	res, err := clients.Query([]string{"mailboxes"}, map[string]interface{}{
+		"user_id": user_id,
+	}, "users")
+	if err != nil {
+		return err
+	}
+	mailboxes, err := prepare_mailboxes(res[0]["mailboxes"])
+	if err != nil {
+		return err
+	}
+	for _, mbox := range mailboxes {
+		if mbox["username"].(string) == mailbox_address {
+			mbox["credentials"] = creds
+			break
+		}
+	}
+	err = clients.UpdateValue("mailboxes", mailboxes, map[string]interface{}{
+		"user_id": user_id,
+	}, "users")
+	return err
+}
+
 func RevokeMailboxAccess(mailbox map[string]interface{}) error {
 	if mailbox["protocol"].(string) == "gmail" {
 		err := RevokeGmailAccess(mailbox["credentials"].(map[string]interface{}))

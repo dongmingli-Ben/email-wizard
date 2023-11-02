@@ -23,26 +23,41 @@ type calendarProps = {
   userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
+  setErrorMailboxes: (addresses: string[]) => void;
+  toGetUserEvents: boolean;
 };
 
 const updateEvents = async (
   userId: number,
   userSecret: string,
   userInfo: userInfoType
-): Promise<void> => {
+): Promise<string[]> => {
+  let promises: Promise<string | undefined>[] = [];
   for (const mailbox of userInfo.useraccounts) {
-    try {
-      await updateAccountEventsAPI(
-        userId,
-        userSecret,
-        mailbox.address,
-        mailbox.protocol
-      );
-    } catch (error) {
-      console.log(error);
-      console.log(`fail to update events for mailbox: ${mailbox}`);
-    }
+    let p = updateAccountEventsAPI(
+      userId,
+      userSecret,
+      mailbox.address,
+      mailbox.protocol
+    )
+      .then(() => {
+        return "";
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+        console.log(`fail to update events for mailbox:`, mailbox);
+        if (error.response.status != 504) {
+          return mailbox.address;
+        }
+        return "";
+      });
+    promises.push(p);
   }
+  let errorousMailboxes = await Promise.all(promises);
+  let mailboxes = errorousMailboxes
+    .map((addr) => addr as string)
+    .filter((address) => address !== "");
+  return mailboxes;
 };
 
 const updateAccountEventsAPI = async (
@@ -381,16 +396,20 @@ const Calendar = (props: calendarProps) => {
   useEffect(() => {
     console.log("updating events for:", props.userInfo);
     if (props.userInfo !== undefined) {
-      updateEvents(props.userId, props.userSecret, props.userInfo).then(() => {
-        getEventsAPI(props.userId, props.userSecret, query).then(
-          (_events: { [key: string]: string }[]) => {
-            setEventStore(_events);
-            updateLocalSearchIndex(_events);
-          }
-        );
-      });
+      updateEvents(props.userId, props.userSecret, props.userInfo).then(
+        (errMailboxes: string[]) => {
+          console.log("Mailboxes in error:", errMailboxes);
+          props.setErrorMailboxes(errMailboxes);
+          getEventsAPI(props.userId, props.userSecret, query).then(
+            (_events: { [key: string]: string }[]) => {
+              setEventStore(_events);
+              updateLocalSearchIndex(_events);
+            }
+          );
+        }
+      );
     }
-  }, [props.userInfo]);
+  }, [props.userInfo, props.toGetUserEvents]);
 
   useEffect(() => {
     console.log("retriving events for:", props.userInfo);
