@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import UserAccountInfo from "./UserAccountInfo";
 import { useNavigate } from "react-router-dom";
 import { appGet } from "../../utilities/requestUtility";
@@ -15,8 +15,10 @@ type SideBarProps = {
   userId: number;
   userSecret: string;
   userInfo: userInfoType | undefined;
+  toGetUserInfo: boolean;
   setUserInfo: (info: userInfoType) => void;
   setAddAccount: (status: boolean) => void;
+  setDeleteAccount: (mailbox: string) => void;
   setUserId: (userId: number) => void;
   setUserSecret: (userSecret: string) => void;
 };
@@ -29,7 +31,11 @@ const getUserInfoAPI = async (
   userAccounts: { address: string; protocol: string }[];
   errMsg: string;
 }> => {
-  return appGet(backendConfig.user_profile, userId, userSecret, {})
+  return appGet(
+    backendConfig.user_profile,
+    { userId: userId, userSecret: userSecret },
+    {}
+  )
     .then((resp) => {
       console.log("mailboxes: ", resp.mailboxes);
       let mailboxes = resp.mailboxes.length > 0 ? resp.mailboxes : [];
@@ -71,7 +77,7 @@ const SideBar = (props: SideBarProps) => {
       .catch((e) => {
         console.log("fail to fetch user profile:", e);
       });
-  }, [props.userId, props.userSecret]);
+  }, [props.userId, props.userSecret, props.toGetUserInfo]);
 
   return (
     <Box
@@ -88,6 +94,7 @@ const SideBar = (props: SideBarProps) => {
             : [{ address: "No accounts", protocol: "null" }]
         }
         setAddAccount={props.setAddAccount}
+        setDeleteAccount={props.setDeleteAccount}
       />
       <Button
         fullWidth

@@ -59,3 +59,34 @@ func RefreshGmailToken(credentials map[string]interface{}) (map[string]interface
 	credentials["expire_timestamp"] = time.Now().Unix() + int64(creds["expires_in"].(float64))
 	return credentials, nil
 }
+
+func RevokeGmailAccess(credentials map[string]interface{}) error {
+	req_url := fmt.Sprintf("https://oauth2.googleapis.com/revoke?token=%v",
+						   credentials["refresh_token"])
+	req, err := http.NewRequest("POST", req_url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Google response to revoke: %v\n", string(body))
+	data := make(map[string]interface{})
+	if err = json.Unmarshal(body, &data); err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 && !(data["error"].(string) == "invalid_token" && 
+								   data["error_description"].(string) == "Token expired or revoked") {
+		return fmt.Errorf("encounter status code %v when revoking gmail access", resp.StatusCode)
+	}
+	return nil
+}

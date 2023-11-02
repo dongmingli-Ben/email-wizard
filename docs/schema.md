@@ -10,7 +10,7 @@
 | user password | string  | not null          |
 | mailboxes     | JSON    | list of mailboxes |
 
-Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type; 3. user credentials. User credentials may contain the following:
+Mailbox: each mailbox should have at least 1. the email address (username); 2. mailbox type (protocol); 3. user credentials (credentials). User credentials may contain the following:
 
 - mailbox password
 - mailbox server address, such as the server of IMAP/POP3 mailboxes
@@ -29,6 +29,8 @@ Mailbox: each mailbox should have at least 1. the email address; 2. mailbox type
 | email datetime     | timestamp with timezone | not null    |
 | email content      | string                  | -           |
 | event IDs          | array of int            | -           |
+
+Assume each email is associated with a SINGLE user for now.
 
 ## Events
 

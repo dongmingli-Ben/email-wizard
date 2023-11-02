@@ -105,3 +105,56 @@ func AddUserMailbox(user_id int, mailbox_type string, mailbox_address string, cr
 	}, "users")
 	return err
 }
+
+func RevokeMailboxAccess(mailbox map[string]interface{}) error {
+	if mailbox["protocol"].(string) == "gmail" {
+		err := RevokeGmailAccess(mailbox["credentials"].(map[string]interface{}))
+		return err
+	}
+	return nil
+}
+
+func RemoveUserMailbox(user_id int, mailbox_address string) error {
+	var mailbox map[string]interface{}
+	var err error
+	if mailbox, err = GetUserEmailAccountFromAddress(user_id, mailbox_address); err != nil {
+		return fmt.Errorf("mailbox %v already removed", mailbox_address)
+	}
+	if err := RevokeMailboxAccess(mailbox); err != nil {
+		return fmt.Errorf("fail to revoke mailbox access: %v", err.Error())
+	}
+	// remove all related events and emails
+	if err = clients.DeleteRows(map[string]interface{} {
+			"user_id": user_id,
+			"email_address": mailbox_address,
+		}, "events"); err != nil {
+		return err
+	}
+	if err = clients.DeleteRows(map[string]interface{} {
+			"user_id": user_id,
+			"email_address": mailbox_address,
+		}, "emails"); err != nil {
+		return err
+	}
+	// remove mailbox in users DB
+	res, err := clients.Query([]string{"mailboxes"}, map[string]interface{}{
+		"user_id": user_id,
+	}, "users")
+	if err != nil {
+		return err
+	}
+	mailboxes, err := prepare_mailboxes(res[0]["mailboxes"])
+	if err != nil {
+		return err
+	}
+	remain_mailboxes := make([]map[string]interface{}, 0)
+	for _, mbox := range mailboxes {
+		if mbox["username"].(string) != mailbox_address {
+			remain_mailboxes = append(remain_mailboxes, mbox)
+		}
+	}
+	err = clients.UpdateValue("mailboxes", remain_mailboxes, map[string]interface{}{
+		"user_id": user_id,
+	}, "users")
+	return err
+}

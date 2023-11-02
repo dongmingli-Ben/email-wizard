@@ -86,7 +86,7 @@ func updateAccountEvents(c *gin.Context) {
 	}
 	creds, err := utils.PrepareAndRefreshEmailAccountCredentials(user_id, account)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "credentials not found in database for this account"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
 	}
 	for key, val := range kwargs {
@@ -223,6 +223,26 @@ func addUserMailbox(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, "")
 }
 
+func removeUserMailbox(c *gin.Context) {
+	user_id, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
+		return
+	}
+	address := c.Param("address")
+	user_secret := c.Request.Header.Get("X-User-Secret");
+	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+		return
+	}
+
+	if err := utils.RemoveUserMailbox(user_id, address); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, "")
+}
+
 func addUser(c *gin.Context) {
 	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
@@ -310,6 +330,7 @@ func main() {
 	router.POST("/authenticate", authenticateUser)
 	router.GET("/users/:user_id/profile", getUserProfile)
 	router.POST("/users/:user_id/mailboxes", addUserMailbox)
+	router.DELETE("/users/:user_id/mailboxes/:address", removeUserMailbox)
 	router.POST("/users", addUser)
 
 	// router.Run(":8080")

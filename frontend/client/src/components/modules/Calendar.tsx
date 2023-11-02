@@ -52,22 +52,30 @@ const updateAccountEventsAPI = async (
   protocol: string
 ): Promise<void> => {
   if (protocol === "IMAP" || protocol == "POP3" || protocol == "gmail") {
-    return appPost(backendConfig.events, userId, userSecret, {
-      address: address,
-      kwargs: {},
-    });
+    return appPost(
+      backendConfig.events,
+      { userId: userId, userSecret: userSecret },
+      {
+        address: address,
+        kwargs: {},
+      }
+    );
   } else if (protocol == "outlook") {
     let access_token = await getAccessToken(address);
     if (access_token.length === 0) {
       console.log("fail to get access token, got: ", access_token);
       return;
     }
-    return appPost(backendConfig.events, userId, userSecret, {
-      address: address,
-      kwargs: {
-        auth_token: access_token,
-      },
-    });
+    return appPost(
+      backendConfig.events,
+      { userId: userId, userSecret: userSecret },
+      {
+        address: address,
+        kwargs: {
+          auth_token: access_token,
+        },
+      }
+    );
   } else {
     throw `un-recognized mailbox type: ${protocol}`;
   }
@@ -78,9 +86,13 @@ const getEventsAPI = async (
   userSecret: string,
   query: string
 ): Promise<{ [key: string]: any }[]> => {
-  return appGet(backendConfig.events, userId, userSecret, {
-    query: query,
-  })
+  return appGet(
+    backendConfig.events,
+    { userId: userId, userSecret: userSecret },
+    {
+      query: query,
+    }
+  )
     .then((resp) => {
       console.log(`events returned`);
       console.log(resp);
