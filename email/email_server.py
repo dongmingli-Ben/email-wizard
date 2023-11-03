@@ -1,5 +1,5 @@
 from concurrent import futures
-import logging
+import logger
 import json
 
 import grpc
@@ -21,7 +21,7 @@ def get_emails(user_config, n_mails: int) -> dict:
             'item': plain_text
         }
         clean_mails.append(email)
-        # print(email_id, plain_text, sep="\n", end="\n\n")
+        logger.debug(f'{email_id}:\n{plain_text}\n')
     emails = {
         'items': clean_mails
     }
@@ -31,12 +31,16 @@ def get_emails(user_config, n_mails: int) -> dict:
 class EmailHelper(pd2_grpc.EmailHelperServicer):
 
     def GetEmails(self, request, context):
-        logging.info(f'received request {request}')
-        config = json.loads(request.config)
-        n_mails = request.n_mails
-        emails = get_emails(config, n_mails)
-        email_json = json.dumps(emails, indent=4, ensure_ascii=False)
-        logging.debug(f'return email JSON:\n {email_json}')
+        logger.info(f'received request {request}')
+        try:
+            config = json.loads(request.config)
+            n_mails = request.n_mails
+            emails = get_emails(config, n_mails)
+            email_json = json.dumps(emails, indent=4, ensure_ascii=False)
+            logger.debug(f'return email JSON:\n {email_json}')
+        except Exception as e:
+            logger.error(f'Error when serving request {request}')
+            raise e
         return pb2.EmailReply(message=email_json)
 
 
@@ -51,5 +55,6 @@ def serve():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logger.logger_init(log_dir='log', name='email',
+                       level='INFO', when='D', backupCount=7)
     serve()

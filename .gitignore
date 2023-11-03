@@ -186,6 +186,7 @@ test
 *.pem
 bundle.js
 tests/**
+log/**
 
 # go
 go.work
