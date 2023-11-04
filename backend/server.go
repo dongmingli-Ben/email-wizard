@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
+	"email-wizard/backend/logger"
 	"email-wizard/backend/utils"
 )
 
@@ -298,6 +299,8 @@ func addUser(c *gin.Context) {
 }
 
 func getUserProfile(c *gin.Context) {
+	// defer logger.LogErrorStackTrace()
+	// logger.Info("receives req for getUserProfile", zap.Any("params", c.Request.Body))
 	user_id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("non-integer user_id: %v", c.Param("user_id"))})
@@ -313,10 +316,14 @@ func getUserProfile(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, profile)
+	// logger.Info("getUserProfile success")
 }
 
 func authenticateUser(c *gin.Context) {
 	var payload map[string]interface{}
+	// defer logger.LogErrorStackTrace()
+	// req, _ := io.ReadAll(c.Request.Body)
+	// logger.Info("receives req for authenticateUser", zap.String("req", string(req)))
 	if err := c.BindJSON(&payload); err != nil {
 		fmt.Println(io.ReadAll(c.Request.Body))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
@@ -338,9 +345,11 @@ func authenticateUser(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, gin.H{"user_id": user_id, "user_secret": user_secret})
+	// logger.Info("authenticateUser success")
 }
 
 func main() {
+	logger.InitLogger("log", "backend", 1, 7, "INFO")
 	router := gin.Default()
 
 	// Add CORS middleware
@@ -357,6 +366,7 @@ func main() {
 		"X-User-Secret",
 	}
 	router.Use(cors.New(config))
+	router.Use(logger.RequestLogger())
 	router.GET("/users/:user_id/events", searchEvents)
 	router.POST("/users/:user_id/events", updateAccountEvents)
 	router.GET("/verify_email", getEmails)
