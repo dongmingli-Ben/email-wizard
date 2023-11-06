@@ -18,7 +18,7 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 ## Tasks
 
-### Stage 1
+### Stage 1 (basic functionality)
 
 #### A1. retrieve emails
 
@@ -112,14 +112,61 @@ Codes in this repo should be able to parse raw email contents into structured co
       - [x] integrate with updated APIs
 - [x] deploy to production server
 
-### Stage 2
+### Stage 2 (minimum useful requirements)
 
 #### A1. retrieve emails
 
 - [x] support gmail mailboxes
+
+#### C2. API requests
+
+- [x] refine API interface
+  - [x] migrate to RESTful APIs
+
+#### C3. calendar view UI
+
+- [x] refine API interface
+- [x] add remove mailbox functionality
+  - [x] revoke authorized mailbox access
+- [x] add event search (pure frontend for now)
+- [x] make the UI more beautiful
+  - [x] iterate with @mui
+
+### Stage 3 (performance optimization)
+
+Following the [best practices for building scalable backend system](https://www.linkedin.com/pulse/10-best-practices-building-scalable-backend-systems-sandeep-shah/)
+
+#### A1. retrieve emails
+
+- [ ] optimize QPS via async tasks and message queue
+
+#### B1. parse plain text for summary and dates
+
+- [ ] optimize QPS
+  - [ ] improve throughput with asynchronous service (possibly through message queues)
+  - [ ] async / multi-threading calling LLM API
+
+#### C1. store summary to database
+
+- [ ] optimize query
+
+#### C2. API requests
+
+- [ ] implement caching
+- [ ] implement auto-scaling
+- [ ] monitor systems
+- [ ] use CDN
+
+#### C3. calendar view UI
+
+- [ ] faster source retrival
+
+### Stage 4 (more features and supports)
+
+#### A1. retrieve emails
+
 - [ ] update outlook oauth to auth code flow
 - [ ] support exchange protocol
-- [ ] optimize QPS
 
 #### A2. clean email into plain texts
 
@@ -127,9 +174,8 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### B1. parse plain text for summary and dates
 
-- [ ] optimize QPS
-  - [ ] improve throughput with asynchronous service (possibly through message queues)
-  - [ ] async / multi-threading calling LLM API
+- [ ] better precision and recall
+- [ ] timezone
 - [ ] refine API interface
 
 #### C1. store summary to database
@@ -138,8 +184,6 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### C2. API requests
 
-- [x] refine API interface
-  - [x] migrate to RESTful APIs
 - [ ] API testing
 - [ ] microservices testing
 - [ ] migrate to full docker orchestration
@@ -148,14 +192,9 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 #### C3. calendar view UI
 
-- [x] refine API interface
 - [ ] update outlook auth to auth code flow
 - [ ] add forget password functionaility
-- [x] add remove mailbox functionality
-  - [x] revoke authorized mailbox access
-- [x] add event search (pure frontend for now)
 - [ ] make the UI more beautiful
-  - [x] iterate with @mui
 
 #### C4. update calendar
 
