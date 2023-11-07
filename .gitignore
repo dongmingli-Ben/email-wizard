@@ -188,7 +188,7 @@ bundle.js
 tests/**
 **/log/**
 database/backup.sql
-database/app_data
+app_data
 
 # go
 go.work
