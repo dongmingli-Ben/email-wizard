@@ -1,4 +1,5 @@
 set -e
+export PGPASSWORD=123456
 
 cd "$(dirname "$0")"
 
