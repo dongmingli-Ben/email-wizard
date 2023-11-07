@@ -16,6 +16,10 @@ Codes in this repo should be able to parse raw email contents into structured co
 
 ![image](../assets/architecture.drawio.svg)
 
+Architecture for asynchronous services (with kafka streams marked with `/`)
+
+![image](../assets/async-kafka.drawio.svg)
+
 ## Tasks
 
 ### Stage 1 (basic functionality)

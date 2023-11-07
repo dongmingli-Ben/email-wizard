@@ -86,7 +86,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     image: goback:v0.3
-    network_mode: host
+    network_mode: host # need to be host so that it can call other services
     ipc: host
     stdin_open: true
     tty: true
@@ -128,6 +128,7 @@ services:
       - kafka-net
     ports:
       - "9092:9092"
+      - "29092:29092"
     volumes:
       - ./app_data/kafka:/bitnami/kafka
     environment:
@@ -136,8 +137,8 @@ services:
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       # Listeners
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=LISTENER_EXTERNAL://kafka:9092,LISTENER_INTERNAL://kafka:29092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=LISTENER_EXTERNAL://localhost:9092,LISTENER_INTERNAL://kafka:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT,LISTENER_INTERNAL:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=LISTENER_INTERNAL
