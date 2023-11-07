@@ -1,0 +1,110 @@
+version: "3"
+
+networks:
+  postgresql-net:
+    driver: bridge
+
+services:
+  email:
+    container_name: email
+    build:
+      context: ./email
+      dockerfile: Dockerfile
+    image: pyemail:v0.2
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./:/mnt
+    command: bash /mnt/email/run_server.sh
+  parse:
+    container_name: parse
+    build:
+      context: ./smart_parse
+      dockerfile: Dockerfile
+    image: pyparse:v0.0
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./:/mnt
+    command: bash /mnt/smart_parse/run_server.sh
+  data:
+    container_name: data
+    build:
+      context: ./database/docker
+      dockerfile: Dockerfile.golang
+    image: gopostgre:v0.1
+    networks:
+      - postgresql-net
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    ports:
+      - "50100-50200:50100-50200"
+    volumes:
+      - ./:/mnt
+    command: bash /mnt/database/run_server.sh
+  postgresql:
+    container_name: postgres
+    build:
+      context: ./database/docker
+      dockerfile: Dockerfile.postgresql
+    image: postgresql:v0.0
+    networks:
+      - postgresql-net
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./database/app_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: email-wizard-data
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: goback:v0.3
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./:/mnt
+    command: bash /mnt/backend/run_server.sh
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: react:v0.1
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./:/mnt
+    command: bash -c "cd /mnt/frontend && npm install && npm run hotloader"
+  nginx:
+    container_name: nginx
+    build:
+      context: ./deploy
+      dockerfile: Dockerfile
+    image: nginx:v0.0
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - ./frontend/client/dist:/usr/share/nginx/html

@@ -1,0 +1,1 @@
+PGPASSWORD=123456 psql -h postgres -U postgres -d email-wizard-data < backup.sql
