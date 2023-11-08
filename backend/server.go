@@ -60,6 +60,7 @@ func updateAccountEventsAsync(c *gin.Context) {
 	}
 	account["credentials"] = creds
 	err = utils.UpdateUserEventsForAccountAsync(user_id, account)
+	err = utils.UpdateUserEventsForAccount(user_id, account)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
