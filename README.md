@@ -21,3 +21,49 @@ Extract events from various emails and present them in calendar
 - support different types of events
 
 See our upcoming feature [plan](./docs/plan.md).
+
+## Hosting on your machine (NOT recommended)
+
+For data privacy issues, you may want to host the service on your machines. Here is a brief guide on how to do that:
+
+### Setting up OpenAI API key
+
+```bash
+touch smart_parse/setup_openai.sh
+echo "export OPENAI_API_KEY=<your-openai-api-key>" > smart_parse/setup_openai.sh
+```
+
+### Setting up request forwarding and domain name
+
+Backend endpoints are hosted on port 8080. We use Nginx to forward each request starting with `/api` to port 8080. This part is already configured in `deploy/nginx.conf`.
+To use your own machine with your own domain name, modify corresponding Nginx configuration and SSL certificates in `backend/server.go`.
+
+### (Re)Starting the service
+
+```bash
+docker compose up
+```
+
+For the first time after the service starts, you need to create the Kafka topics. Afterwards, you do not need to do so. Even if the service is down, it will automatically recognize previous topics and data after restart.
+
+Use the script to initialize kafka topics:
+
+```bash
+bash backend/kafka_init.sh
+```
+
+### Using the service with browsers
+
+The webpage is not built automatically on container starts for development purpose. To build the webpage, use:
+
+```bash
+docker exec -d frontend bash -c "cd /mnt/frontend && bash run.sh"
+```
+
+Then you can view the webpage using your server url specified in `deploy/nginx.conf`.
+
+### Shutting down the service
+
+```bash
+docker compose down
+```
