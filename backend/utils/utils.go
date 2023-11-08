@@ -267,7 +267,7 @@ func PrepareAndRefreshEmailAccountCredentials(user_id int, account map[string]in
 		if err != nil {
 			return nil, err
 		}
-		if err = UpdateUserEmailAccountCredentials(user_id, account["username"].(string), creds); err == nil {
+		if err = UpdateUserEmailAccountCredentials(user_id, account["username"].(string), creds); err != nil {
 			return nil, err
 		}
 		return creds, nil
@@ -295,4 +295,40 @@ func UpdateUserEmailAccountCredentials(user_id int, address string, credentials 
 		"user_id": user_id,
 	}, "users")
 	return err
+}
+
+
+func UpdateUserEventsForAccount(user_id int, account map[string]interface{}) error {
+	// read recent emails from user email accounts (and store emails to DB)
+	emails, err := GetUserEmailsFromAccount(account)
+	if err != nil {
+		return err
+	}
+
+	// filter for un-parsed emails
+	emails, err = GetUserUnparsedEmails(emails, account["username"].(string), user_id)
+	if err != nil {
+		return err
+	}
+	for _, email := range emails {
+		// todo: atomic!
+		err = StoreUserEmails([]map[string]interface{}{email}, account, user_id)
+		if err != nil {
+			return err
+		}
+		// parse into events
+		events, err := ParseEmailToEvents(email, 5)
+		if err != nil {
+			return err
+		}
+		// store back to db
+		err = StoreUserEvents(events, user_id,
+			email["email_id"].(string),
+			account["username"].(string))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

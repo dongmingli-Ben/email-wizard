@@ -13,46 +13,11 @@ import (
 	"email-wizard/backend/utils"
 )
 
-func UpdateUserEventsForAccount(user_id int, account map[string]interface{}) error {
-	// read recent emails from user email accounts (and store emails to DB)
-	emails, err := utils.GetUserEmailsFromAccount(account)
-	if err != nil {
-		return err
-	}
-
-	// filter for un-parsed emails
-	emails, err = utils.GetUserUnparsedEmails(emails, account["username"].(string), user_id)
-	if err != nil {
-		return err
-	}
-	for _, email := range emails {
-		// todo: atomic!
-		err = utils.StoreUserEmails([]map[string]interface{}{email}, account, user_id)
-		if err != nil {
-			return err
-		}
-		// parse into events
-		events, err := utils.ParseEmailToEvents(email, 5)
-		if err != nil {
-			return err
-		}
-		// store back to db
-		err = utils.StoreUserEvents(events, user_id,
-			email["email_id"].(string),
-			account["username"].(string))
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 /* reads new emails, parses them into events, and store them in DB
 
- TODO: update client auth flow to auth code flow and eliminate the need of kwargs in the request
- */
-func updateAccountEvents(c *gin.Context) {
+TODO: update client auth flow to auth code flow and eliminate the need of kwargs in the request
+*/
+func updateAccountEventsAsync(c *gin.Context) {
 	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
 		fmt.Println(io.ReadAll(c.Request.Body))
@@ -94,7 +59,7 @@ func updateAccountEvents(c *gin.Context) {
 		creds[key] = val
 	}
 	account["credentials"] = creds
-	err = UpdateUserEventsForAccount(user_id, account)
+	err = utils.UpdateUserEventsForAccountAsync(user_id, account)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
@@ -368,7 +333,7 @@ func main() {
 	router.Use(cors.New(config))
 	router.Use(logger.RequestLogger())
 	router.GET("/users/:user_id/events", searchEvents)
-	router.POST("/users/:user_id/events", updateAccountEvents)
+	router.POST("/users/:user_id/events", updateAccountEventsAsync)
 	router.GET("/verify_email", getEmails)
 	router.POST("/authenticate", authenticateUser)
 	router.GET("/users/:user_id/profile", getUserProfile)
