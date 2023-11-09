@@ -3,3 +3,5 @@ cd ${script_dir}
 
 export PYTHONPATH=$PYTHONPATH:${script_dir}/service
 python email_server.py
+
+sleep infinity

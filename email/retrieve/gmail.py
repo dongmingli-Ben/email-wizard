@@ -4,6 +4,7 @@ from datetime import datetime
 import re
 import json
 import logger
+import asyncio
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -29,7 +30,7 @@ def convert_timestamp(timestamp: str) -> str:
     try:
         parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z")
     except ValueError as e:
-        logger.info(f"encounter error {e}, trying another format")
+        logger.info(f"encounter error: {e}, trying another format")
         parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z")
 
     # Define the desired output format
@@ -43,7 +44,9 @@ def convert_timestamp(timestamp: str) -> str:
 def get_raw_texts(message):
     mime: str = message["mimeType"]
     contents = []
-    if mime.startswith("multipart") or message["body"]["size"] == 0:
+    if mime.startswith("multipart") or (
+        message["body"]["size"] == 0 and "parts" in message
+    ):
         for part in message["parts"]:
             children = get_raw_texts(part)
             contents += children
@@ -124,9 +127,9 @@ async def aretrieve_email_gmail(user_config: dict, n_mails: int = 50):
         messages = results.get("messages", [])
         raw_emails = []
 
-        for message in messages:
+        async def get_raw_email_by_id(id):
             msg = await aiogoogle.as_user(
-                service.users.messages.get(userId="me", id=message["id"])
+                service.users.messages.get(userId="me", id=id)
             )
 
             # Extract subject, sender, and content
@@ -136,16 +139,20 @@ async def aretrieve_email_gmail(user_config: dict, n_mails: int = 50):
             recipient = None
 
             # Iterate through the headers to find subject and sender
-            for header in msg["payload"]["headers"]:
-                if header["name"] == "Subject":
-                    subject = header["value"]
-                elif header["name"] == "From":
-                    sender = header["value"]
-                elif header["name"] == "Date":
-                    date = convert_timestamp(header["value"])
-                elif header["name"] == "To":
-                    recipient = header["value"]
-            contents = get_raw_texts(msg["payload"])
+            try:
+                for header in msg["payload"]["headers"]:
+                    if header["name"] == "Subject":
+                        subject = header["value"]
+                    elif header["name"] == "From":
+                        sender = header["value"]
+                    elif header["name"] == "Date":
+                        date = convert_timestamp(header["value"])
+                    elif header["name"] == "To":
+                        recipient = header["value"]
+                contents = get_raw_texts(msg["payload"])
+            except Exception as e:
+                logger.error(f"encounter: {e}, email id: {id}")
+                raise e
 
             raw_email = {
                 "subject": subject,
@@ -154,12 +161,18 @@ async def aretrieve_email_gmail(user_config: dict, n_mails: int = 50):
                 "recipient": [recipient],
                 "content": contents,
             }
-            raw_emails.append((msg["id"], raw_email))
+            logger.info(f"retrieved email id: {id}")
+            return (id, raw_email)
+
+        raw_emails = await asyncio.gather(
+            *[get_raw_email_by_id(m["id"]) for m in messages]
+        )
+
     return raw_emails
 
 
 if __name__ == "__main__":
-    import asyncio
+    logger.logger_init(name="test")
 
     with open("./config/gmail_user_credentials.json", "r") as f:
         credentials = json.load(f)
