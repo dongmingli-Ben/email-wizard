@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 import re
 import json
+import logger
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -28,6 +29,7 @@ def convert_timestamp(timestamp: str) -> str:
     try:
         parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z")
     except ValueError as e:
+        logger.info(f"encounter error {e}, trying another format")
         parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z")
 
     # Define the desired output format

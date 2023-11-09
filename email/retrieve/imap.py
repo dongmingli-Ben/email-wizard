@@ -1,6 +1,7 @@
 import imaplib
 import aioimaplib
 from typing import List, ByteString, Tuple
+import logger
 
 
 def retrieve_email_bytes(
@@ -42,12 +43,12 @@ async def aretrieve_email_bytes(
         user_config["username"], credentials["password"]
     )
     if status != "OK":
-        print(f'Login to {user_config["username"]} failed with {resp}')
+        logger.warning(f'Login to {user_config["username"]} failed with {resp}')
 
     await imap_server.select("INBOX")
     status, email_ids = await imap_server.search("ALL")
     if status != "OK":
-        print(f'Searching {user_config["username"]} emails failed.')
+        logger.warning(f'Searching {user_config["username"]} emails failed.')
         raise RuntimeError(f'Searching {user_config["username"]} emails failed.')
     email_ids = email_ids[0].split()  # Convert the email IDs to a list
     raw_emails = []
@@ -56,7 +57,7 @@ async def aretrieve_email_bytes(
             email_id.decode("utf-8"), "(RFC822)"
         )
         if status != "OK":
-            print(f"fail to fetch email {email_id}")
+            logger.warning(f"fail to fetch email {email_id}")
         raw_emails.append((email_id.decode("utf-8"), bytes(email_data[1])))
 
     await imap_server.close()

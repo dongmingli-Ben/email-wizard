@@ -1,6 +1,8 @@
 import requests
 import aiohttp
 
+import logger
+
 APP_CLIENT_ID = "34fe7958-6ad4-438e-8218-cb028e47fe40"
 
 
@@ -72,7 +74,10 @@ async def aretrieve_email_outlook(user_config, n_mails: int = 50):
                     email_info["content"] = [email["body"]["content"]]
                     raw_emails.append((email["id"], email_info))
             else:
-                print("Error:", response.text)
+                logger.info(
+                    f"Error: {await response.text()}",
+                )
+                raise RuntimeError(f"Error: fail to fetch email from graph API")
 
     return raw_emails
 
@@ -80,6 +85,8 @@ async def aretrieve_email_outlook(user_config, n_mails: int = 50):
 if __name__ == "__main__":
     import json
     import asyncio
+
+    logger.logger_init(name="test")
 
     # raw_emails = retrieve_email_outlook(
     #     user_config=json.load(open("./config/outlook.json")),
