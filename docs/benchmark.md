@@ -1,8 +1,10 @@
 # Benchmarking the Microservices API
 
-## email.GetEmails
+## email
 
-Retrieve 5 emails for a user (timeout after 20s):
+### Sync `GetEmails`
+
+Retrieve 5 emails for a outlook mailbox (timeout after 20s):
 
 ```
 Summary:
@@ -27,21 +29,27 @@ Response time histogram:
   19996.966 [20] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
 
 Latency distribution:
-  10 % in 2.51 s 
-  25 % in 5.42 s 
-  50 % in 10.18 s 
-  75 % in 15.28 s 
-  90 % in 18.17 s 
-  95 % in 19.16 s 
-  99 % in 19.79 s 
+  10 % in 2.51 s
+  25 % in 5.42 s
+  50 % in 10.18 s
+  75 % in 15.28 s
+  90 % in 18.17 s
+  95 % in 19.16 s
+  99 % in 19.79 s
 
 Status code distribution:
-  [DeadlineExceeded]   6 responses     
-  [OK]                 194 responses   
+  [DeadlineExceeded]   6 responses
+  [OK]                 194 responses
 
 Error distribution:
   [6]   rpc error: code = DeadlineExceeded desc = context deadline exceeded
 ```
+
+### Async requests with Kafka
+
+Received 200 requests to fetch 5 emails for the same outlook mailbox.
+
+Finished in 16s, Requests/sec: 12.5, 233 requests exceeded QPS limit for outlook mailbox, ~400 requests processed (including retries). Approximated req/sec for all processed requests: 25. 194 requests succeed after retries, 6 fails.
 
 ## parse.ParseEmail
 
@@ -70,13 +78,13 @@ Response time histogram:
   47282.800 [9]   |∎∎∎
 
 Latency distribution:
-  10 % in 17.21 s 
-  25 % in 34.36 s 
-  50 % in 36.35 s 
-  75 % in 38.14 s 
-  90 % in 41.42 s 
-  95 % in 42.87 s 
-  99 % in 45.61 s 
+  10 % in 17.21 s
+  25 % in 34.36 s
+  50 % in 36.35 s
+  75 % in 38.14 s
+  90 % in 41.42 s
+  95 % in 42.87 s
+  99 % in 45.61 s
 
 Status code distribution:
   [OK]   200 responses

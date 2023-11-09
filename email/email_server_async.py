@@ -95,7 +95,11 @@ async def req_retry_handler(
         except Exception as e:
             retries -= 1
             err_str = str(e)
-            logger.error("Error retriving emails for request: {}".format(err_str))
+            logger.error(
+                "Error retriving emails for request: {}, retrying in 1s ...".format(
+                    err_str
+                )
+            )
             await asyncio.sleep(1)
 
     error_producer.produce(
@@ -122,6 +126,7 @@ def task_func(
         loop.run_until_complete(asyncio.gather(*tasks))
     except Exception as e:
         logger.error("Error parsing requests: {}".format(str(e)))
+        logger.warning("requests: {}".format([r.value() for r in reqs]))
         raise e
 
 
