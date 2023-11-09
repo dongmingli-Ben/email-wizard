@@ -13,6 +13,12 @@ from aiogoogle import Aiogoogle
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+TIMESTAMP_FORMATS = [
+    "%a, %d %b %Y %H:%M:%S %z",
+    "%a, %d %b %Y %H:%M:%S %Z",
+    "%d %b %Y %H:%M:%S %z",
+    "%d %b %Y %H:%M:%S %Z"
+]
 
 
 def decode_base64url(s: str):
@@ -27,11 +33,15 @@ def convert_timestamp(timestamp: str) -> str:
     m = re.search("(.*) \(.*\)", timestamp)
     if m is not None:
         timestamp = m.group(1)
-    try:
-        parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %z")
-    except ValueError as e:
-        logger.info(f"encounter error: {e}, trying another format")
-        parsed_time = datetime.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+    parsed_time = None
+    for fmt in TIMESTAMP_FORMATS:
+        try:
+            parsed_time = datetime.strptime(timestamp, fmt)
+            break
+        except ValueError as e:
+            logger.info(f"encounter error: {e}, trying another format")
+    if parsed_time is None:
+        raise ValueError(f"cannot parse timestamp: {timestamp}")
 
     # Define the desired output format
     desired_output_format = "%Y-%m-%d %H:%M:%S%z"
@@ -161,7 +171,7 @@ async def aretrieve_email_gmail(user_config: dict, n_mails: int = 50):
                 "recipient": [recipient],
                 "content": contents,
             }
-            logger.info(f"retrieved email id: {id}")
+            logger.debug(f"retrieved email id: {id}")
             return (id, raw_email)
 
         raw_emails = await asyncio.gather(

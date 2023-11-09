@@ -64,7 +64,7 @@ class RetryCounter:
                     ),
                 )
         else:
-            logger.info(
+            logger.debug(
                 f"[{self.id}]: Successfully produced message to topic: {msg.topic()}"
             )
 
@@ -124,6 +124,7 @@ def task_func(
         ]
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*tasks))
+        logger.info(f"Finished processing {len(reqs)} requests")
     except Exception as e:
         logger.error("Error parsing requests: {}".format(str(e)))
         logger.warning("requests: {}".format([r.value() for r in reqs]))
@@ -135,13 +136,8 @@ def serve():
         f"start running async server at thread id {threading.get_ident()}, process id {os.getpid()} ..."
     )
 
-    def reset_offset(consumer, partitions):
-        for p in partitions:
-            p.offset = OFFSET_BEGINNING
-        consumer.assign(partitions)
-
     consumer = Consumer(KAFKA_CONFIG)
-    consumer.subscribe(["requests"], on_assign=reset_offset)
+    consumer.subscribe(["requests"])
     email_producer = Producer(KAFKA_CONFIG)
     error_producer = Producer(KAFKA_CONFIG)
 
@@ -156,7 +152,7 @@ def serve():
     def worker_init():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        logger.info(f"worker thread id {threading.get_ident()} initialized ...")
+        logger.debug(f"worker thread id {threading.get_ident()} initialized ...")
 
     with futures.ThreadPoolExecutor(
         max_workers=10, initializer=worker_init
