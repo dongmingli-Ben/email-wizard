@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 export PGPASSWORD=123456
 
 go build -o main ./grpc_server
-./main
+go build -tags musl -o async ./async_server
+./main & ./async
 
 sleep infinity

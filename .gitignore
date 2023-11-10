@@ -189,6 +189,8 @@ tests/**
 **/log/**
 database/backup.sql
 app_data
+async
+test.sql
 
 # go
 go.work

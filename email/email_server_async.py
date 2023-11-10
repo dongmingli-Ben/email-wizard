@@ -64,8 +64,9 @@ class RetryCounter:
                     ),
                 )
         else:
-            logger.debug(
-                f"[{self.id}]: Successfully produced message to topic: {msg.topic()}"
+            email = json.loads(msg.value().decode("utf-8"))
+            logger.info(
+                f"[{self.id}]: Successfully produced email (id = {email['email_id']}, address = {email['address']}) to topic: {msg.topic()}"
             )
 
 
