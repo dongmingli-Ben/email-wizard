@@ -84,6 +84,9 @@ async def req_retry_handler(
         try:
             emails = await aget_emails(req["config"], req["n_mails"])
             for email in emails["items"]:
+                email['user_id'] = req['user_id']
+                email['address'] = req['config']['username']
+                email['protocol'] = req['config']['protocol']
                 email_producer.produce(
                     "emails",
                     key="email",

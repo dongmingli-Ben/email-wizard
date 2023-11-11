@@ -9,7 +9,16 @@ Example message:
 
 ```yaml
 key: request
-value: '{"config": {"credentials": credentials, "protocol": "gmail", "username": "xxx@gmail.com"}, "n_mails": 5}'
+value: '{
+    "user_id": 1,
+    "config":
+        {
+            "credentials": credentials,
+            "protocol": "gmail",
+            "username": "xxx@gmail.com"
+        },
+    "n_mails": 5
+}'
 ```
 
 ## `kafka.emails`
@@ -22,8 +31,32 @@ Example message:
 ```yaml
 key: email
 value: '{
+    "user_id": 1,
     "email_id": "idxxx",
     "address": "xxx@gmail.com",
+    "protocol: "gmail",
+    "item": {
+        "subject": "subject",
+        ...,
+        "content": "..."
+    }
+}'
+```
+
+## `kafka.new_emails`
+
+Producer: `data`
+Consumer: `parse`
+
+Example message:
+
+```yaml
+key: new_email
+value: '{
+    "user_id": 1,
+    "email_id": "idxxx",
+    "address": "xxx@gmail.com",
+    "protocol: "gmail",
     "item": {
         "subject": "subject",
         ...,

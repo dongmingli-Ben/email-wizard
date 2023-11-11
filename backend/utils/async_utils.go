@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"go.uber.org/zap"
 )
 
 func UpdateUserEventsForAccountAsync(user_id int, account map[string]interface{}) error {
@@ -33,6 +34,7 @@ func UpdateUserEventsForAccountAsync(user_id int, account map[string]interface{}
 	// Produce messages to topic (asynchronously)
 	topic := "requests"
 	req := map[string]interface{}{
+		"user_id": user_id,
 		"config": account,
 		"n_mails": N_EMAIL_RETREIVAL,
 	}
@@ -40,13 +42,17 @@ func UpdateUserEventsForAccountAsync(user_id int, account map[string]interface{}
 	if err != nil {
 		return err
 	}
-	p.Produce(&kafka.Message{
+	err = p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Value:          req_bytes,
 		}, nil)
+	if err != nil {
+		logger.Error("failed to produce message", zap.String("error", err.Error()))
+	}
 
 	// Wait for message deliveries before shutting down
 	p.Flush(15 * 1000)
+	logger.Info("produced 1 request for user_id", zap.Int("user_id", user_id))
 
 	return nil
 }
