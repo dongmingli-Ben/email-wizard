@@ -72,17 +72,18 @@ func process_emails(emails []map[string]interface{}, producer *kafka.Producer, s
 	}
 	defer db.Close()
 
-	query := `SELECT query.email_id, query.email_address, emails.email_id IS NULL as is_new
+	query := `SELECT query.email_id, query.email_address, emails.email_id IS NULL as is_new, query.seqid
 			  FROM (VALUES `
 	for i, email := range emails {
 		if i != 0 {
 			query += ", "
 		}
-		query += fmt.Sprintf("('%s', '%s')", email["email_id"].(string), email["address"].(string))
+		query += fmt.Sprintf("('%s', '%s', %v)", email["email_id"].(string), email["address"].(string), i)
 	}
-	query += `) AS query(email_id, email_address)
+	query += `) AS query(email_id, email_address, seqid)
 			  LEFT JOIN emails ON query.email_id = emails.email_id 
-			  	AND query.email_address = emails.email_address;`
+			  	AND query.email_address = emails.email_address
+			  ORDER BY query.seqid ASC;`
 	rows, err := db.Query(query)
 	if err != nil {
 		logger.Error("failure in querying DB", zap.String("error", err.Error()))
@@ -97,22 +98,54 @@ func process_emails(emails []map[string]interface{}, producer *kafka.Producer, s
 	defer rows.Close()
 	for i := 0; i < len(emails); i++ {
 		rows.Next()
-		values := make([]interface{}, 3)
-		if err := rows.Scan(&values[0], &values[1], &values[2]); err != nil {
+		values := make([]interface{}, 4)
+		if err := rows.Scan(&values[0], &values[1], &values[2], &values[3]); err != nil {
 			logger.Error("failure in scanning row", zap.String("error", err.Error()))
 			continue
 		}
+		if values[0].(string) != emails[i]["email_id"].(string) {
+			logger.Error("email_id mismatch, should not happen!", 
+				zap.String("query", values[0].(string)), 
+				zap.String("email", emails[i]["email_id"].(string)))
+			panic("email_id mismatch, should not happen!")
+		}
 		if values[2].(bool) {
 			logger.Info("new email", zap.String("email_id", values[0].(string)), zap.String("email_address", values[1].(string)))
-			err := produce_email_to_topic(producer, emails[i], "new_emails", "new_email")
+			// store new emails to DB
+			_, err = utils.AddRow(map[string]interface{}{
+				"user_id":          emails[i]["user_id"],
+				"email_id":         emails[i]["email_id"],
+				"email_address":    emails[i]["address"],
+				"mailbox_type":     emails[i]["protocol"],
+				"email_subject":    emails[i]["item"].(map[string]interface{})["subject"],
+				"email_sender":     emails[i]["item"].(map[string]interface{})["sender"],
+				"email_recipients": emails[i]["item"].(map[string]interface{})["recipient"],
+				"email_date":       emails[i]["item"].(map[string]interface{})["date"],
+				"email_content":    emails[i]["item"].(map[string]interface{})["content"],
+				"event_ids":        []int32{},
+			}, "emails")
 			if err != nil {
-				logger.Error("failure in producing email to new_emails", zap.String("error", err.Error()))
+				logger.Error("failure in storing new email to DB", zap.String("error", err.Error()),
+					zap.String("email_id", values[0].(string)), zap.String("email_address", values[1].(string)))
 				err = produce_email_to_topic(producer, emails[i], "errors", "error_data_deduplicate")
 				if err != nil {
 					logger.Error("failure in producing email to errors", zap.String("error", err.Error()))
 				}
+				continue
 			}
-			// store new emails to DB
+			logger.Info("stored new email to DB", zap.String("email_id", values[0].(string)), zap.String("email_address", values[1].(string)))
+
+			err := produce_email_to_topic(producer, emails[i], "new_emails", "new_email")
+			if err != nil {
+				logger.Error("failure in producing email to new_emails", zap.String("error", err.Error()),
+					zap.String("email_id", values[0].(string)), zap.String("email_address", values[1].(string)))
+				err = produce_email_to_topic(producer, emails[i], "errors", "error_data_deduplicate")
+				if err != nil {
+					logger.Error("failure in producing email to errors", zap.String("error", err.Error()))
+				}
+				continue
+			}
+			logger.Info("produced new email to new_emails", zap.String("email_id", values[0].(string)), zap.String("email_address", values[1].(string)))
 		}
 	}
 }
@@ -139,15 +172,15 @@ func main() {
 
 	consumer.SubscribeTopics([]string{"emails"}, nil)
 
-	// Manually assign partitions to the beginning offsets
-	partitions, _ := consumer.Assignment()
-	for _, partition := range partitions {
-		consumer.Seek(kafka.TopicPartition{
-			Topic:     partition.Topic,
-			Partition: partition.Partition,
-			Offset:    kafka.OffsetBeginning,
-		}, 500)
-	}
+	// // Manually assign partitions to the beginning offsets
+	// partitions, _ := consumer.Assignment()
+	// for _, partition := range partitions {
+	// 	consumer.Seek(kafka.TopicPartition{
+	// 		Topic:     partition.Topic,
+	// 		Partition: partition.Partition,
+	// 		Offset:    kafka.OffsetBeginning,
+	// 	}, 500)
+	// }
 
 	logger.Info("data-async server started")
 
