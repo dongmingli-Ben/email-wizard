@@ -64,3 +64,24 @@ value: '{
     }
 }'
 ```
+
+## `kafka.events`
+
+Producer: `parse`
+Consumer: `data`, `backend`
+
+Example message:
+
+```yaml
+key: event
+value: '{
+    "user_id": 1,
+    "email_id": "idxxx",
+    "address": "xxx@gmail.com",
+    "event" {
+        "event_type": "...",
+        ...,
+        "summary": "..."
+    }
+}
+```

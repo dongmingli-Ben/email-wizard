@@ -51,9 +51,11 @@ Received 200 requests to fetch 5 emails for the same outlook mailbox.
 
 Finished in 16s, Requests/sec: 12.5, 233 requests exceeded QPS limit for outlook mailbox, ~400 requests processed (including retries). Approximated req/sec for all processed requests: 25. 194 requests succeed after retries, 6 fails.
 
-## parse.ParseEmail
+## parse
 
-Retrieve a email (timeout after 100s):
+### Sync `ParseEmail`
+
+Retrieve a email for 200 times (timeout after 100s):
 
 ```
 Summary:
@@ -89,3 +91,11 @@ Latency distribution:
 Status code distribution:
   [OK]   200 responses
 ```
+
+### Async requests with kafka
+
+Received 200 emails (all the same) to parse.
+
+Finished in 38s, Requests/sec: 5.3, 17 requests exceeded QPS limit for OpenAI API, 217 requests processed (including retries). Approximated req/sec for all processed requests: 5.7.
+
+Time from flushing requests to kafka to consumer receiving it: 2ms.
