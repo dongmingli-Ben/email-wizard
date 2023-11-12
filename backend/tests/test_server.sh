@@ -76,5 +76,5 @@ if [ ! -f ./websocat.x86_64-unknown-linux-musl ]; then
 fi
 
 ./websocat.x86_64-unknown-linux-musl \
-    -H "X-User-Secret: $user_secret" \
+    --header="X-User-Secret: $user_secret" \
     wss://www.toymaker-ben.online/api/ws/${user_id}

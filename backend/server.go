@@ -357,6 +357,28 @@ func main() {
 		defer logger.LogErrorStackTrace()
 		user_id, err := strconv.Atoi(c.Param("user_id"))
 		user_secret := c.Request.Header.Get("X-User-Secret")
+
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			logger.Error("fail to upgrade to websocket",
+				zap.String("error", err.Error()))
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "cannot upgrade to websocket"})
+			return
+		}
+
+		if user_secret == "" {
+			// expect the first message from client to be user_secret
+			_, msg, err := conn.ReadMessage()
+			if err != nil {
+				logger.Error("fail to read message from client",
+					zap.String("error", err.Error()))
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "cannot read message from client"})
+				return
+			}
+			user_secret = string(msg)
+			logger.Info("receives user_secret from client", zap.String("user_secret", user_secret))
+		}
+
 		if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
 			c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 			return
@@ -365,13 +387,6 @@ func main() {
 			logger.Error("bad user_id",
 				zap.String("error", err.Error()))
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
-			return
-		}
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			logger.Error("fail to upgrade to websocket",
-				zap.String("error", err.Error()))
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "cannot upgrade to websocket"})
 			return
 		}
 		utils.HandleWebSocketConnection(conn, user_id, hub)

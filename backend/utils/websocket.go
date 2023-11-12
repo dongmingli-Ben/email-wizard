@@ -11,6 +11,7 @@ import (
 )
 
 var CONSUMER_WAIT_TIME_PER_MESSAGE = time.Millisecond * 500
+var BUFFER_SIZE_PER_USER = 50
 
 type Handler struct {
 	rec     chan map[string]interface{}
@@ -112,7 +113,7 @@ func NewHub() *Hub {
 
 func (h *Hub) RegisterHandler(user_id int) *Handler {
 	handler := &Handler{
-		rec:     make(chan map[string]interface{}),
+		rec:     make(chan map[string]interface{}, BUFFER_SIZE_PER_USER),
 		user_id: user_id,
 	}
 	h.register <- handler
@@ -122,6 +123,24 @@ func (h *Hub) RegisterHandler(user_id int) *Handler {
 func HandleWebSocketConnection(conn *websocket.Conn, user_id int, h *Hub) {
 	handler := h.RegisterHandler(user_id)
 	logger.Info("Websocket connection opened", zap.Int("user_id", user_id))
+	// send stored events to clients
+	events, err := GetUserEvents(user_id)
+	if err != nil {
+		logger.Error("failure in getting events from database", zap.String("error", err.Error()))
+		close_msg := websocket.FormatCloseMessage(
+			websocket.CloseInternalServerErr,
+			"Internal server error: failure in getting events from database")
+		conn.WriteMessage(websocket.CloseMessage, close_msg)
+		return
+	}
+	go func() {
+		for _, event := range events {
+			handler.rec <- map[string]interface{}{
+				"event": event,
+			}
+		}
+	}()
+	// send incrementing events to clients
 	done_channel := make(chan bool)
 
 	go func() {

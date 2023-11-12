@@ -158,4 +158,5 @@ export const backendConfig = {
   update_mailbox:
     "https://www.toymaker-ben.online/api/users/{userId}/mailboxes/{address}",
   user_profile: "https://www.toymaker-ben.online/api/users/{userId}/profile",
+  ws: "wss://www.toymaker-ben.online/api/ws/{userId}",
 };
