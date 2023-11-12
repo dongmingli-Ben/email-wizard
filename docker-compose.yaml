@@ -113,7 +113,7 @@ services:
     build:
       context: ./deploy
       dockerfile: Dockerfile
-    image: nginx:v0.0
+    image: nginx:v0.1
     network_mode: host
     ipc: host
     stdin_open: true

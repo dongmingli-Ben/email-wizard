@@ -69,3 +69,12 @@ curl -X POST -H "Content-Type: application/json;charset=UTF-8" \
     https://toymaker-ben.online/api/users/$user_id/events
 curl -G -H "X-User-Secret: $user_secret" \
     https://toymaker-ben.online/api/users/$user_id/events
+
+# download websocat if not exists
+if [ ! -f ./websocat.x86_64-unknown-linux-musl ]; then
+    wget https://github.com/vi/websocat/releases/download/v1.12.0/websocat.x86_64-unknown-linux-musl
+fi
+
+./websocat.x86_64-unknown-linux-musl \
+    -H "X-User-Secret: $user_secret" \
+    wss://www.toymaker-ben.online/api/ws/${user_id}

@@ -179,6 +179,9 @@ func process_emails(emails []map[string]interface{}, producer *kafka.Producer, s
 				zap.String("producer", "deduplicate-email"))
 		}
 	}
+	logger.Info("processed batch of emails", 
+		zap.Int("emails num", len(emails)), 
+		zap.String("producer", "deduplicate-email"))
 }
 
 func serve_deduplicate(producer *kafka.Producer, wg *sync.WaitGroup) {

@@ -191,6 +191,7 @@ database/backup.sql
 app_data
 async
 test.sql
+websocat.x86_64-unknown-linux-musl
 
 # go
 go.work

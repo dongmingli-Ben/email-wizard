@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -13,13 +14,12 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-
 var logger *zap.Logger
 
 var LOGGING_LEVEL_MAP = map[string]zapcore.Level{
 	"DEBUG": zap.DebugLevel,
-	"INFO": zap.InfoLevel,
-	"WARN": zap.WarnLevel,
+	"INFO":  zap.InfoLevel,
+	"WARN":  zap.WarnLevel,
 	"ERROR": zap.ErrorLevel,
 	"FATAL": zap.FatalLevel,
 }
@@ -32,16 +32,22 @@ func InitLogger(log_dir string, name string, rotation_period int, backup int, le
 	if _, ok := LOGGING_LEVEL_MAP[level]; !ok {
 		fmt.Printf("log level %v not recognized, setting level to INFO ...", level)
 	}
-	core := zapcore.NewCore(
+	f_logger := zapcore.NewCore(
 		stacktrace_encoder,
 		zapcore.AddSync(&lumberjack.Logger{
-			Filename: filepath.Join(log_dir, fmt.Sprintf("%v.log", name)),
+			Filename:   filepath.Join(log_dir, fmt.Sprintf("%v.log", name)),
 			MaxBackups: backup,
-			MaxAge: rotation_period,
-			Compress: false,
+			MaxAge:     rotation_period,
+			Compress:   false,
 		}),
 		LOGGING_LEVEL_MAP[level],
 	)
+	t_logger := zapcore.NewCore(
+		stacktrace_encoder,
+		zapcore.AddSync(os.Stdout),
+		LOGGING_LEVEL_MAP[level],
+	)
+	core := zapcore.NewTee(f_logger, t_logger)
 	logger = zap.New(core)
 }
 
@@ -73,27 +79,27 @@ func LogErrorStackTrace() {
 }
 
 func RequestLogger() gin.HandlerFunc {
-    return func(c *gin.Context) {
+	return func(c *gin.Context) {
 		defer LogErrorStackTrace()
-        start := time.Now()
-		
+		start := time.Now()
+
 		// Create a custom io.ReadCloser to capture and buffer the request body
-        var buf bytes.Buffer
-        tee := io.TeeReader(c.Request.Body, &buf)
-        c.Request.Body = io.NopCloser(tee)
-        c.Next()
+		var buf bytes.Buffer
+		tee := io.TeeReader(c.Request.Body, &buf)
+		c.Request.Body = io.NopCloser(tee)
+		c.Next()
 
-        end := time.Now()
-        latency := end.Sub(start)
+		end := time.Now()
+		latency := end.Sub(start)
 
-        logger.Info("HTTP request",
-            zap.String("method", c.Request.Method),
-            zap.String("path", c.Request.URL.Path),
-            zap.Int("status", c.Writer.Status()),
-            zap.Any("params", c.Request.URL.Query()),
+		logger.Info("HTTP request",
+			zap.String("method", c.Request.Method),
+			zap.String("path", c.Request.URL.Path),
+			zap.Int("status", c.Writer.Status()),
+			zap.Any("params", c.Request.URL.Query()),
 			zap.String("payload", buf.String()),
-            zap.Duration("latency", latency),
-            zap.String("userAgent", c.GetHeader("User-Agent")),
-        )
-    }
+			zap.Duration("latency", latency),
+			zap.String("userAgent", c.GetHeader("User-Agent")),
+		)
+	}
 }
