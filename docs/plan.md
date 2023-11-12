@@ -142,17 +142,18 @@ Following the [best practices for building scalable backend system](https://www.
 
 #### A1. retrieve emails
 
-- [ ] refactor the microservice to listen from kafka logs
+- [x] refactor the microservice to listen from kafka logs
+- [x] async / multi-threading retrieving emails
 
 #### B1. parse plain text for summary and dates
 
-- [ ] optimize QPS
-  - [ ] refactor the microservice to listen from kafka logs
-  - [ ] async / multi-threading calling LLM API
+- [x] optimize QPS
+  - [x] refactor the microservice to listen from kafka logs
+  - [x] async / multi-threading calling LLM API
 
 #### C1. store summary to database
 
-- [ ] optimize query
+- [x] optimize query
 
 #### C2. API requests
 
@@ -160,11 +161,11 @@ Following the [best practices for building scalable backend system](https://www.
 - [ ] implement auto-scaling
 - [ ] monitor systems
 - [ ] use CDN
-- [ ] improve responsiveness via message queues
-  - [ ] set up kafka servers
-  - [ ] refactor retrieve-parse-display flow to be asynchronous
-    - [ ] listen to kafka logs
-    - [ ] return events via websocket
+- [x] improve responsiveness via message queues
+  - [x] set up kafka servers
+  - [x] refactor retrieve-parse-display flow to be asynchronous
+    - [x] listen to kafka logs
+    - [x] return events via websocket
 
 #### C3. calendar view UI
 
