@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func connectDB() (*sql.DB, error) {
+func ConnectDB() (*sql.DB, error) {
 	host := "postgres"
 	user := "postgres"
 	password := "123456"
@@ -131,7 +131,7 @@ func prepare_insert_query(db *sql.DB, row map[string]interface{}, table string) 
 }
 
 func AddRow(row map[string]interface{}, table string) (map[string]interface{}, error) {
-	db, err := connectDB()
+	db, err := ConnectDB()
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func prepare_update_query(db *sql.DB, column string, value interface{},
 
 // do not support complex type condition yet
 func UpdateValue(column string, value interface{}, condition map[string]interface{}, table string) error {
-	db, err := connectDB()
+	db, err := ConnectDB()
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func prepare_delete_query(db *sql.DB, condition map[string]interface{}, table st
 
 // do not support complex type condition yet
 func DeleteRows(condition map[string]interface{}, table string) error {
-	db, err := connectDB()
+	db, err := ConnectDB()
 	if err != nil {
 		return err
 	}
@@ -272,7 +272,7 @@ func prepare_select_query(db *sql.DB, columns []string, condition map[string]int
 
 // do not support complex fields for columns yet
 func Query(columns []string, condition map[string]interface{}, table string) ([]map[string]interface{}, error) {
-	db, err := connectDB()
+	db, err := ConnectDB()
 	if err != nil {
 		return nil, err
 	}

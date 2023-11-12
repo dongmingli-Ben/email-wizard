@@ -3,6 +3,8 @@ version: "3"
 networks:
   postgresql-net:
     driver: bridge
+  kafka-net:
+    driver: bridge
 
 services:
   email:
@@ -11,11 +13,16 @@ services:
       context: ./email
       dockerfile: Dockerfile
     image: pyemail:v0.2
-    network_mode: host
+    networks:
+      - kafka-net
     ipc: host
     stdin_open: true
     tty: true
     privileged: true
+    expose:
+      - "50051"
+    ports:
+      - "50051:50051"
     volumes:
       - ./:/mnt
     command: bash /mnt/email/run_server.sh
@@ -25,11 +32,16 @@ services:
       context: ./smart_parse
       dockerfile: Dockerfile
     image: pyparse:v0.0
-    network_mode: host
+    networks:
+      - kafka-net
     ipc: host
     stdin_open: true
     tty: true
     privileged: true
+    expose:
+      - "50052"
+    ports:
+      - "50052:50052"
     volumes:
       - ./:/mnt
     command: bash /mnt/smart_parse/run_server.sh
@@ -41,6 +53,7 @@ services:
     image: gopostgre:v0.1
     networks:
       - postgresql-net
+      - kafka-net
     ipc: host
     stdin_open: true
     tty: true
@@ -63,7 +76,7 @@ services:
     tty: true
     privileged: true
     volumes:
-      - ./database/app_data:/var/lib/postgresql/data
+      - ./app_data/postgresql:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: email-wizard-data
@@ -73,7 +86,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     image: goback:v0.3
-    network_mode: host
+    network_mode: host # need to be host so that it can call other services
     ipc: host
     stdin_open: true
     tty: true
@@ -100,7 +113,7 @@ services:
     build:
       context: ./deploy
       dockerfile: Dockerfile
-    image: nginx:v0.0
+    image: nginx:v0.1
     network_mode: host
     ipc: host
     stdin_open: true
@@ -108,3 +121,25 @@ services:
     privileged: true
     volumes:
       - ./frontend/client/dist:/usr/share/nginx/html
+  kafka:
+    container_name: kafka
+    image: docker.io/bitnami/kafka:3.6
+    networks:
+      - kafka-net
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    volumes:
+      - ./app_data/kafka:/bitnami/kafka
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      # Listeners
+      - KAFKA_CFG_LISTENERS=LISTENER_EXTERNAL://kafka:9092,LISTENER_INTERNAL://kafka:29092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=LISTENER_EXTERNAL://localhost:9092,LISTENER_INTERNAL://kafka:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT,LISTENER_INTERNAL:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=LISTENER_INTERNAL

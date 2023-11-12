@@ -1,3 +1,4 @@
 openai
 grpcio
 grpcio-tools
+confluent-kafka

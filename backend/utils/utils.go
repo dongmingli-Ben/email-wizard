@@ -10,58 +10,6 @@ import (
 
 var N_EMAIL_RETREIVAL int32 = 25
 
-func ParsedUserEmailIDs(user_id int) ([]map[string]interface{}, error) {
-	res, err := clients.Query([]string{"email_id", "email_address"},
-		map[string]interface{}{"user_id": user_id}, "emails")
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func GetUserUnparsedEmails(emails []map[string]interface{}, email_address string,
-	user_id int) ([]map[string]interface{}, error) {
-	parsed_email_info, err := ParsedUserEmailIDs(user_id)
-	if err != nil {
-		return nil, err
-	}
-	email_ids := make(map[string]bool)
-	for _, info := range parsed_email_info {
-		if info["email_address"] != email_address {
-			continue
-		}
-		email_ids[info["email_id"].(string)] = true
-	}
-	unparsed_emails := make([]map[string]interface{}, 0)
-	for _, email := range emails {
-		if _, ok := email_ids[email["email_id"].(string)]; !ok {
-			unparsed_emails = append(unparsed_emails, email)
-		}
-	}
-	return unparsed_emails, nil
-}
-
-func StoreUserEmails(emails []map[string]interface{}, account map[string]interface{}, user_id int) error {
-	email_address := account["username"]
-	for _, email := range emails {
-		_, err := clients.AddRow(map[string]interface{}{
-			"user_id":          user_id,
-			"email_id":         email["email_id"],
-			"email_address":    email_address,
-			"mailbox_type":     account["protocol"],
-			"email_subject":    email["subject"],
-			"email_sender":     email["sender"],
-			"email_recipients": email["recipient"],
-			"email_date":       email["date"],
-			"email_content":    email["content"],
-			"event_ids":        []int32{},
-		}, "emails")
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 func GetUserEmailsFromAccount(account map[string]interface{}) ([]map[string]interface{}, error) {
 	all_emails := make([]map[string]interface{}, 0)
@@ -267,7 +215,7 @@ func PrepareAndRefreshEmailAccountCredentials(user_id int, account map[string]in
 		if err != nil {
 			return nil, err
 		}
-		if err = UpdateUserEmailAccountCredentials(user_id, account["username"].(string), creds); err == nil {
+		if err = UpdateUserEmailAccountCredentials(user_id, account["username"].(string), creds); err != nil {
 			return nil, err
 		}
 		return creds, nil

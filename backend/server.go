@@ -8,63 +8,37 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 
 	"email-wizard/backend/logger"
 	"email-wizard/backend/utils"
 )
 
-func UpdateUserEventsForAccount(user_id int, account map[string]interface{}) error {
-	// read recent emails from user email accounts (and store emails to DB)
-	emails, err := utils.GetUserEmailsFromAccount(account)
-	if err != nil {
-		return err
-	}
-
-	// filter for un-parsed emails
-	emails, err = utils.GetUserUnparsedEmails(emails, account["username"].(string), user_id)
-	if err != nil {
-		return err
-	}
-	for _, email := range emails {
-		// todo: atomic!
-		err = utils.StoreUserEmails([]map[string]interface{}{email}, account, user_id)
-		if err != nil {
-			return err
-		}
-		// parse into events
-		events, err := utils.ParseEmailToEvents(email, 5)
-		if err != nil {
-			return err
-		}
-		// store back to db
-		err = utils.StoreUserEvents(events, user_id,
-			email["email_id"].(string),
-			account["username"].(string))
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
-/* reads new emails, parses them into events, and store them in DB
-
- TODO: update client auth flow to auth code flow and eliminate the need of kwargs in the request
- */
-func updateAccountEvents(c *gin.Context) {
+/*
+TODO: update client auth flow to auth code flow and eliminate the need of kwargs in the request
+*/
+func updateAccountEventsAsync(c *gin.Context) {
 	var payload map[string]interface{}
 	if err := c.BindJSON(&payload); err != nil {
 		fmt.Println(io.ReadAll(c.Request.Body))
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": "Invalid JSON data"})
 		return
 	}
-	user_id, err := strconv.Atoi(c.Param("user_id"));
+	user_id, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
 		return
 	}
-	user_secret := c.Request.Header.Get("X-User-Secret");
+	user_secret := c.Request.Header.Get("X-User-Secret")
 	var email_address string
 	var kwargs map[string]interface{}
 	var ok bool
@@ -94,7 +68,8 @@ func updateAccountEvents(c *gin.Context) {
 		creds[key] = val
 	}
 	account["credentials"] = creds
-	err = UpdateUserEventsForAccount(user_id, account)
+	err = utils.UpdateUserEventsForAccountAsync(user_id, account)
+	// err = utils.UpdateUserEventsForAccount(user_id, account)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": err.Error()})
 		return
@@ -114,7 +89,7 @@ func searchEvents(c *gin.Context) {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
 	}
-	
+
 	query := c.Request.URL.Query().Get("query")
 	var events []map[string]interface{}
 	if query == "" {
@@ -130,8 +105,7 @@ func searchEvents(c *gin.Context) {
 		events, err = utils.SearchUserEvents(user_id, query)
 		if err != nil {
 			fmt.Println(err.Error())
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": 
-				fmt.Sprintf("fail to search for events with query: %s", query)})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("fail to search for events with query: %s", query)})
 			return
 		}
 	}
@@ -153,18 +127,18 @@ func getEmails(c *gin.Context) {
 	var account map[string]interface{}
 	if email_type == "IMAP" {
 		account = map[string]interface{}{
-			"protocol":    "IMAP",
-			"username":    username,
-			"credentials": map[string]interface{} {
+			"protocol": "IMAP",
+			"username": username,
+			"credentials": map[string]interface{}{
 				"password":    password,
 				"imap_server": q.Get("imap_server"),
 			},
 		}
 	} else {
 		account = map[string]interface{}{
-			"protocol":    "POP3",
-			"username":    username,
-			"credentials": map[string]interface{} {
+			"protocol": "POP3",
+			"username": username,
+			"credentials": map[string]interface{}{
 				"password":    password,
 				"imap_server": q.Get("imap_server"),
 			},
@@ -189,7 +163,7 @@ func addUserMailbox(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
 		return
 	}
-	user_secret := c.Request.Header.Get("X-User-Secret");
+	user_secret := c.Request.Header.Get("X-User-Secret")
 	var mailbox_type string
 	var mailbox_address string
 	var credentials map[string]interface{}
@@ -235,7 +209,7 @@ func updateUserMailbox(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
 		return
 	}
-	user_secret := c.Request.Header.Get("X-User-Secret");
+	user_secret := c.Request.Header.Get("X-User-Secret")
 	mailbox_address := c.Param("address")
 	var credentials map[string]interface{}
 	if _credentials, ok := payload["credentials"].(map[string]interface{}); !ok {
@@ -264,7 +238,7 @@ func removeUserMailbox(c *gin.Context) {
 		return
 	}
 	address := c.Param("address")
-	user_secret := c.Request.Header.Get("X-User-Secret");
+	user_secret := c.Request.Header.Get("X-User-Secret")
 	if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
 		c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
 		return
@@ -368,7 +342,7 @@ func main() {
 	router.Use(cors.New(config))
 	router.Use(logger.RequestLogger())
 	router.GET("/users/:user_id/events", searchEvents)
-	router.POST("/users/:user_id/events", updateAccountEvents)
+	router.POST("/users/:user_id/events", updateAccountEventsAsync)
 	router.GET("/verify_email", getEmails)
 	router.POST("/authenticate", authenticateUser)
 	router.GET("/users/:user_id/profile", getUserProfile)
@@ -376,6 +350,47 @@ func main() {
 	router.DELETE("/users/:user_id/mailboxes/:address", removeUserMailbox)
 	router.PUT("/users/:user_id/mailboxes/:address", updateUserMailbox)
 	router.POST("/users", addUser)
+
+	// websocket
+	hub := utils.NewHub()
+	router.GET("/ws/:user_id", func(c *gin.Context) {
+		defer logger.LogErrorStackTrace()
+		user_id, err := strconv.Atoi(c.Param("user_id"))
+		user_secret := c.Request.Header.Get("X-User-Secret")
+
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			logger.Error("fail to upgrade to websocket",
+				zap.String("error", err.Error()))
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "cannot upgrade to websocket"})
+			return
+		}
+
+		if user_secret == "" {
+			// expect the first message from client to be user_secret
+			_, msg, err := conn.ReadMessage()
+			if err != nil {
+				logger.Error("fail to read message from client",
+					zap.String("error", err.Error()))
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"errMsg": "cannot read message from client"})
+				return
+			}
+			user_secret = string(msg)
+			logger.Info("receives user_secret from client", zap.String("user_secret", user_secret))
+		}
+
+		if ok, err := utils.ValidateUserSecret(user_id, user_secret); err != nil || !ok {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"errMsg": fmt.Sprintf("wrong secret for user_id %v", user_id)})
+			return
+		}
+		if err != nil {
+			logger.Error("bad user_id",
+				zap.String("error", err.Error()))
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"errMsg": fmt.Sprintf("bad user_id: %v", c.Param("user_id"))})
+			return
+		}
+		utils.HandleWebSocketConnection(conn, user_id, hub)
+	})
 
 	// router.Run(":8080")
 	router.RunTLS(":8080", "cert/www.toymaker-ben.online.pem", "cert/www.toymaker-ben.online.key")

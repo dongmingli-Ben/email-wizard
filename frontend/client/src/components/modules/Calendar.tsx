@@ -370,6 +370,10 @@ const Calendar = (props: calendarProps) => {
   const [query, setQuery] = useState<string>("");
   const calendarRef = useRef(null);
 
+  const receivedEvents: { [key: string]: any }[] = [];
+  let receivedNewEvents: boolean = false;
+  let updateTimer: boolean = true;
+
   const prepareEventsForCalendar = (rawEvents: { [key: string]: string }[]) => {
     let events: { [key: string]: any }[] = [];
     for (const e of rawEvents) {
@@ -400,30 +404,58 @@ const Calendar = (props: calendarProps) => {
         (errMailboxes: string[]) => {
           console.log("Mailboxes in error:", errMailboxes);
           props.setErrorMailboxes(errMailboxes);
-          getEventsAPI(props.userId, props.userSecret, query).then(
-            (_events: { [key: string]: string }[]) => {
-              setEventStore(_events);
-              updateLocalSearchIndex(_events);
-            }
-          );
         }
       );
     }
-  }, [props.userInfo, props.toGetUserEvents]);
+  }, [props.userInfo, props.toGetUserEvents, updateTimer]);
+
+  setInterval(() => {
+    updateTimer = !updateTimer;
+  }, 1000 * 60 * 5);
 
   useEffect(() => {
-    console.log("retriving events for:", props.userInfo);
-    if (props.userInfo !== undefined) {
-      getEventsAPI(props.userId, props.userSecret, query).then(
-        (_events: { [key: string]: string }[]) => {
-          setEventStore(_events);
-          updateLocalSearchIndex(_events);
-        }
-      );
+    // initiate a websocket connection
+    if (props.userId <= 0 || props.userSecret.length === 0) {
+      console.log("not logged in, skip websocket connection");
+      return;
     }
-  }, [props.userInfo]);
+    const ws = new WebSocket(
+      backendConfig.ws.replace("{userId}", props.userId.toString())
+    );
+    ws.addEventListener("open", (event) => {
+      console.log("connected to websocket, sending authenication");
+      ws.send(props.userSecret);
+      console.log("sent authenication");
+    });
+    ws.addEventListener("message", (message) => {
+      // console.log("received message from websocket");
+      // console.log(message);
+      let event = JSON.parse(message.data);
+      receivedEvents.push(event);
+      receivedNewEvents = true;
+    });
+    ws.addEventListener("close", (event) => {
+      console.log("websocket closed");
+    });
+    return () => {
+      ws.close();
+    };
+  }, [props.userId, props.userSecret]);
+
+  setInterval(() => {
+    if (receivedNewEvents) {
+      console.log("received new events:", receivedEvents.length);
+      setEventStore([...receivedEvents]); // need to recreate the array, otherwise useEffect won't be triggered
+      // see https://stackoverflow.com/a/54621059/22896924
+      console.log("event store updated, length:", eventStore.length);
+      receivedNewEvents = false;
+      updateLocalSearchIndex(eventStore);
+    }
+  }, 500);
 
   useEffect(() => {
+    console.log("rerendering");
+    console.log("event store length:", eventStore.length);
     if (query === "") {
       setEvents(prepareEventsForCalendar(eventStore));
       return;
@@ -431,15 +463,6 @@ const Calendar = (props: calendarProps) => {
     let matchEvents = localSearch(query);
     let readyEvents = prepareEventsForCalendar(matchEvents);
     setEvents(readyEvents);
-
-    // return;
-    // getEventsAPI(props.userId, props.userSecret, query).then(
-    //   (resp: { [key: string]: string }[]) => {
-    //     console.log("query result:");
-    //     console.log(resp);
-    //     setEvents(resp);
-    //   }
-    // );
   }, [query, eventStore]);
 
   return (
