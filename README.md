@@ -12,6 +12,8 @@ Our service is available at [https://www.toymaker-ben.online/](https://www.toyma
 
 Note that the service is under development, so it may be inaccessible sometimes.
 
+See the [demo](https://acsweb.ucsd.edu/~dol031/projects/email-wizard)!
+
 ## Feature
 
 Extract events from various emails and present them in calendar
